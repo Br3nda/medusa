@@ -1,3 +1,3 @@
 <?
-define("CONFIG_OUTPUT", "xml");
+define("CONFIG_OUTPUT", "json");
 ?>
