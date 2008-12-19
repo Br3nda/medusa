@@ -1,9 +1,14 @@
 <?
 require_once('../lib/medusa/common.php');
 
-array_push($output,array('A','B','C','D'=>123));
-array_push($output,"Testing");
+$user = new user($db,$_GET['username']);
+echo $user->getFullName();
 
-// At this point, we should have a database connection, auth objects and way of pushing output.
+if (isset($_GET['username'])) {
+	$sql = 'SELECT * FROM request INNER JOIN usr ON usr.user_no=request.requester_id WHERE usr.username=\''.$_GET['username'].'\'';
+	foreach ($db->query($sql) as $row) {
+		array_push($output,$row);
+	}
+}
 
 ?>
