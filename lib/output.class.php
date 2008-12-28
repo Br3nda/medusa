@@ -14,7 +14,7 @@
 	if ($this->output_type == 'json')
 		echo json_encode($this->output);
 	else if ($this->output_type == 'xml')
-		echo xmlrpc_encode($this->output);
+		echo xmlrpc_encode($this->output); # This produces less than helpful output, we may have to roll our own
 	else echo "Unknown output type\n";
     }
   }
