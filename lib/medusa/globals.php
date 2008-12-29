@@ -3,7 +3,13 @@
 
 $dbconstring = CONFIG_DBTYPE.':host='.CONFIG_DBHOST.';dbname='.CONFIG_DBNAME;
 if (defined('CONFIG_DBPORT')) $dbconstring .= ';port='.CONFIG_DBPORT;
-$db = new PDO($dbconstring, CONFIG_DBUSER, CONFIG_DBPASS);
+try {
+    $db = new PDO($dbconstring, CONFIG_DBUSER, CONFIG_DBPASS);
+} 
+catch (Exception $e) {
+    echo "PDO Error when connecting: ". $e->getMessage();
+    exit;
+}
 
 // Really need to catch errors here
 
