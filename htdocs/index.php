@@ -15,7 +15,10 @@
  *   - @link /api/globals Global variables @endlink
 */
 
-$request = new request();
+require('../lib/request/request.class.php');
+
+$uri = $_SERVER['REQUEST_URI'];
+$request = new request($uri);
 $method = $request->method();
 $params = $request->params();
 $formats = $request->format();
@@ -23,7 +26,7 @@ $formats = $request->format();
 
 
 //TODO: Work out method
-* //if (is_callable($method)
+//if (is_callable($method)
 //TODO: Check method exists
 //TODO: Work out params
 //TODO Call method
@@ -31,12 +34,3 @@ $formats = $request->format();
 //TODO Encode as requested and ouput
 
 
-//will move later
-class request {
-  public function method() {
-  }
-  public function params() {
-  }
-  public function format() {
-  }
-}
