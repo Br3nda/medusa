@@ -1,4 +1,10 @@
 <?php
+/**
+ * @file
+ Errors
+ * @ingroup Error
+ */
+
 
 class error {
         protected $error = array();
