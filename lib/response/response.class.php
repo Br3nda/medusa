@@ -6,22 +6,22 @@
  */
 
 
-class error {
-        protected $error = array();
+class response {
+        protected $reponse = array();
 
         /**
-         * The return code for the error
+         * The return code for the response
          */
         function code($code) {
             assert(!is_null($code));
-            $this->error['code'] = $code;
+            $this->response['code'] = $code;
         }
         /**
          * The human readable message
          */
         function message($message) {
             assert(!is_null($message));
-            $this->error['message'] = $message;
+            $this->response['message'] = $message;
         }
 
         /**
@@ -33,18 +33,19 @@ class error {
         }
 
         /**
-         * So we can append to our error
+         * So we can append to our response
          */
         function message_append($message) {
             assert(!is_null($message));
-            $this->error['message'] .= ' ' . $message;
+            $this->response['message'] .= ' ' . $message;
         }
 
         /**
-         * Render the error, in whichever format we want
+         * Render the response, in whichever format we want
          */
         function render($type = 'html') {
-            switch ($type) {
+
+            switch (strtolower($type)) {
                 case 'html':
                     return $this->__render_html();
                     break;
@@ -52,7 +53,7 @@ class error {
                     return $this->__render_json();
                     break;
                 default:
-                    echo "Error: Unable to render error";
+                    return $this->__render_html();
                     break;
             }
         }
@@ -61,9 +62,9 @@ class error {
          * Yay for php5!
          */
         private function __render_html() {
-            return htmlentities($this->error['code'] . ": " . $this->error['message']);
+            return htmlentities($this->response['code'] . ": " . $this->response['message']);
         }
         private function __render_json() {
-            return json_encode($this->error);
+            return json_encode($this->response);
         }
 }
