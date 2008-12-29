@@ -178,6 +178,9 @@ class access {
     public function canUserSeeTask($taskid) {
 	return $this->getAccessLevel($taskid,'See');
     }
+
+    // Commented by ben to stop php errors
+    /*
 	if (is_int($task) && ($task > 0)) {
 
 
@@ -185,7 +188,7 @@ class access {
 			return true;
 	}
 	else return false;
-    }
+}*/
 
     public function canUserWrite($task) {
 	if (is_int($task) && ($task > 0)) {
