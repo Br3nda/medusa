@@ -1,4 +1,4 @@
-<?
+<?php
 // TODO: Add stuff that works out the database type and sets us up apropriately.
 
 $dbconstring = CONFIG_DBTYPE.':host='.CONFIG_DBHOST.';dbname='.CONFIG_DBNAME;
@@ -21,4 +21,3 @@ global $db, $output,$_output;
 #$_GLOBAL['db'] = $db;
 #$_GLOBAL['output'] = $output;
 
-?>
