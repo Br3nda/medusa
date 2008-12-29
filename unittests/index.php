@@ -1,2 +1,5 @@
 <?php
-echo 'Unittests arriving here soon';
+require_once('simpletest/autorun.php');
+
+class TestOfLogging extends UnitTestCase {
+}
