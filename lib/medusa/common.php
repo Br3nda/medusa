@@ -1,5 +1,7 @@
-<?
-
+<?php
+/**
+ *
+*/
 # We're probably supposed to do fancy webroot stuff here
 
 require_once ('../lib/config/general.php');
@@ -14,6 +16,4 @@ require_once ('../lib/medusa/globals.php');
 
 
 
-//Check that Everything is set up correctly?
-
-?>
+//TODO Check that Everything is set up correctly?
