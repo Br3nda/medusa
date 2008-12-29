@@ -1,9 +1,9 @@
 <?php
 /**
  * @file
- * The Search method
  * @ingroup Search
- */
+ * The Search method
+  */
 
 /**
  * @defgroup Search wrms.search
