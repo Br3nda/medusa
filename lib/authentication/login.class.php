@@ -6,6 +6,7 @@
  */
 
     include("../lib/medusa/common.php");
+    include("../lib/memcache/memcache.wrapper.class.php");
 
     /*
      * Nice and simple: do they have a valid login
@@ -50,14 +51,52 @@
         return false; 
     }
 
-    function create_session($userid, $response) {
+    /*
+     * Create a session for this user - if the user already has a session, give them their current one
+     * Allows multiple scripts to run at the same time and not cause each other to fail
+     */
+    function create_session($current_session, $response) {
+
+        // Check if we are already logged in - of so return our current session ID
+        if (is_logged_in($current_session, &$response)) {
+            return;
+        }
 
         $session_id = __generate_session_id();
 
-        // Write value to memcache
+        /*
+         * Write value to memcache
+         */
+        // If the write fails
+        if (!memcache::set('medusa_sessionid_'.$session_id, true)) {
+            $response->set('500', memcache::report_last_error()." (memcache::set)");
+            return;
+        }
 
-        $response->set('200', "Success");
-        $response->set_var('session_id', time().':'.rand(0000000000000,9999999999999)); 
+        // Ok, I know this is a bit pedantic and doubles the cost but it's better to be safe than sorry
+        if (!memcache::get('medusa_sessionid_'.$session_id)) {
+            $response->set('500', memcache::report_last_error()." (memcache::get)");
+            return;
+        }
+
+        // If we get this far we have a value in memcache, let the user login
+        $response->set('200', "Login Success");
+        $response->set_var('session_id', $session_id); 
+    }
+
+    function is_logged_in($session_id, $response) {
+        if (memcache::get('medusa_sessionid_'.$session_id)) {
+            // Refresh their session
+            if (!memcache::set('medusa_sessionid_'.$session_id, true)) {
+                $response->set('500', memcache::report_last_error()." (memcache::set)");
+                return;
+            }
+            $response->set('200', 'Login still valid');
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     function __generate_session_id() {

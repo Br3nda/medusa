@@ -6,6 +6,7 @@ $response = new response();
 $username = $_POST['username']; # Don't allow logins via GET
 $password = $_POST['password']; # Don't allow logins via GET
 $format = $_GET['format']; # What format do we want
+$session_id = $_POST['session_id']; # What format do we want
 
 /*
  * Make sure we were called properly
@@ -26,7 +27,7 @@ if (check_credentials($username, $password, &$userid, &$response)) {
      * Make a session and all that lovely stuff
      */
     echo "Login success";
-    create_session($userid, &$response);
+    create_session($session_id, &$response);
     echo $response->render($format);
 } 
 else {
