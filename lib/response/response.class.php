@@ -38,6 +38,11 @@ class response {
       assert(!is_null($message));
       $this->response['message'] .= ' ' . $message;
     }
+    function set_var($name, $value) {
+        assert(!is_null($name));
+        assert(!is_null($value));
+        $this->response[$name] = $value;
+    }
   
   /**
     * Render the response, in whichever format we want
@@ -61,7 +66,11 @@ class response {
     * Yay for php5!
     */
     private function __render_html() {
-      return htmlentities($this->response['code'] . ": " . $this->response['message']);
+        $html = "<br />Response:<br />";
+        foreach($this->response as $k => $v) {
+            $html .= htmlentities("'$k' : '$v'").'<br />';
+        }
+        return $html;
     }
   private function __render_json() {
     return json_encode($this->response);
