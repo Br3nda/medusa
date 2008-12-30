@@ -21,11 +21,15 @@ if (is_null($password)) {
     return;
 }
 
-if (check_credentials($username, $password)) {
-    
+if (check_credentials($username, $password, &$userid, &$response)) {
+    /*
+     * Make a session and all that lovely stuff
+     */
+    echo "Login success";
+    create_session($userid, &$response);
+    echo $response->render($format);
 } 
 else {
-    $response->set(403, "Invalid username or password");
     echo $response->render($format);
 }
 
