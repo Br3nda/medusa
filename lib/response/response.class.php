@@ -38,6 +38,7 @@ class response {
       assert(!is_null($message));
       $this->response['message'] .= ' ' . $message;
     }
+    
     function set_var($name, $value) {
         assert(!is_null($name));
         assert(!is_null($value));
@@ -72,9 +73,9 @@ class response {
         }
         return $html;
     }
-  private function __render_json() {
-    return json_encode($this->response);
-  }
+    private function __render_json() {
+        return json_encode($this->response);
+    }
 }
 
 /**

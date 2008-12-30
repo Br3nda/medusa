@@ -60,7 +60,7 @@
         $response->set_var('session_id', time().':'.rand(0000000000000,9999999999999)); 
     }
 
-    private function __generate_session_id() {
+    function __generate_session_id() {
         return time().':'.rand(0000000000000,9999999999999);
     }
 

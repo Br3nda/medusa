@@ -3,6 +3,8 @@ require_once('simpletest/autorun.php');
 
 
 require('../lib/request/request.class.php');
+require('../lib/response/response.class.php');
+require('../lib/authentication/login.class.php');
 
 class TestRequestParsing extends UnitTestCase {
   function testParsing() {
@@ -14,6 +16,13 @@ class TestRequestParsing extends UnitTestCase {
     $param = $request->get_method();
     $this->assertEqual($param['user'], 'brenda');
     $this->assertEqual(sizeof($param), 1);
-  }
-    
+  } 
+}
+
+class TestLogin extends UnitTestCase {
+    function testLogin() {
+        $response = new response();
+        $this->assertFalse(check_credentials('user', 'password', &$userid, &$response));
+        
+    }
 }
