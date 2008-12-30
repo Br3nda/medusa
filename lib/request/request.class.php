@@ -1,4 +1,13 @@
 <?php
+/**
+ * @defgroup Requests
+ */
+
+/**
+ * @ingroup Request
+ * Parses the URI, works out what methods to call.
+ */
+
 class Request {
   private $_uri_;
   function __construct($uri) {
