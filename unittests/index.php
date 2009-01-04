@@ -9,14 +9,15 @@
  * @defgroup Unittests
  * @link http://www.simpletest.org/en/start-testing.html Simple test quick start @endlink
  */
-
-
-require_once('simpletest/autorun.php');
-require_once('../lib/request/request.class.php');
+ 
+require('config/always.inc.php');
+require('simpletest/autorun.php');
 
 /**
  * @ingroup Unittests
  */
+
+/*
 class TestRequestParsing extends UnitTestCase {
   function testParsing() {
     $request = new Request('/search.xml?user=brenda');
@@ -31,8 +32,7 @@ class TestRequestParsing extends UnitTestCase {
     
 }
 
-require('../lib/request/request.class.php');
-
+/*
 class testSearch extends UnitTestCase {
   function testSearch() {
     //TODO
@@ -55,5 +55,13 @@ class testDatabase extends UnitTestCase {
     $result = db_query("SELECT * FROM users");
     $this->assertTrue($result != false);
     
+  }
+}
+*/
+
+class TestLogin extends UnitTestCase {
+  function testLogin() {
+    $response = new response();
+    //$this->assertFalse(check_credentials('user', 'password', &$userid, &$response));
   }
 }
