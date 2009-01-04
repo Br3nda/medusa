@@ -49,11 +49,7 @@ class response {
     * Render the response, in whichever format we want
     */
     function render($type = 'html') {
-      
       switch (strtolower($type)) {
-        case 'html':
-          return $this->__render_html();
-        break;
         case 'json':
           return $this->__render_json();
         break;
@@ -68,8 +64,13 @@ class response {
     */
     private function __render_html() {
         $html = "<br />Response:<br />";
-        foreach($this->response as $k => $v) {
-            $html .= htmlentities("'$k' : '$v'").'<br />';
+        if (is_array($this->response)) {
+	        foreach($this->response as $k => $v) {
+	            $html .= htmlentities("'$k' : '$v'").'<br />';
+	        }
+        }
+        else {
+        	return '<p>No response</p>';
         }
         return $html;
     }
