@@ -10,35 +10,24 @@ class user {
   private $db;
   private $org; # Link to org object
   
-  function __construct($_db, $_user) {
-    #Foobar hax, it's meant to be a global, but apparently we can't have that. Bitches.
-    //Use the static!
- 
-    $this->db = $_db;
-    if (is_string($_user) && (preg_match('/^[a-zA-Z0-9]+$/', $_user))) {
-      $sql = 'SELECT * FROM usr WHERE usr.username=\''.$_user.'\'';
+  function __construct($user) {
+
+    if (intval($user) || is_int($user) && ($user > 0)) {
+      $result = db_query("SELECT * FROM usr WHERE usr.user_no=%d", $user);
     }
-    else if (is_int($_user) && ($_user > 0)) {
-      $sql = 'SELECT * FROM usr WHERE usr.user_no=\''.$_user.'\'';
+    elseif (is_string($user) && (preg_match('!^[a-zA-Z0-9]+$!', $user))) {
+      $result = db_query("SELECT * FROM usr WHERE usr.username='%s'", $user);
     }
     else {
-      return false; # Boomshakalaka
+      return false; 
     }
     
-    if (isset($sql)) {
-      if (!isset($this->db)) {
-        echo "ETWTF?!? NoDBFTL!";
-      }
-      $result = $this->db->query($sql)->fetchAll();
-      if (count($result) != 1) {
-        return false; # Wrong! Try! Again!
-      }
-      else {
-        $this->username = $result[0]['username'];
-        $this->userfullname = $result[0]['fullname'];
-        $this->userid = $result[0]['user_no'];
-        $this->orgid = $result[0]['org_code'];
-      }
+    if (!$result) {
+      return false; 
+    }
+    $object = db_fetch_object($result);
+    foreach($object as $key => $val) {
+    	$this->$key = $val;	
     }
   }
   
@@ -71,33 +60,24 @@ class org {
   private $orgabbrev;
   private $adminid;
   private $db;
-  
-  function __construct($db, $orgid) {
+
+  /**
+    * Pulls org from database
+    */
+  function __construct($orgid) {
+ 
+    $result = db_query("SELECT * FROM org WHERE org.ordcode='%d'", $orgid);
     
-    $this->db = $db;
-    
-    if (is_int($orgid) && ($_user > 0)) {
-      $sql = 'SELECT * FROM org WHERE org.ordcode=\''.$orgid.'\'';
+    if (!$result) {
+      return false; # Wrong! Try! Again!
     }
-    else {
-      return false; # no org for you
-    }
-    
-    if (isset($sql)) {
-      if (!isset($this->db)) {
-        echo "Bad mojo";
-      }
-      $result = $this->db->query($sql)->fetchAll();
-      if (count($result) != 1) {
-        return false; # Wrong! Try! Again!
-      }
-      else {
-        $this->orgname = $result[0]['org_name'];
-        $this->orgabbrev = $result[0]['abbreviation'];
-        $this->orgid = $result[0]['org_code'];
-        $this->ownerid = $result[0]['admin_user_no'];
-      }
-    }
+    $record = db_fetch_object($result);
+
+    $this->orgname = $record->org_name;
+    $this->orgabbrev = $record->abbreviation;
+    $this->orgid = $record->org_code;
+    $this->ownerid = $record->admin_user_no;
+
   }
   
   public function getOrgName() {
