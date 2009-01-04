@@ -13,24 +13,36 @@
  *   - @link /api/groups Topics @endlink
  *   - @link /api/constants Constants @endlink
  *   - @link /api/globals Global variables @endlink
-*/
+ */
 
-require('../lib/request/request.class.php');
+require_once('medusa/common.php');
 
 $uri = $_SERVER['REQUEST_URI'];
 $request = new request($uri);
-$method = $request->method();
-$params = $request->params();
-$formats = $request->format();
+$method = $request->get_method();
+$params = $request->get_params();
+$format = $request->get_format();
+error_logging('DEBUG', "method=$method params=$params format=$format");
+
+if (!$method) {
+	error_logging('WARNING', "No method");
+	$result = new error("Method required");
+}
+elseif(!$format) {
+	$result = new error("Format required");
+}
+elseif (class_exists($method)) {
+	error_logging('DEBUG', "method $method exists");
+	$class = new $method();
+	error_logging('DEBUG', "about to run $method");
+	$result = $class->run();
+}
+else {
+	error_logging('WARNING', "Method $method does not exist");
+	$result = new error("$method does not exist");	
+}
 
 
-
-//TODO: Work out method
-//if (is_callable($method)
-//TODO: Check method exists
-//TODO: Work out params
-//TODO Call method
-//TODO Work out form (xml? json? yaml?)
-//TODO Encode as requested and ouput
-
-
+$response = new response($result);
+error_logging('DEBUG', "Sending response");
+echo $response->render($format);
