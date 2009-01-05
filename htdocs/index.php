@@ -13,6 +13,17 @@
  *   - @link /api/groups Topics @endlink
  *   - @link /api/constants Constants @endlink
  *   - @link /api/globals Global variables @endlink
+ * 
+ * Auth 
+ */
+
+
+/**
+ * @file 
+ * Every request goes through this file
+ * 
+ * e.g. http://api.wrms.com/wrms.get
+ * 
  */
 
 require_once('medusa/common.php');
