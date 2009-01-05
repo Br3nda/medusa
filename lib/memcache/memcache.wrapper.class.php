@@ -1,7 +1,6 @@
 <?php
 
-include("../lib/memcache/memcache.class.php");
-include("../lib/config/general.php");
+require("memcache/memcache.class.php");
 
 class memcache {
     private static $memcache = null;
@@ -27,5 +26,3 @@ class memcache {
     }
 
 }
-
-?>
