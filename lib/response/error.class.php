@@ -1,7 +1,8 @@
 <?php
 
 class error {
-
-    function error() {
+	public $message;
+    function error($message) {
+    	$this->message = $message;
     }
 }
