@@ -6,9 +6,8 @@
 */
 
 /**
-* @defgroup Database
-* Database Object
-* Any database specific requests should be made here.
+* @defgroup Database Database Queries
+* 
 * @{
 */
 class db {
@@ -150,9 +149,28 @@ class db {
 }//end class
 
 /**
-* function to query database, easier to call that db::query
-* @param query string
-* @param parameters of query string
+ * Runs a basic query in the active database.
+ *
+ * User-supplied arguments to the query should be passed in as separate
+ * parameters so that they can be properly escaped to avoid SQL injection
+ * attacks.
+ *
+ * @param $query
+ *   A string containing an SQL query.
+ * @param ...
+ *   A variable number of arguments which are substituted into the query
+ *   using sprintf() syntax. Instead of a variable number of query arguments,
+ *   you may also pass a single array containing the query arguments.
+ *
+ *   Valid %-modifiers are: %s, %d, %f, %b (binary data, do not enclose
+ *   in '') and %%.
+ *
+ *   NOTE: using this syntax will cast NULL and FALSE values to decimal 0,
+ *   and TRUE values to decimal 1.
+ *
+ * @return
+ *   A database query result resource, or FALSE if the query was not
+ *   executed correctly.
 */
 function db_query($query){
   static $watch;
