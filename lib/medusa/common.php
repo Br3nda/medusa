@@ -6,7 +6,7 @@
  * Window - Preferences - PHPeclipse - PHP - Code Templates
  */
 
-require('request/request.class.php');
+require('medusa/uri_parser.class.php');
 require('response/error.class.php');
 require('response/response.class.php');
 require('authentication/login.class.php');
