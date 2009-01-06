@@ -200,7 +200,128 @@ class access {
     return (is_int($task) && ($task > 0));
   }
   
-  
+  //Massive number of permission stubs following
+  //May need to be simplified down eventually
+  //Will need to review arguments
+  public function canUserSeeRequest($wr) {
+      return true;
+  }
+
+  public function canUserCreateRequest() {
+      return true;
+  }
+
+  public function canUserEditRequest($wr) {
+      return true;
+  }
+
+  public function canUserAlterStatus($wr) {
+      return true;
+  }
+
+  public function canUserSeeStatus($wr) {
+      return true;
+  }
+
+  public function canUserSeeFiles($wr) {
+      return true;
+  }
+
+  public function canUserAddFile($wr) {
+      return true;
+  }
+
+  public function canUserRemoveFile($wr) {
+      return true;
+  }
+
+  public function canUserGetQuotes($wr) {
+      return true;
+  }
+
+  public function canUserAddQuote($wr) {
+      return true;
+  }
+
+  public function canUserApproveQuote($wr) {
+      return true;
+  }
+
+  public function canUserInvoiceQuote($wr) {
+      return true;
+  }
+
+  public function canUserGetWRTimesheets($wr) {
+      return true;
+  }
+
+  public function canUserGetSelfTimesheets() {
+      return true;
+  }
+
+  public function canUserAddTimesheets() {
+      return true;
+  }
+
+  public function canUserRemoveTimesheets($wr) {
+      return true;
+  }
+
+  public function canUserInvoiceTimesheets($wr) {
+      return true;
+  }
+
+  public function canUserAddSubscriber($wr) {
+      return true;
+  }
+
+  public function canUserGetSubscribers($wr) {
+      return true;
+  }
+
+  public function canUserRemoveSubscribers($wr) {
+      return true;
+  }
+
+  public function canUserAllocatePeople($wr) {
+      return true;
+  }
+
+  public function canUserGetAllocatedPeople($wr) {
+      return true;
+  }
+
+  public function canUserRemoveAllocatedPeople($wr) {
+      return true;
+  }
+
+  public function canUserAddQAAction($wr) {
+      return true;
+  }
+
+  public function canUserGetQAActions($wr) {
+      return true;
+  }
+
+  public function canUserAddRelations($wr) {
+      return true;
+  }
+
+  public function canUserGetRelations($wr) {
+      return true;
+  }
+
+  public function canUserRemoveRelations($wr) {
+      return true;
+  }
+
+  public function canUserGetNotes($wr) {
+      return true;
+  }
+
+  public function canUserAddNote($wr) {
+      return true;
+  }
 }
 
 /**
