@@ -29,9 +29,9 @@ class TestRequestParsing extends UnitTestCase {
     $this->assertEqual($request->get_method(), 'search');
     $this->assertEqual($request->get_format(), 'xml');
 
-    $param = $request->get_method();
-    //$this->assertEqual($param['user'], 'brenda');
-    //$this->assertEqual(sizeof($param), 1);
+    $param = $request->get_params();
+    $this->assertEqual($param['user'], 'brenda');
+    $this->assertEqual(sizeof($param), 1);
     
     
     $request = new Uri_Parser('/wrms.request.get_request.xml?user=brenda');
@@ -39,9 +39,9 @@ class TestRequestParsing extends UnitTestCase {
     $this->assertEqual($request->get_method(), 'wrms.request.get_request');
     $this->assertEqual($request->get_format(), 'xml');
 
-    $param = $request->get_method();
-    //$this->assertEqual($param['user'], 'brenda');
-    //$this->assertEqual(sizeof($param), 1);
+    $param = $request->get_params();
+    $this->assertEqual($param['user'], 'brenda');
+    $this->assertEqual(sizeof($param), 1);
     
   }
    
