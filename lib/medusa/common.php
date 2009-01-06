@@ -20,5 +20,9 @@ require_once('medusa/globals.php');
 require_once('logging/logging.inc.php');
 
 function __autoload($class_name) {
-    require_once('lib/' . $class_name . '.php');
+    $filename = 'methods/' . $class_name . '.php';
+    error_logging('DEBUG', "Including class: $filename");
+    if (is_file($filename)) {
+      include_once($filename);
+    }
 }
