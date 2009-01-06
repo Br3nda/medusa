@@ -11,6 +11,8 @@ require('response/error.class.php');
 require('response/response.class.php');
 require('authentication/login.class.php');
 
+require('methods/search.class.php');
+
 require_once('config/general.php');
 require_once('config/database.php');
 require_once('authentication/session.class.php');
