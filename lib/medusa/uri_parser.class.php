@@ -1,18 +1,28 @@
 <?php
 /**
- * @defgroup Requests
+ * @defgroup Uri_Parse Uri Parser
+ * Parses requests to the RESTFUL api, and works out what code to run
  */
 
 /**
- * @ingroup Request
+ * @ingroup Uri_Parser 
  * Parses the URI, works out what methods to call.
  */
-
 class Uri_Parser {
   private $_uri_;
   function __construct($uri) {
     $this->_uri_ = $uri;
-    $bits = split('/', $uri);
+    $bits = split('\.|/|\?', $uri);
+    $this->_method_ = $bits[1];
+    $this->_format_ = $bits[2];
+    
+    $raw_params = $bits[3];
+    foreach(split(';', $raw_params) as $variable) {
+    	echo $variable;
+    	$bits = split('=', $variable);
+    	$params[$bits[0]] = $bits[1];
+    }
+    $this->_params_ = $params;
   }
   
   public function get_method() {
@@ -27,15 +37,3 @@ class Uri_Parser {
   
 }
 
-/** 
- * @ingroup Methods
- * 
- */
-class wrms_request_getRequest {
-	function run($params) {
-		$request_id = $params['request_id'];
-		$result = db_query('SELECT * FROM request WHERE request_id = %d', $request_id);
-		$object = db_fetch_object($result);
-		return $object; 
-	} 
-}
