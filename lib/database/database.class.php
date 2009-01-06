@@ -6,9 +6,9 @@
 */
 
 /**
-* @defgroup Database Database Queries
-* 
-* @{
+ * @defgroup Database Database Queries
+*  For people hacking on medusa 
+ * @{
 */
 class db {
   
@@ -148,6 +148,56 @@ class db {
     }
 }//end class
 
+
+ /**
+  * recording load times and queries
+  */
+class stopwatch
+ {
+         //start time
+         private $start;
+
+         //stop time
+         private $stop;
+
+         private $recordset = array();
+
+         public function __construct(){
+                 $this->start = date('U');
+         }
+
+         public function reset(){
+                 $this->recordset = array();
+                 $this->start = date('U');
+         }
+
+         public function stop(){
+                 $this->stop = date('U');
+                 $this->recordset[] = $this->stop - $this->start;
+                 if (count($this->recordset) > 1){
+                         return $this->recordset;
+                 }
+                 return $this->stop - $this->start;
+         }
+
+         public function getTime(){
+                 if ($this->start > $this->stop){
+                         $this->stop = date('U');
+                 }
+                 if (count($this->recordset) > 1){
+                         return $this->recordset;
+                 }
+                 return $this->stop - $this->start;
+         }
+
+         public function split(){
+                 $this->recordset[] = date('U') - $this->start;
+                 $this->start = date('U');
+         }
+ }
+
+
+
 /**
  * Runs a basic query in the active database.
  *
@@ -182,17 +232,17 @@ function db_query($query){
     $query = preg_replace_callback('/(%d|%s|%f|%b)/','_sort_db_query',$query);
   }
   //Record time to make query
-  errorLogging('DEBUG-SQL',$query);
+  error_logging('DEBUG-SQL',$query);
   $watch->reset();
   $rs = db::query($query);
   $time = $watch->stop();
   if ($time > 1 && !DEBUG_MODE){
     $query = preg_replace('/\\n/','', $query);
-    errorLogging("ERROR", "SQL Query Took $time seconds: $query");
+    error_logging("ERROR", "SQL Query Took $time seconds: $query");
   }
   if (!$rs){
     $query = preg_replace('/\\n/','', $query);
-    errorLogging("ERROR", "SQL query failed: $query");
+    error_logging("ERROR", "SQL query failed: $query");
   }
   return $rs;
 }
@@ -295,3 +345,22 @@ function db_block_query($query){
 function db_commit($bool = true){
   return db::commit($bool);
 }
+
+/**
+ * Perform an SQL query and return success or failure.
+ *
+ * @param $sql
+ *   A string containing a complete SQL query.  %-substitution
+ *   parameters are not supported.
+ * @return
+ *   An array containing the keys:
+ *      success: a boolean indicating whether the query succeeded
+ *      query: the SQL query executed, passed through check_plain()
+ */
+function update_sql($sql) {
+  $result = db_query($sql, true);
+  return array('success' => $result !== FALSE, 'query' => check_plain($sql));
+}
+
+
+
