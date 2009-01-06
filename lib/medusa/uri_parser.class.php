@@ -7,6 +7,9 @@
 /**
  * @ingroup Uri_Parser 
  * Parses the URI, works out what methods to call.
+ * 
+ * example http request = http://api.wrms.com/wrms.request.getRequest.xml?request_id=123
+ * where the method is  wrms.request.getRequest, the format is xml, and the params are request_id=>123
  */
 class Uri_Parser {
   private $_uri_;
