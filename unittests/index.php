@@ -10,17 +10,20 @@
  * @link http://www.simpletest.org/en/start-testing.html Simple test quick start @endlink
  */
  
-require('config/always.inc.php');
+ 
+ 
+ set_include_path(get_include_path() . PATH_SEPARATOR . realpath('../lib'));
+require('medusa/common.php');
 require('simpletest/autorun.php');
 
 /**
  * @ingroup Unittests
  */
 
-/*
+
 class TestRequestParsing extends UnitTestCase {
   function testParsing() {
-    $request = new Request('/search.xml?user=brenda');
+    $request = new Uri_Parser('/search.xml?user=brenda');
     
     $this->assertEqual($request->get_method(), 'search');
     $this->assertEqual($request->get_format(), 'xml');
