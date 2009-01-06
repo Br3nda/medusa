@@ -15,15 +15,32 @@ class Uri_Parser {
   private $_uri_;
   function __construct($uri) {
     $this->_uri_ = $uri;
-    $bits = split('\.|/|\?', $uri);
-    $this->_method_ = $bits[1];
-    $this->_format_ = $bits[2];
-    
-    $raw_params = $bits[3];
-    foreach(split(';', $raw_params) as $variable) {
-    	echo $variable;
-    	$bits = split('=', $variable);
-    	$params[$bits[0]] = $bits[1];
+    $section1 = '';
+    $section2 = '';
+    $raw_params = '';
+    $in_params = false;
+    for($i = 0; $i < strlen($uri); $i++) {
+      if (($uri[$i] == '.') && !$in_params) {
+        $section1 .= $section2;
+        $section2 = '';
+      }
+      if (($uri[$i] == '?') && !$in_params) {
+        $in_params = true;
+        $this->_method_ = substr($section1, 1);
+        $this->_format_ = substr($section2, 1);
+      }
+      if (!$in_params) {
+        $section2 .= $uri[$i];
+      }
+      if ($in_params) {
+        $raw_params .= $uri[$i];
+      }
+    }
+    $raw_params = substr($raw_params, 1);
+    foreach(split('&', $raw_params) as $variable) {
+      echo $variable;
+      $bits = split('=', $variable);
+      $params[$bits[0]] = $bits[1];
     }
     $this->_params_ = $params;
   }
