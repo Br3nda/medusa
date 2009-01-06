@@ -21,8 +21,8 @@ class search {
                         return $this->searchWorkRequests();
                         break;
                 default:
-                        error_logging('WARNING', "Search type $paramters['type'] doesn't exist.");
-                        break
+                        error_logging('WARNING', "Search type ". $paramters['type']." doesn't exist.");
+                        break;
                 }
             }
     }
