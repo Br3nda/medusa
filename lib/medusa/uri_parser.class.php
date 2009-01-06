@@ -38,7 +38,6 @@ class Uri_Parser {
     }
     $raw_params = substr($raw_params, 1);
     foreach(split('&', $raw_params) as $variable) {
-      echo $variable;
       $bits = split('=', $variable);
       $params[$bits[0]] = $bits[1];
     }

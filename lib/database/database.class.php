@@ -83,16 +83,16 @@ class db {
     */
     public static function init(){
       $msg = '';
-      if (!defined('DB')){
+      if (!defined('CONFIG_DBNAME')){
         $msg = "Database Is Not Defined.";
       }
-      if (!defined('HOST')){
-        $msg .= "HOST Is Not Defined.";
+      if (!defined('CONFIG_DBHOST')){
+        $msg .= "CONFIG_DBHOST Is Not Defined.";
       }
-      if (!defined('USER')){
+      if (!defined('CONFIG_DBUSER')){
         $msg .= "Username Is Not Defined.";
       }
-      if (!defined('PORT')){
+      if (!defined('CONFIG_DBPORT')){
         $msg .= "Port Is Not Defined.";
       }
       if (!empty($msg)){
@@ -110,7 +110,7 @@ class db {
         return self::$con;
       }
       if (self::init()){
-        $str = 'host='.HOST.' dbname='.DB.' user='.USER . ' port='.PORT;
+        $str = 'host='.CONFIG_DBHOST.' dbname='.CONFIG_DBNAME.' user='.CONFIG_DBUSER . ' port='.CONFIG_DBPORT;
         self::$con = pg_connect($str);
         if (!self::$con){
           errorLogging('CRITICAL', "Could not connect to database: $str");
@@ -311,7 +311,7 @@ function db_num_rows($rs){
 * @param recordset
 * @param offset of row
 */
-function db_fetch_obj($result, $int = false){
+function db_fetch_object($result, $int = false){
   if ($result && is_int($int)){
     return pg_fetch_object($result, $int);
   } elseif ($result){

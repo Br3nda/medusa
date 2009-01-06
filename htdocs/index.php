@@ -47,13 +47,12 @@ elseif (class_exists($method)) {
 	error_logging('DEBUG', "method $method exists");
 	$class = new $method();
 	error_logging('DEBUG', "about to run $method");
-	$result = $class->run();
+	$result = $class->run($params);
 }
 else {
 	error_logging('WARNING', "Method $method does not exist");
 	$result = new error("$method does not exist");	
 }
-
 
 $response = new response($result);
 error_logging('DEBUG', "Sending response");
