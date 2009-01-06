@@ -6,7 +6,8 @@
 
 
 class response {
-  protected $reponse = array();
+  protected $reponse;
+  private $thing;
   
   /**
     * The return code for the response
@@ -48,15 +49,12 @@ class response {
   /**
     * Render the response, in whichever format we want
     */
-    function render($type = 'html') {
-      switch (strtolower($type)) {
-        case 'json':
-          return $this->__render_json();
-        break;
-        default:
-          return $this->__render_html();
-        break;
-      }
+    function render($format = 'html') {
+    	$method = '__render_' . $format;
+    	if(is_callable($this->$method)) {
+    		return $this->$method;
+    	}
+    	else return $this->__render_html();
     }
   /**
     * Private functions - we don't want others calling these directly
@@ -64,7 +62,7 @@ class response {
     */
     private function __render_html() {
         $html = "<br />Response:<br />";
-        if (is_array($this->response)) {
+        if (is_object($this->response)) {
 	        foreach($this->response as $k => $v) {
 	            $html .= htmlentities("'$k' : '$v'").'<br />';
 	        }
@@ -77,10 +75,23 @@ class response {
     private function __render_json() {
         return json_encode($this->response);
     }
+    private function __render_xml() {
+    	return 'hello';
+    }
+    
+    function response($thing) {
+    	$this->response = $thing;
+    }
 }
 
 /**
-* @defgroup Response wrms.response
-* Send to the requestee
-*
-*/
+ * @defgroup Response Medusa Response
+ * encodes the result of the method call, into the requested format
+ *  e.g.
+ *  - html
+ *  - json
+ *  - csv
+ *  - yaml
+ *  - tetris
+ *
+ */

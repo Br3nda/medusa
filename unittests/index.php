@@ -7,29 +7,44 @@
 
 /**
  * @defgroup Unittests
+ * 
  * @link http://www.simpletest.org/en/start-testing.html Simple test quick start @endlink
  */
  
-require('config/always.inc.php');
+ 
+ 
+set_include_path(get_include_path() . PATH_SEPARATOR . realpath('../lib/'));
+
+require('medusa/common.php');
 require('simpletest/autorun.php');
+
 
 /**
  * @ingroup Unittests
  */
-
-/*
 class TestRequestParsing extends UnitTestCase {
   function testParsing() {
-    $request = new Request('/search.xml?user=brenda');
+    $request = new Uri_Parser('/search.xml?user=brenda');
     
     $this->assertEqual($request->get_method(), 'search');
     $this->assertEqual($request->get_format(), 'xml');
 
-    $param = $request->get_method();
+    $param = $request->get_params();
     $this->assertEqual($param['user'], 'brenda');
     $this->assertEqual(sizeof($param), 1);
-  }
     
+    
+    $request = new Uri_Parser('/wrms.request.get_request.xml?user=brenda');
+    
+    $this->assertEqual($request->get_method(), 'wrms.request.get_request');
+    $this->assertEqual($request->get_format(), 'xml');
+
+    $param = $request->get_params();
+    $this->assertEqual($param['user'], 'brenda');
+    $this->assertEqual(sizeof($param), 1);
+    
+  }
+   
 }
 
 /*
@@ -58,10 +73,10 @@ class testDatabase extends UnitTestCase {
   }
 }
 */
-
+/*
 class TestLogin extends UnitTestCase {
   function testLogin() {
-    $response = new response();
+    //$response = new response();
     //$this->assertFalse(check_credentials('user', 'password', &$userid, &$response));
   }
-}
+}*/

@@ -29,11 +29,12 @@
 require_once('medusa/common.php');
 
 $uri = $_SERVER['REQUEST_URI'];
-$request = new request($uri);
-$method = $request->get_method();
-$params = $request->get_params();
-$format = $request->get_format();
-error_logging('DEBUG', "method=$method params=$params format=$format");
+$Uri_Parser = new Uri_Parser($uri);
+$method = $Uri_Parser->get_method();
+$params = $Uri_Parser->get_params();
+$format = $Uri_Parser->get_format();
+$method = str_replace('.', '_', $method);
+error_logging('DEBUG', "method=$method params=".print_r($params, true)." format=$format");
 
 if (!$method) {
 	error_logging('WARNING', "No method");
