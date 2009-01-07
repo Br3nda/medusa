@@ -62,7 +62,7 @@ class test_wrms_request_allocated_getAllocated extends UnitTestCase {
 		$result = $class->run($params);
 		$this->assertTrue(is_array($result));
 		$this->assertEqual(sizeof($result), 4);
-		foreach($result as $r) {
+		foreach ($result as $r) {
 			$this->assertEqual('user', get_class($r));
 		}
 	}	
@@ -92,13 +92,16 @@ class CodeStyleTest extends UnitTestCase {
    function pathToCode() {
      $dirs = array(realpath($_SERVER['DOCUMENT_ROOT'] . '/..'));
      $dirs = $this->addSubFolders($dirs);
+     $dirs = $this->addSubFolders($dirs);
      return $dirs;
    }
    function testCodeStyle() {
+
      $codestyle = $_SERVER['DOCUMENT_ROOT'] . '/code-style.pl';
 
-     foreach($this->pathToCode() as $dir) {
-       if (preg_match('!\.\.$!', $dir)) {
+     foreach ($this->pathToCode() as $dir) {
+     	
+       if (preg_match('!\.!', $dir)) {
          continue;
        }
 
@@ -108,7 +111,7 @@ class CodeStyleTest extends UnitTestCase {
          return false;
        }
 
-       while($entry = $d->read()) {
+       while ($entry = $d->read()) {
 
          if (!preg_match('!\.inc$!', $entry) && !preg_match('!\.php$!', $entry)) {
            continue;
@@ -118,7 +121,7 @@ class CodeStyleTest extends UnitTestCase {
 
          $line_num = 1;
          $full_code = '';
-         foreach($code_lines as $l) {
+         foreach ($code_lines as $l) {
            $full_code .= "$line_num $l\n";
            $line_num++;
          }
@@ -131,7 +134,7 @@ class CodeStyleTest extends UnitTestCase {
           */
          $lines = split("\n", $result);
 
-         foreach($lines as $line) {
+         foreach ($lines as $line) {
            if (!$this->asserttrue(empty($line), $line)) {
              preg_match("!$dir/$entry:([0-9]+): !", $line, $matches);
              $code = $code_lines[$matches[1] -1];
@@ -141,7 +144,7 @@ class CodeStyleTest extends UnitTestCase {
 
          //mark passes for number of lines without error.. just to make it look good
 
-         for($i=0; $i < count($code_lines) - count($lines); $i++) {
+         for ($i=0; $i < count($code_lines) - count($lines); $i++) {
            $this->assertTrue(true);
          }
        }
@@ -160,7 +163,7 @@ class CodeStyleTest extends UnitTestCase {
          if (preg_match('!\.!', $entry)) {
 
          }
-         if(preg_match('!Zend!', $entry)) {
+         elseif(preg_match('!Zend!', $entry)) {
 
          }
          elseif(is_dir($base . '/'. $entry)) {
