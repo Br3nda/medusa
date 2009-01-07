@@ -1,6 +1,6 @@
 <?php
 
-class search {
+class wrms_search {
     private $parameters;
 
     function __construct() {

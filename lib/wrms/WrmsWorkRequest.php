@@ -3,7 +3,7 @@
 /**
  * WorkRequest Object
  */
-class WrmsRequest extends WrmsBase
+class WrmsWorkRequest extends WrmsBase
 {
     private $id;
     private $populated;
@@ -43,13 +43,13 @@ class WrmsRequest extends WrmsBase
 
     private function __get($name) {
         if ($name == 'timesheets') {
-            if ($this->timesheets == null) # TODO There might be a slightly better way of doing this, but my brain hurts so much right now.
+            if ($this->timesheets == null) { # TODO There might be a slightly better way of doing this, but my brain hurts so much right now.
                 $this->timesheets = new WrmsTimeSheets($this->id); # Create the time sheets object
             }
             return $this->timesheets;
         }
         else if ($name == 'notes') { # And so on. There might be a better way!
-            if ($this->notes == null)
+            if ($this->notes == null) {
                 $this->notes = new WrmsRequestNotes($this->id);
             }
             return $this->notes;
