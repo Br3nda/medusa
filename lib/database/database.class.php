@@ -18,7 +18,7 @@ class db {
   // used for black transactions
   private static $query = array();
   
-  private static function resetBlockTransaction(){
+  private static function resetBlockTransaction() {
     self::$query = array();
     return true;
   }
