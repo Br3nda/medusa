@@ -47,19 +47,25 @@ class TestRequestParsing extends UnitTestCase {
    
 }
 
-/*
-class testSearch extends UnitTestCase {
-  function testSearch() {
-    //TODO
-    //$this->assertTrue(false);
-  }
-}
-
-class testUser extends UnitTestCase {
-  function testStuff() {
-    $user = new user($username, $password);
-    
-  }
+/**
+ * wrms.request.allocated.getAllocated 
+ * Gets a list of the people whom this work is currently assigned to. 
+ * Method Arguments Argument Title 	Name 	Data type 
+ * Work Request ID 	wr 	int
+ */
+ require('methods/wrms_request_allocated_getAllocated.php');
+class test_wrms_request_allocated_getAllocated extends UnitTestCase {
+	function testgetAllocated() {
+		//You probably need a session
+		$class = new wrms_request_allocated_getAllocated();
+		$params = array('request_id' => '58286');
+		$result = $class->run($params);
+		$this->assertTrue(is_array($result));
+		$this->assertEqual(sizeof($result), 4);
+		foreach($result as $r) {
+			$this->assertEqual('user', get_class($r));
+		}
+	}	
 }
 
 class testDatabase extends UnitTestCase {
@@ -72,7 +78,7 @@ class testDatabase extends UnitTestCase {
     
   }
 }
-*/
+
 /*
 class TestLogin extends UnitTestCase {
   function testLogin() {
