@@ -2,6 +2,8 @@
 /**
  * wrms.request.allocated.getAllocated
  * Returns the current allocated users
+ * wrms.request.allocated.getAllocated 
+ * @ingroup Methods
  */
 class wrms_request_allocated_getAllocated {
     /**
