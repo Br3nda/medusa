@@ -17,6 +17,6 @@ class wrms_request_status_getStatusHistory {
      */
     function run ($params) {
         $return = array();
-        return $return
+        return $return;
     }
 }

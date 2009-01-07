@@ -19,7 +19,7 @@ class wrms_request_timesheet_getTimesheets {
      *     An array of timesheets or an empty array if no results
      */
     function run ($params) {
-        $return = array;
+        $return = array();
         return $return;
     }
 }
