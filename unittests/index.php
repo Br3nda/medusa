@@ -128,17 +128,18 @@ class TestLogin extends UnitTestCase {
 
 
 class CodeStyleTest extends UnitTestCase {
-   function pathToCode() {
-     $dirs = array(realpath($_SERVER['DOCUMENT_ROOT'] . '/..'));
+   function pathToCode($docroot) {
+     $dirs = array(realpath($docroot . '/..'));
      $dirs = $this->addSubFolders($dirs);
      $dirs = $this->addSubFolders($dirs);
      return $dirs;
    }
    function testCodeStyle() {
+   	$docroot = $_SERVER['DOCUMENT_ROOT'];
+   	if (!$docroot) $docroot = '.';
+     $codestyle = $docroot . '/code-style.pl';
 
-     $codestyle = $_SERVER['DOCUMENT_ROOT'] . '/code-style.pl';
-
-     foreach ($this->pathToCode() as $dir) {
+     foreach ($this->pathToCode($docroot) as $dir) {
      	
        if (preg_match('!\.!', $dir)) {
          continue;
@@ -200,13 +201,17 @@ class CodeStyleTest extends UnitTestCase {
        else {
        	$ignore_list = array('Zend', 'simpletest', '\.');
        while($entry = $d->read()) {
+
+         if(is_dir($base . '/'. $entry)) {
+         	$on_ignore = false;
        	  foreach($ignore_list as $i) {
        	  	if (preg_match("!$i!", $entry)) {
-       	  		next;
+       	  		$on_ignore = true;
        	  	}
        	  }
-         if(is_dir($base . '/'. $entry)) {
+       	  if (!$on_ignore) {
            $dir[] = $base . '/'. $entry;
+       	  }
          }
        }
        }
