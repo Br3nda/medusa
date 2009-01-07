@@ -29,10 +29,14 @@ class wrms_search {
 
     private function searchWorkRequests() {
         $matches = array();
-        $result = db_query("SELECT * FROM request WHERE request_id='%d'", $_GET['id']);
-
-        foreach ($result as $row) {
-            $matches[] = new wrms.WorkRequest()->populate($row);
+#        $result = db_query("SELECT * FROM request WHERE request_id=%d", $_GET['id']);
+#       $result = db_query("SELECT * FROM request WHERE requester_id=%d", $_GET['uid']);
+       $result = db_query("SELECT * FROM request INNER JOIN usr ON usr.user_no=request.requester_id WHERE usr.username='%s'", $_GET['username']);
+        while ($row = db_fetch_assoc($result)) {
+            $workreq = new WrmsWorkRequest();
+            $workreq->populate($row);
+            $matches[] = $workreq;
+            
         }
         return $matches;
     }
