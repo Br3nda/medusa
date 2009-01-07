@@ -17,7 +17,18 @@ class wrms_request_status_getCurrentStatus {
      *   NULL if no work request
      */
     function run ($params) {
-        $return = null;
-        return $return;
+        $request_id = $params['wr'];
+        $access = access::getInstance();
+        if ($access->canUserSeeStatus($request_id)) {
+            $result = db_query('SELECT last_status AS current_status FROM request WHERE request_id = %d', $request_id);
+            if (db_num_rows($result) > 0) {
+                $info = db_fetch_object($result);
+                return $info;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 }

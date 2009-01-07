@@ -50,22 +50,27 @@ class response {
     * Render the response, in whichever format we want
     */
     function render($format = 'html') {
-    	$method = '__render_' . $format;
-    	if(is_callable($this->$method)) {
-    		return $this->$method;
+        $method = '__render_' . $format;
+        error_logging('DEBUG', 'Render method: '.$method);
+        if(is_callable(array($this, $method))) {
+    		return $this->$method();
     	}
-    	else return $this->__render_html();
+        else {
+            error_logging('DEBUG', 'Going to default rendering');
+            return $this->__render_html();
+        }
     }
   /**
     * Private functions - we don't want others calling these directly
     * Yay for php5!
     */
     private function __render_html() {
+        error_logging('DEBUG', 'Rendering with __render_html');
         $html = "<br />Response:<br />";
-        if (is_object($this->response)) {
-	        foreach($this->response as $k => $v) {
-	            $html .= htmlentities("'$k' : '$v'").'<br />';
-	        }
+        if (is_object($this->response) || is_array($this->response)) {
+            $html = $this->__recurse_html($this->response); 
+        } elseif (!empty($this->response)) {
+            $html = $this->response;
         }
         else {
         	return '<p>No response</p>';
@@ -76,11 +81,57 @@ class response {
         return json_encode($this->response);
     }
     private function __render_xml() {
-    	return 'hello';
+    	return $this->__recurse_xml($this->response);
+    }
+    private function __render_dump() {
+        return '<br />Response:<br /><pre>'.print_r($this->response, true).'</pre>';
     }
     
-    function response($thing) {
-    	$this->response = $thing;
+    function __construct($response = null) {
+    	$this->response = $response;
+    }
+
+    private function __recurse_html($input) {
+        if (is_object($input) || is_array($input)) {
+            $output = '';
+            foreach ($input as $key=>$value) {
+                if (is_array($value) || is_object($value)) {
+                    $output .= $this->__recurse_html($value);
+                } else {
+                    $output .= htmlentities($key) . ': ' . htmlentities($value) . "<br />\n";
+                }
+            }
+            return $output;
+        } else {
+            return null;
+        }
+    }
+
+    private function __recurse_xml($input, $depth = 0, $parent = 'request') {
+        if (is_object($input) || is_array($input)) {
+            error_logging('DEBUG', 'Is object, depth = '.$depth);
+            $output = '';
+            $next_depth = $depth + 1;
+            foreach ($input as $key=>$value) {
+                $tag = htmlentities($key);
+                if (is_numeric($tag)) {
+                    $tag = $parent;
+                }
+                $tabs = '';
+                for ($i = 0; $i < $depth; $i++) {
+                   //There has to be a more elegant way to do this
+                   $tabs .= chr(9);
+                }
+                if (is_array($value) || is_object($value)) {
+                    $output .= "$tabs<$tag>\n".$this->__recurse_xml($value, $next_depth, $tag)."</$tag>\n";
+                } else {
+                    $output .= "$tabs<$tag>".htmlentities($value)."</$tag>\n";
+                }
+            }
+            return $output;
+        } else {
+            return null;
+        }
     }
 }
 
@@ -90,7 +141,6 @@ class response {
  *  e.g.
  *  - html
  *  - json
- *  - csv
  *  - yaml
  *  - tetris
  *
