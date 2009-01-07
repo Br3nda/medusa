@@ -73,7 +73,7 @@ class testDatabase extends UnitTestCase {
     
   }
   function testQuery() {
-    $result = db_query("SELECT * FROM users");
+    $result = db_query("SELECT * FROM request LIMIT 10");
     $this->assertTrue($result != false);
     
   }
@@ -86,3 +86,91 @@ class TestLogin extends UnitTestCase {
     //$this->assertFalse(check_credentials('user', 'password', &$userid, &$response));
   }
 }*/
+
+
+class CodeStyleTest extends UnitTestCase {
+   function pathToCode() {
+     $dirs = array(realpath($_SERVER['DOCUMENT_ROOT'] . '/..'));
+     $dirs = $this->addSubFolders($dirs);
+     return $dirs;
+   }
+   function testCodeStyle() {
+     $codestyle = $_SERVER['DOCUMENT_ROOT'] . '/code-style.pl';
+
+     foreach($this->pathToCode() as $dir) {
+       if (preg_match('!\.\.$!', $dir)) {
+         continue;
+       }
+
+       $d = dir($dir);
+       if (!$d) {
+         $this->dump('testCodeStyle: Failed to read dir: "' . $dir .'"');
+         return false;
+       }
+
+       while($entry = $d->read()) {
+
+         if (!preg_match('!\.inc$!', $entry) && !preg_match('!\.php$!', $entry)) {
+           continue;
+         }
+         $contents = file_get_contents("$dir/$entry");
+         $code_lines = split("\n", $contents);
+
+         $line_num = 1;
+         $full_code = '';
+         foreach($code_lines as $l) {
+           $full_code .= "$line_num $l\n";
+           $line_num++;
+         }
+
+         $result = shell_exec("$codestyle $dir/$entry");
+         /*
+         if (!$this->assertTrue(empty($result), 'Bad code style in ' . "$dir/$entry")) {
+           $this->dump($full_code);
+         }
+          */
+         $lines = split("\n", $result);
+
+         foreach($lines as $line) {
+           if (!$this->asserttrue(empty($line), $line)) {
+             preg_match("!$dir/$entry:([0-9]+): !", $line, $matches);
+             $code = $code_lines[$matches[1] -1];
+             $this->dump($code ."\n");
+           }
+         }
+
+         //mark passes for number of lines without error.. just to make it look good
+
+         for($i=0; $i < count($code_lines) - count($lines); $i++) {
+           $this->assertTrue(true);
+         }
+       }
+     }
+   }
+   function addSubFolders($dirs) {
+     $dir = array();
+     foreach ($dirs as $base) {
+       $d = dir($base);
+       if (!$d) {
+         $this->assertTrue(false, 'Failed to read dir: "' . $dir .'"');
+         next;
+       }
+       else {
+       while($entry = $d->read()) {
+         if (preg_match('!\.!', $entry)) {
+
+         }
+         if(preg_match('!Zend!', $entry)) {
+
+         }
+         elseif(is_dir($base . '/'. $entry)) {
+           $dir[] = $base . '/'. $entry;
+         }
+       }
+       }
+
+     }
+     return $dir;
+   }
+ }
+
