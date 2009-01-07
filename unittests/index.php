@@ -68,6 +68,45 @@ class test_wrms_request_allocated_getAllocated extends UnitTestCase {
 	}	
 }
 
+class test_wrms_request_getRequest extends UnitTestCase {
+	//TODO
+}
+
+class test_wrms_request_note_getNote  extends UnitTestCase {
+	//TODO
+}
+
+class test_wrms_request_quote_getQuotes extends UnitTestCase {
+	//TODO
+}
+
+class test_wrms_request_status_getCurrentStatus extends UnitTestCase {
+	//TODO
+}
+
+class test_wrms_request_status_getStatusHistory extends UnitTestCase {
+	//TODO
+}
+
+class test_wrms_request_subscriber_getSubscribers extends UnitTestCase {
+	//TODO
+}
+
+class test_wrms_request_timesheet_addTimesheet extends UnitTestCase {
+	//TODO
+}
+
+class test_wrms_request_timesheet_getTimesheets extends UnitTestCase {
+	//TODO
+}
+
+class test_wrms_user_timesheet_addTimesheet extends UnitTestCase{
+	//TODO
+}
+
+class test_wrms_user_timesheet_getTimesheets extends UnitTestCase {
+	//TODO
+}
 class testDatabase extends UnitTestCase {
   function testConnection() {
     
@@ -159,14 +198,14 @@ class CodeStyleTest extends UnitTestCase {
          next;
        }
        else {
+       	$ignore_list = array('Zend', 'simpletest', '\.');
        while($entry = $d->read()) {
-         if (preg_match('!\.!', $entry)) {
-
-         }
-         elseif(preg_match('!Zend!', $entry)) {
-
-         }
-         elseif(is_dir($base . '/'. $entry)) {
+       	  foreach($ignore_list as $i) {
+       	  	if (preg_match("!$i!", $entry)) {
+       	  		next;
+       	  	}
+       	  }
+         if(is_dir($base . '/'. $entry)) {
            $dir[] = $base . '/'. $entry;
          }
        }
