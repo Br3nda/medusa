@@ -29,6 +29,20 @@ class wrms_search {
 
     private function searchWorkRequests() {
         $matches = array();
+        /* Acceptable paramters are; 
+        * requester
+        * status history
+        * watchers (users)
+        * todo (users)
+        */
+        $joinsql = array(); # We could do a big string, but this is similar to the below bit, which is nice
+        $wheresql = array(); # list of where's to join together in abig happy array
+
+        if ($paramters['requester'] != null) {
+            $joinsql[] = 'INNER JOIN usr ON usr.user_no=request.requester_id';
+            $wheresql[] = 
+        }
+
 #        $result = db_query("SELECT * FROM request WHERE request_id=%d", $_GET['id']);
 #       $result = db_query("SELECT * FROM request WHERE requester_id=%d", $_GET['uid']);
        $result = db_query("SELECT * FROM request INNER JOIN usr ON usr.user_no=request.requester_id WHERE usr.username='%s'", $_GET['username']);
