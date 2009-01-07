@@ -24,9 +24,18 @@ class wrms_request_getRequest {
      *     NULL if no work request
      */
 	function run($params) {
-		$request_id = $params['request_id'];
-		$result = db_query('SELECT * FROM request WHERE request_id = %d', $request_id);
-		$object = db_fetch_object($result);
-		return $object; 
+        $request_id = $params['wr'];
+        $access = access::getInstance();
+        $result = db_query('SELECT * FROM request WHERE request_id = %d', $request_id);
+        if (db_num_rows($result) == 1) {
+            if ($access->canUserSeeRequest($request_id)) {
+                $object = db_fetch_object($result);
+                return $object;
+            } else {
+                return false;
+            }
+        } else {
+            return null;
+        } 
 	} 
 }

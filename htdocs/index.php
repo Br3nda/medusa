@@ -36,6 +36,9 @@ $format = $Uri_Parser->get_format();
 $method = str_replace('.', '_', $method);
 error_logging('DEBUG', "method=$method params=".print_r($params, true)." format=$format");
 
+$access = access::getInstance();
+$access->updateInfo($params['user']);
+
 if (!$method) {
 	error_logging('WARNING', "No method");
 	$result = new error("Method required");

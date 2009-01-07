@@ -66,7 +66,7 @@ class org {
     */
   function __construct($orgid) {
  
-    $result = db_query("SELECT * FROM org WHERE org.ordcode='%d'", $orgid);
+    $result = db_query("SELECT * FROM organisation org WHERE org.org_code='%d'", $orgid);
     
     if (!$result) {
       return false; # Wrong! Try! Again!
@@ -104,18 +104,21 @@ class org {
 * @ingroup User
  */
 class access {
-  private $db;
+  private static $instance;
   private $user; # User object, already initilized, or failing that, a string
   private $org; # Org object
   private $taskcache; # Array of task ids, with returned text levels;
-  
-  function __construct($db, &$user, &$org = null) {
+
+  private function __construct() {
+    //Its hidden and those nothing, call updateInfo to set user and org
+  }
+
+  public function updateInfo(&$user, &$org = null) {
     
     $this->taskcache = array();
-    $this->db = $db;
     
-  # the next two code blocks are to make up for the fact that php does not support function overloading.
-  # Users and orgs may be passed as names, id's, or existing objects
+    # the next two code blocks are to make up for the fact that php does not support function overloading.
+    # Users and orgs may be passed as names, id's, or existing objects
     if (is_object($user) && ($user instanceof user))
       $this->user = $user; # Existing user object is usable, wootage.
     else if (!is_object($user))
@@ -129,13 +132,24 @@ class access {
       $this->org = $org;
     }
     else if (!is_object($org)) { # It might be an org id. How handy!
-    $this->org = new org($db, $org); # Cos that's not confusing at all!
+      $this->org = new org($db, $org); # Cos that's not confusing at all!
     }
     else {
       return false; # What have you done here?
     }
   }
-  
+
+  public static function getInstance() {
+    if (!isset(self::$instance)) {
+      $c = __CLASS__;
+      self::$instance = new $c();
+    }
+    return self::$instance;
+  }
+
+  public function __clone() {
+    trigger_error ('Clone is forbidden on this object', E_USER_ERROR);
+  }
   
     # This sets up the array and sets a bunch of things to false.
   private function initTaskArray($taskid) {
