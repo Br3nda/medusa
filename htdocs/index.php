@@ -43,7 +43,7 @@ if (!$method) {
 	error_logging('WARNING', "No method");
 	$result = new error("Method required");
 }
-elseif(!$format) {
+elseif (!$format) {
 	$result = new error("Format required");
 }
 elseif (class_exists($method)) {
