@@ -171,65 +171,6 @@ class response {
         }
     }
 
-    private function __recurse_xml_newer($input, $depth = 0) {
-        if ($input instanceof WrmsBase) {
-            //Data is not publicly available for these classes
-            //So we make it so
-            return $this->__xml_build_element(get_class($input), $input->getData, $depth);
-        } elseif (is_array($input) || is_object($input)) {
-            $output = '';
-            foreach ($input as $key => $value) {
-                $output .= $this->__xml_build_element($key, $value, ++$depth);
-            }
-            return $output;
-        }else {
-            return $input;
-        }
-    }
-
-    private function __xml_build_element($tag, $data, $depth = 0) {
-        $output = '';
-        $tabs = '';
-        //Behold the ugly dirty tab builder
-        for ($i = 0; $i < $depth; $i++) {
-            $tabs .= chr(9);
-        }
-        $output = "$tabs<$tag>\n".$this->__recurse_xml($data, ++$depth)."$tabs</$tag>\n";
-        return $output;
-    }
-
-    private function __recurse_xml_old($input, $depth = 0, $parent = 'request') {
-        //This function will need review and maybe refactoring, tis a bit messy
-        if ($input instanceof WrmsBase) {
-            //Data is not publicly available so call again with the data
-            return $this->__recurse_xml($input->getData(), $depth, get_class($input));
-        } elseif (is_object($input) || is_array($input)) { 
-            $output = '';
-            $next_depth = $depth + 1;
-            foreach ($input as $key=>$value) {
-                $tag = htmlentities($key);
-                if (is_numeric($tag)) {
-                    $tag = $parent;
-                }
-                $tabs = '';
-                for ($i = 0; $i < $depth; $i++) {
-                   //There has to be a more elegant way to do this
-                   $tabs .= chr(9);
-                }
-                if (is_array($value) || is_object($value)) {
-                    if (is_object($value)) {
-                        $tag = get_class($value);
-                    }
-                    $output .= "$tabs<$tag>\n".$this->__recurse_xml($value, $next_depth, $tag)."</$tag>\n";
-                } else {
-                    $output .= "$tabs<$tag>".htmlentities($value)."</$tag>\n";
-                }
-            }
-            return $output;
-        } else {
-            return null;
-        }
-    }
 }
 
 /**
