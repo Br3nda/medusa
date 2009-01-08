@@ -91,7 +91,7 @@ class response {
                     $output[] = $value;
                 }
             }
-            return json_encode($this->response);
+            return json_encode($output);
         } elseif ($this->response instanceof WrmsBase) {
             return json_encode($this->response->getData());
         } else {
