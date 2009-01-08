@@ -24,7 +24,7 @@ class wrms_request_getRequest {
      *     NULL if no work request
      */
 	function run($params) {
-        $request_id = $params['wr'];
+        $request_id = $params['GET']['wr'];
         $access = access::getInstance();
         if ($access->canUserSeeRequest($request_id)) {
             $result = db_query('SELECT * FROM request WHERE request_id = %d', $request_id);

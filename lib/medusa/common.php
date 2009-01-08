@@ -10,8 +10,6 @@ require('medusa/uri_parser.class.php');
 require('response/error.class.php');
 require('response/response.class.php');
 require('authentication/login.class.php');
-require('wrms/WrmsBase.php');
-require('wrms/WrmsWorkRequest.php');
 require_once('database/database.class.php');
 require_once('config/general.php');
 require_once('config/database.php');
@@ -25,6 +23,13 @@ function __autoload($class_name) {
     # a var called $path
     foreach (split(':',get_include_path()) as $path) {
         $filename = $path . '/methods/' . $class_name . '.php';
+        error_logging('DEBUG', "Include path is: '$path'");
+        error_logging('DEBUG', "Including class: $filename");
+        if ($path[0] == '/' && is_file($filename) && is_readable($path)) { # ensure absolute pathing
+            include_once($filename);
+            break;            
+        }
+        $filename = $path . '/wrms/' . $class_name . '.php';
         error_logging('DEBUG', "Include path is: '$path'");
         error_logging('DEBUG', "Including class: $filename");
         if ($path[0] == '/' && is_file($filename) && is_readable($path)) { # ensure absolute pathing
