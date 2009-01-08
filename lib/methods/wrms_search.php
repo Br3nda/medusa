@@ -39,8 +39,8 @@ class wrms_search {
         $wheresql = array(); # list of where's to join together in abig happy array
 
         if ($paramters['requester'] != null) {
-            $joinsql[] = 'INNER JOIN usr ON usr.user_no=request.requester_id';
-            $wheresql[] = 
+#            $joinsql[] = 'INNER JOIN usr ON usr.user_no=request.requester_id';
+#            $wheresql[] = 
         }
 
 #        $result = db_query("SELECT * FROM request WHERE request_id=%d", $_GET['id']);
