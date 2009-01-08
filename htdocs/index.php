@@ -27,17 +27,25 @@
  */
 
 require_once('medusa/common.php');
+$params = array('GET' => array(), 'POST' => array());
 
 $uri = $_SERVER['REQUEST_URI'];
 $Uri_Parser = new Uri_Parser($uri);
 $method = $Uri_Parser->get_method();
-$params = $Uri_Parser->get_params();
+$params['GET'] = $Uri_Parser->get_params();
 $format = $Uri_Parser->get_format();
 
 error_logging('DEBUG', "method=$method params=".print_r($params, true)." format=$format");
 
 $access = access::getInstance();
-$access->updateInfo($params['user']);
+$access->updateInfo($params['GET']['user']);
+
+/*
+ * POST variables are not cleaned here
+ */
+foreach ($_POST as $k => $v) {
+        $params['POST'] = $_POST;
+}
 
 if (!$method) {
 	error_logging('WARNING', "No method");
