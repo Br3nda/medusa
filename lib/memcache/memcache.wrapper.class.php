@@ -2,7 +2,7 @@
 
 require("memcache/memcache.class.php");
 
-class memcache {
+class memcached {
     private static $memcache = null;
 
     private function connect() {
