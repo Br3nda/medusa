@@ -6,6 +6,7 @@
  * Window - Preferences - PHPeclipse - PHP - Code Templates
  */
 
+
 require('medusa/uri_parser.class.php');
 require('response/error.class.php');
 require('response/response.class.php');
@@ -20,6 +21,11 @@ require_once('authorization/access.class.php');
 require_once('medusa/globals.php');
 require_once('logging/logging.inc.php');
 require_once('memcache/memcache.wrapper.class.php');
+
+
+if (DEBUG_MODE) {
+    require_once('medusa/debug.php');
+}
 
 function __autoload($class_name) {
     # Pull all the possible include paths out of the include directory into

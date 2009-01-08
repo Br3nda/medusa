@@ -27,7 +27,7 @@
  */
 
 require_once('medusa/common.php');
-$params = array('GET' => array(), 'POST' => array());
+$params = array('GET' => array(), 'POST' => array(), 'wrms' => array());
 
 $uri = $_SERVER['REQUEST_URI'];
 $Uri_Parser = new Uri_Parser($uri);
@@ -37,9 +37,6 @@ $format = $Uri_Parser->get_format();
 
 error_logging('DEBUG', "method=$method params=".print_r($params, true)." format=$format");
 
-$access = access::getInstance();
-$access->updateInfo($params['wrms']['user']);
-
 /*
  * POST variables are not cleaned here
  */
@@ -47,7 +44,19 @@ foreach ($_POST as $k => $v) {
         $params['POST'] = $_POST;
 }
 
-//some user goes here = login::check_session($params['GET']['sessionid']));
+if (!is_null($params['GET']['session_id'])) {
+    $params['wrms']['user'] = new user(login::check_session($params['GET']['session_id']));
+}
+
+dump($params);
+echo '<br />';
+echo '<br />';
+echo '<br />';
+
+$access = access::getInstance();
+$access->updateInfo($params['wrms']['user']);
+
+var_dump($params);
 
 if (!$method) {
 	error_logging('WARNING', "No method");
