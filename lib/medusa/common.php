@@ -19,6 +19,7 @@ require_once('authentication/session.class.php');
 require_once('authorization/access.class.php');
 require_once('medusa/globals.php');
 require_once('logging/logging.inc.php');
+require_once('memcache/memcache.wrapper.class.php');
 
 function __autoload($class_name) {
     # Pull all the possible include paths out of the include directory into
