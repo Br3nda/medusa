@@ -29,7 +29,6 @@ class wrms_request_getRequest {
         if ($access->canUserSeeRequest($request_id)) {
             $result = db_query('SELECT * FROM request WHERE request_id = %d', $request_id);
             if (db_num_rows($result) == 1) {
-                //$object = db_fetch_object($result);
                 $object = new WrmsWorkRequest();
                 $object->populate(db_fetch_object($result));
                 return $object;

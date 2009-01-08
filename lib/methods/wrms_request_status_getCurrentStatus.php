@@ -17,13 +17,14 @@ class wrms_request_status_getCurrentStatus {
      *   NULL if no work request
      */
     function run ($params) {
-        $request_id = $params['wr'];
+        $request_id = $params['GET']['wr'];
         $access = access::getInstance();
         if ($access->canUserSeeStatus($request_id)) {
-            $result = db_query('SELECT last_status AS current_status FROM request WHERE request_id = %d', $request_id);
+            $result = db_query('SELECT * FROM request_status WHERE request_id = %d ORDER BY status_on DESC LIMIT 1', $request_id);
             if (db_num_rows($result) > 0) {
-                $info = db_fetch_object($result);
-                return $info;
+                $object = new WrmsStatus();
+                $object->populate(db_fetch_object($result));
+                return $object;
             } else {
                 return false;
             }
