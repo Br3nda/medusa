@@ -78,7 +78,24 @@ class response {
         return $html;
     }
     private function __render_json() {
-        return json_encode($this->response);
+        //Check if the response is an array
+        if (is_array($this->response)) {
+            $output = array();
+            foreach ($this->response as $key=>$value) {
+                if (is_object($value) && ($value instanceof WrmsBase)) {
+                    //Can use this method as WrmsBase defines it
+                    $output[] = $value->getData();
+                } else {
+                    //Shove anything else into array
+                    $output[] = $value;
+                }
+            }
+            return json_encode($this->response);
+        } elseif ($this->response instanceof WrmsBase) {
+            return json_encode($this->response->getData());
+        } else {
+            return json_encode($this->response);
+        }
     }
     private function __render_xml() {
     	return $this->__recurse_xml($this->response);
@@ -92,7 +109,9 @@ class response {
     }
 
     private function __recurse_html($input) {
-        if (is_object($input) || is_array($input)) {
+        if ($input instanceof WrmsBase) {
+            return $this->__recurse_html($input->getData());
+        } elseif (is_array($input) || is_object($input)) {
             $output = '';
             foreach ($input as $key=>$value) {
                 if (is_array($value) || is_object($value)) {
@@ -103,13 +122,15 @@ class response {
             }
             return $output;
         } else {
-            return null;
+            return $input;
         }
     }
 
     private function __recurse_xml($input, $depth = 0, $parent = 'request') {
-        if (is_object($input) || is_array($input)) {
-            error_logging('DEBUG', 'Is object, depth = '.$depth);
+        if ($input instanceof WrmsBase) {
+            //Data is not publicly available so call again with the data
+            return $this->__recurse_xml($input->getData(), $depth, get_class($input));
+        } elseif (is_object($input) || is_array($input)) { 
             $output = '';
             $next_depth = $depth + 1;
             foreach ($input as $key=>$value) {
