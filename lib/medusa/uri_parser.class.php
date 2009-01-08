@@ -22,14 +22,29 @@ class Uri_Parser {
   */
   function __construct($uri) {
     $this->_uri_ = $uri;
-
-    $urihalves = split('\?',$uri,2); # Divide the uri into the class.format and parameters
-    $methodstrings = split('\.',$urihalves[0]);
-    $this->_format_ = array_pop($methodstrings); # drop off the last bit (the format), and...
-    $this->_method_ = join('_',$methodstrings); # ... join them up with a different string
-    $this->_method_ = str_replace(array('<', '>', '\\', '/',',','.'), "", $this->_method_);  # Clean up the method string
-
-    foreach(split('&',  $urihalves[1]) as $variable) {
+    $section1 = '';
+    $section2 = '';
+    $raw_params = '';
+    $in_params = false;
+    for($i = 0; $i < strlen($uri); $i++) {
+      if (($uri[$i] == '.') && !$in_params) {
+        $section1 .= $section2;
+        $section2 = '';
+      }
+      if (($uri[$i] == '?') && !$in_params) {
+        $in_params = true;
+        $this->_method_ = substr($section1, 1);
+        $this->_format_ = substr($section2, 1);
+      }
+      if (!$in_params) {
+        $section2 .= $uri[$i];
+      }
+      if ($in_params) {
+        $raw_params .= $uri[$i];
+      }
+    }
+    $raw_params = substr($raw_params, 1);
+    foreach(split('&', $raw_params) as $variable) {
       $bits = split('=', $variable);
       $params[$bits[0]] = $bits[1];
     }
