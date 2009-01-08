@@ -26,7 +26,7 @@ class db {
   /**
     * start transaction block
     */
-    public static function begin(){
+    public static function begin() {
 	  error_logging('DEBUG', "Begin transaction");
       return self::resetBlockTransaction();
     }
@@ -34,12 +34,12 @@ class db {
   /**
     * append query to transaction block -> can be called the same way as db_query
     */
-    public static function block_query($query){
+    public static function block_query($query) {
       $args = func_get_args();
       array_shift($args);
-      if ($args){
+      if ($args) {
         _sort_db_query($args, true);
-        $query = preg_replace_callback('/(%d|%s|%f)/','_sort_db_query',$query);
+        $query = preg_replace_callback('/(%d|%s|%f)/', '_sort_db_query', $query);
       }
       self::$query[] = $query;
       return true;
@@ -48,12 +48,12 @@ class db {
   /**
     * commits database queries built up from block_query
     */
-    public static function commit($commit = true){
+    public static function commit($commit = true) {
   	  error_logging('DEBUG', "commit() called");
       self::query("BEGIN");
       $rollback = false;
-      foreach(self::$query as $query){
-        if (!db_query($query)){
+      foreach (self::$query as $query) {
+        if (!db_query($query)) {
           errorLogging('ERROR', "QUERY FAILED: $query");
           self::query("ROLLBACK");
           $rollback = true;
@@ -65,13 +65,14 @@ class db {
         * this allows testing to see if queries run without fail
         * without commiting at the end
         */
-        if ($commit && !$rollback){
+        if ($commit && !$rollback) {
           self::query("COMMIT");
           return true;
-        } else {
+        } 
+        else {
           self::query("ROLLBACK");
         }
-      if ($rollback){
+      if ($rollback) {
         return false;
       }
       return true;
@@ -81,21 +82,21 @@ class db {
   /**
     * insure connection creditials are available
     */
-    public static function init(){
+    public static function init() {
       $msg = '';
-      if (!defined('CONFIG_DBNAME')){
+      if (!defined('CONFIG_DBNAME')) {
         $msg = "Database Is Not Defined.";
       }
-      if (!defined('CONFIG_DBHOST')){
+      if (!defined('CONFIG_DBHOST')) {
         $msg .= "CONFIG_DBHOST Is Not Defined.";
       }
-      if (!defined('CONFIG_DBUSER')){
+      if (!defined('CONFIG_DBUSER')) {
         $msg .= "Username Is Not Defined.";
       }
-      if (!defined('CONFIG_DBPORT')){
+      if (!defined('CONFIG_DBPORT')) {
         $msg .= "Port Is Not Defined.";
       }
-      if (!empty($msg)){
+      if (!empty($msg)) {
         exit($msg);
       }
       return true;
@@ -105,14 +106,14 @@ class db {
     * Connection function
     * @return connection object or exit on failure
     */
-    public static function connect(){
-      if (self::$con){
+    public static function connect() {
+      if (self::$con) {
         return self::$con;
       }
-      if (self::init()){
+      if (self::init()) {
         $str = 'host='.CONFIG_DBHOST.' dbname='.CONFIG_DBNAME.' user='.CONFIG_DBUSER . ' port='.CONFIG_DBPORT;
         self::$con = pg_connect($str);
-        if (!self::$con){
+        if (!self::$con) {
           errorLogging('CRITICAL', "Could not connect to database: $str");
           exit("Could Not Connect to Database");
         }
@@ -123,7 +124,7 @@ class db {
   /**
     * escapes str for query
     */
-    public static function escape_string($str){
+    public static function escape_string($str) {
       return pg_escape_string($str);
     }
   
@@ -132,7 +133,7 @@ class db {
     * @param query string
     * @return recordset object on success or false on failure
     */
-    public static function query($query){
+    public static function query($query) {
       return pg_query(self::connect(), $query);
     }
   
@@ -140,8 +141,8 @@ class db {
     * returns number of rows in given dataset
     * @param recordset
     */
-    public static function num_rows($rs){
-      if (get_resource_type($rs) == 'pgsql result'){
+    public static function num_rows($rs) {
+      if (get_resource_type($rs) == 'pgsql result') {
         return pg_num_rows($rs);
       }
       return false;
@@ -152,8 +153,7 @@ class db {
  /**
   * recording load times and queries
   */
-class stopwatch
- {
+class stopwatch {
          //start time
          private $start;
 
@@ -162,35 +162,35 @@ class stopwatch
 
          private $recordset = array();
 
-         public function __construct(){
+         public function __construct() {
                  $this->start = date('U');
          }
 
-         public function reset(){
+         public function reset() {
                  $this->recordset = array();
                  $this->start = date('U');
          }
 
-         public function stop(){
+         public function stop() {
                  $this->stop = date('U');
                  $this->recordset[] = $this->stop - $this->start;
-                 if (count($this->recordset) > 1){
+                 if (count($this->recordset) > 1) {
                          return $this->recordset;
                  }
                  return $this->stop - $this->start;
          }
 
-         public function getTime(){
-                 if ($this->start > $this->stop){
+         public function getTime() {
+                 if ($this->start > $this->stop) {
                          $this->stop = date('U');
                  }
-                 if (count($this->recordset) > 1){
+                 if (count($this->recordset) > 1) {
                          return $this->recordset;
                  }
                  return $this->stop - $this->start;
          }
 
-         public function split(){
+         public function split() {
                  $this->recordset[] = date('U') - $this->start;
                  $this->start = date('U');
          }
@@ -222,26 +222,28 @@ class stopwatch
  *   A database query result resource, or FALSE if the query was not
  *   executed correctly.
 */
-function db_query($query){
+function db_query($query) {
   static $watch;
-  if (get_class($watch) != 'stopwatch') $watch = new stopwatch();
+  if (get_class($watch) != 'stopwatch') {
+  	$watch = new stopwatch();
+  }
   $args = func_get_args();
   array_shift($args);
-  if ($args){
+  if ($args) {
     _sort_db_query($args, true);
-    $query = preg_replace_callback('/(%d|%s|%f|%b)/','_sort_db_query',$query);
+    $query = preg_replace_callback('/(%d|%s|%f|%b)/', '_sort_db_query', $query);
   }
   //Record time to make query
-  error_logging('DEBUG-SQL',$query);
+  error_logging('DEBUG-SQL', $query);
   $watch->reset();
   $rs = db::query($query);
   $time = $watch->stop();
-  if ($time > 1 && !DEBUG_MODE){
-    $query = preg_replace('/\\n/','', $query);
+  if ($time > 1 && !DEBUG_MODE) {
+    $query = preg_replace('/\\n/', '', $query);
     error_logging("ERROR", "SQL Query Took $time seconds: $query");
   }
-  if (!$rs){
-    $query = preg_replace('/\\n/','', $query);
+  if (!$rs) {
+    $query = preg_replace('/\\n/', '', $query);
     error_logging("ERROR", "SQL query failed: $query");
   }
   return $rs;
@@ -253,21 +255,21 @@ function db_query($query){
 *                                from preg_replace_callback in db_query()
 * @return db query safe string
 */
-function _sort_db_query($matches, $reset = false){
+function _sort_db_query($matches, $reset = false) {
   static $args;
-  if ($reset){
+  if ($reset) {
     $args = $matches;
     return;
   }
-  switch($matches[1]){
+  switch ($matches[1]) {
     case '%d':
-      if (!is_int($args[0])){
+      if (!is_int($args[0])) {
         return intval(array_shift($args));
       }
     return array_shift($args);
     break;
     case '%s':
-      if (is_string($args[0])){
+      if (is_string($args[0])) {
         return db::escape_string(array_shift($args));
       }
     $str = array_shift($args);
@@ -278,7 +280,7 @@ function _sort_db_query($matches, $reset = false){
     break;
     case '%b':
         //echo "Boolean found.\n";
-      return "'".pg_escape_bytea(array_shift($args))."'";
+      return "'". pg_escape_bytea(array_shift($args)) ."'";
     break;
   }
 }
@@ -289,10 +291,11 @@ function _sort_db_query($matches, $reset = false){
 * @param offset of row
 * @return array
 */
-function db_fetch_assoc($result, $int = false){
-  if ($result && is_int($int)){
+function db_fetch_assoc($result, $int = false) {
+  if ($result && is_int($int)) {
     return pg_fetch_assoc($result);
-  } elseif ($result){
+  } 
+  elseif ($result) {
     return pg_fetch_assoc($result);
   }
   return false;
@@ -302,7 +305,7 @@ function db_fetch_assoc($result, $int = false){
 * @return number of rows
 * @param recordset
 */
-function db_num_rows($rs){
+function db_num_rows($rs) {
   return db::num_rows($rs);
 }
 
@@ -311,10 +314,11 @@ function db_num_rows($rs){
 * @param recordset
 * @param offset of row
 */
-function db_fetch_object($result, $int = false){
-  if ($result && is_int($int)){
+function db_fetch_object($result, $int = false) {
+  if ($result && is_int($int)) {
     return pg_fetch_object($result, $int);
-  } elseif ($result){
+  } 
+  elseif ($result) {
     return pg_fetch_object($result);
   }
 }
@@ -322,19 +326,19 @@ function db_fetch_object($result, $int = false){
 /**
 * Begins a block transaction
 */
-function db_begin(){
+function db_begin() {
   db::begin();
 }
 
 /**
 * appends a query to a block transaction
 */
-function db_block_query($query){
+function db_block_query($query) {
   $args = func_get_args();
   array_shift($args);
-  if ($args){
+  if ($args) {
     _sort_db_query($args, true);
-    $query = preg_replace_callback('/(%d|%s|%f|%b)/','_sort_db_query',$query);
+    $query = preg_replace_callback('/(%d|%s|%f|%b)/', '_sort_db_query', $query);
   }
   db::block_query($query);
 }
@@ -342,7 +346,7 @@ function db_block_query($query){
 /**
 * commits a block transaction
 */
-function db_commit($bool = true){
+function db_commit($bool = true) {
   return db::commit($bool);
 }
 
