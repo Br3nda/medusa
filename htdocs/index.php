@@ -38,7 +38,7 @@ $format = $Uri_Parser->get_format();
 error_logging('DEBUG', "method=$method params=".print_r($params, true)." format=$format");
 
 $access = access::getInstance();
-$access->updateInfo($params['GET']['user']);
+$access->updateInfo($params['wrms']['user']);
 
 /*
  * POST variables are not cleaned here
@@ -46,6 +46,8 @@ $access->updateInfo($params['GET']['user']);
 foreach ($_POST as $k => $v) {
         $params['POST'] = $_POST;
 }
+
+//some user goes here = login::check_session($params['GET']['sessionid']));
 
 if (!$method) {
 	error_logging('WARNING', "No method");
