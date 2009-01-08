@@ -28,8 +28,12 @@ class WrmsWorkRequest extends WrmsBase {
     $result = db_query("SELECT * FROM request WHERE request_id='%d'", $id);
     if (count($result) == 1) {
       $this->populate($result[0]);
-    }
   }
+  
+    public function getData() {
+      //Hack way to get data out
+      return $this->data;
+    }
 
     /**
   * Force Extending class to define this metho
