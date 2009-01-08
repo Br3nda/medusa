@@ -36,9 +36,10 @@ class WrmsWorkRequest extends WrmsBase {
     */
   public function populate($row) {
       // TODO, fill this out!
-          foreach ($row as $key => $value)
-          $this->$key = $value; # Horrible horrible hack!
-          $this->populated = true;
+      foreach ($row as $key => $value) {
+        $this->$key = $value; # Horrible horrible hack!
+      }
+      $this->populated = true;
   }
 
   private function __set($name, $value) {
