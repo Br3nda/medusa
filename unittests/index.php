@@ -58,7 +58,7 @@ class test_wrms_request_allocated_getAllocated extends UnitTestCase {
 	function testgetAllocated() {
 		//You probably need a session
 		$class = new wrms_request_allocated_getAllocated();
-		$params = array('request_id' => '58286');
+		$params = array('wr' => '58286');
 		$result = $class->run($params);
 		$this->assertTrue(is_array($result));
 		$this->assertEqual(sizeof($result), 4);
@@ -69,7 +69,18 @@ class test_wrms_request_allocated_getAllocated extends UnitTestCase {
 }
 
 class test_wrms_request_getRequest extends UnitTestCase {
-	//TODO
+    function testgetRequest() {
+        //Will need to build session object
+        $class = new wrms_request_getRequest();
+        $params = array('wr' => '58286');
+        $result = $class->run($params);
+        $this->assertTrue(is_object($result));
+        $this->assertTrue($result instanceof WrmsWorkRequest);
+    }
+
+    //function testgetRequest_xml()
+    //function testgetRequest_json()
+    //function testgetRequest_forbidden()
 }
 
 class test_wrms_request_note_getNote  extends UnitTestCase {
