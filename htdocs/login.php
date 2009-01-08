@@ -1,7 +1,7 @@
 <?php
 include("../lib/authentication/login.class.php");
 include("../lib/response/response.class.php");
-$response = new response();
+$response = new response(null);
 
 $username = $_POST['username']; # Don't allow logins via GET
 $password = $_POST['password']; # Don't allow logins via GET
