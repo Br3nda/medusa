@@ -1,4 +1,4 @@
-<?
+<?php
 define("CONFIG_OUTPUT", "json");
 define("CONFIG_MEMCACHE_HOST", "memcache");
 define("CONFIG_MEMCACHE_PORT", "11211");
