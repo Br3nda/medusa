@@ -30,7 +30,7 @@ if (DEBUG_MODE) {
 function __autoload($class_name) {
     # Pull all the possible include paths out of the include directory into
     # a var called $path
-    foreach (split(':',get_include_path()) as $path) {
+    foreach (split(':', get_include_path()) as $path) {
         $filename = $path . '/methods/' . $class_name . '.php';
         error_logging('DEBUG', "Include path is: '$path'");
         error_logging('DEBUG', "Including class: $filename");
