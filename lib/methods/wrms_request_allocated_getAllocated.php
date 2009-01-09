@@ -17,7 +17,7 @@ class wrms_request_allocated_getAllocated {
      *     An array of users on success
      *     An empty array on failure
      */
-    function run ($params) {
+    function run($params) {
         $return = array();
         return $return;
     }

@@ -32,10 +32,12 @@ class wrms_request_getRequest {
                 $object = new WrmsWorkRequest();
                 $object->populate(db_fetch_object($result));
                 return $object;
-            } else {
+            } 
+            else {
                 return false;
             }
-        } else {
+        } 
+        else {
             return false;
         }
 	} 

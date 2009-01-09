@@ -21,7 +21,7 @@ class wrms_search {
                         return $this->searchWorkRequests();
                         break;
                 default:
-                        error_logging('WARNING', "Search type ". $paramters['type']." doesn't exist.");
+                        error_logging('WARNING', "Search type ". $paramters['type'] ." doesn't exist.");
                         break;
                 }
             }
@@ -59,5 +59,4 @@ class wrms_search {
     }
 }
 
-?>
 

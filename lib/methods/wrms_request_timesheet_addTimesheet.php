@@ -20,7 +20,7 @@ class wrms_request_timesheet_addTimesheet {
      * @return
      *   TRUE on success, FALSE on failure to add
      */
-    function run ($params) {
+    function run($params) {
         $return = false;
         return $return;
     }

@@ -15,7 +15,7 @@ class wrms_request_status_getStatusHistory {
      *   An array of status changes ordered from most recent to oldest
      *   An empty array if permission is denied
      */
-    function run ($params) {
+    function run($params) {
         $return = array();
         $access = access::getInstance();
         $request_id = $params['GET']['wr'];

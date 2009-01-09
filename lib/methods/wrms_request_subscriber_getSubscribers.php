@@ -15,7 +15,7 @@ class wrms_request_subscriber_getSubscribers {
      *    An array of users on success
      *    Empty array of failure
      */
-    function run ($params) {
+    function run($params) {
         $return = array();
         return $return;
     }

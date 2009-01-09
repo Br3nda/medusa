@@ -16,7 +16,7 @@ class wrms_request_status_getCurrentStatus {
      *   FALSE is permission denied
      *   NULL if no work request
      */
-    function run ($params) {
+    function run($params) {
         $request_id = $params['GET']['wr'];
         $access = access::getInstance();
         if ($access->canUserSeeStatus($request_id)) {
@@ -25,10 +25,12 @@ class wrms_request_status_getCurrentStatus {
                 $object = new WrmsStatus();
                 $object->populate(db_fetch_object($result));
                 return $object;
-            } else {
+            } 
+            else {
                 return false;
             }
-        } else {
+        } 
+        else {
             return false;
         }
     }
