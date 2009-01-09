@@ -7,19 +7,21 @@
  */
 
 
+require_once('logging/logging.inc.php');
 require('medusa/uri_parser.class.php');
-require('response/error.class.php');
 require('response/response.class.php');
+require('response/error.class.php');
+require('response/response_renderer.class.php');
 require('authentication/login.class.php');
 require_once('database/database.class.php');
 require_once('config/general.php');
 require_once('config/database.php');
 require_once('authentication/session.class.php');
 require_once('authorization/user.class.php');
+require_once('authorization/currentuser.class.php');
 require_once('authorization/org.class.php');
 require_once('authorization/access.class.php');
 require_once('medusa/globals.php');
-require_once('logging/logging.inc.php');
 require_once('memcache/memcache.wrapper.class.php');
 
 

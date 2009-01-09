@@ -32,11 +32,11 @@ class user {
   }
   
   public function getUserID() {
-    return $this->userid;
+    return $this->user_no;
   }
   
   public function getFullName() {
-    return $this->userfullname;
+    return $this->fullname;
   }
   
   public function getUserName() {

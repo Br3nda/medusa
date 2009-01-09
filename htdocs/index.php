@@ -27,7 +27,7 @@
  */
 
 require_once('medusa/common.php');
-$params = array('GET' => array(), 'POST' => array(), 'wrms' => array());
+$params = array('GET' => array(), 'POST' => array());
 
 $uri = $_SERVER['REQUEST_URI'];
 $Uri_Parser = new Uri_Parser($uri);
@@ -45,18 +45,11 @@ foreach ($_POST as $k => $v) {
 }
 
 if (!is_null($params['GET']['session_id'])) {
-    $params['wrms']['user'] = new user(login::check_session($params['GET']['session_id']));
+    currentuser::set(new user(login::check_session($params['GET']['session_id'])));
 }
 
-dump($params);
-echo '<br />';
-echo '<br />';
-echo '<br />';
-
 $access = access::getInstance();
-$access->updateInfo($params['wrms']['user']);
-
-var_dump($params);
+$access->updateInfo(currentuser::getInstance());
 
 if (!$method) {
 	error_logging('WARNING', "No method");
@@ -76,6 +69,7 @@ else {
 	$result = new error("$method does not exist");	
 }
 
-$response = new response($result);
+//$response = new response($result);
 error_logging('DEBUG', "Sending response");
-echo $response->render($format);
+$response_renderer = new response_renderer($result);
+echo $response_renderer->render($format);

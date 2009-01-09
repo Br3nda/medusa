@@ -8,7 +8,7 @@
 class login {
 
     // Assumes we've already checked for an existing session
-    function do_login($params) {
+    public function do_login($params) {
 
         $username = $params['POST']['username']; # Don't allow logins via GET
         $password = $params['POST']['password']; # Don't allow logins via GET
@@ -23,12 +23,13 @@ class login {
             return new error('No password supplied');
         }
 
-        if (login::login_user($username, $password, &$userid, &$response)) {
+        if (login::valid_credentials($username, $password, &$user_id, &$response)) {
             /*
              * Make a session and all that lovely stuff
              */
             // If we successfully put out session into memcache
-            if (login::create_session(&$response)) {
+            if (login::create_session($user_id, &$response)) {
+                currentuser::set(new user($user_id));
                 return new response($response);
             }
             // If putting our session into memcache failed
@@ -47,17 +48,16 @@ class login {
     /*
      * Nice and simple: do they have a valid login?
      */
-    function login_user($username, $password, $userid, $response) {        
+    private function valid_credentials($username, $password, $user_id, $response) {        
         assert(!is_null($username));
         assert(!is_null($password));
 
         error_logging('DEBUG', "checking credentials of $username, $password");
         // See if they even exist
-        $result = db_query("SELECT password from usr where username = '$username'");
+        $result = db_query("SELECT user_no, password from usr where username = '$username'");
         
-        
-        $hash = db_fetch_object($result);
-        $hash = $hash->password;
+        $row = db_fetch_object($result);
+        $hash = $row->password;
 
         /*
          * WRMS has passwords in the format: *salt*md5hash
@@ -72,7 +72,7 @@ class login {
 
             // Compare our hashes
             if ($hash_of_received == $hash) {
-                // Why no response? Because we still have to make a session, until that happens then no point saying they're logged in
+                $user_id = $row->user_no;
                 return true;
             } 
             else {
@@ -90,7 +90,7 @@ class login {
      * Create a session for this user - if the user already has a session, give them their current one
      * Allows multiple scripts to run at the same time and not cause each other to fail
      */
-    function create_session($response) {
+    private function create_session($user_id, $response) {
 
         $session_id = login::__generate_session_id();
 
@@ -98,13 +98,13 @@ class login {
          * Write value to memcache
          */
         // If the write fails
-        if (!memcached::set('medusa_sessionid_'.$session_id, true)) {
+        if (!memcached::set('medusa_sessionid_'.$session_id, $user_id)) {
             $response = memcached::report_last_error().' (memcached::set)';
             return false;
         }
 
         // Ok, I know this is a bit pedantic and doubles the cost but it's better to be safe than sorry
-        if (!memcached::get('medusa_sessionid_'.$session_id)) {
+        if (!is_numeric(memcached::get('medusa_sessionid_'.$session_id))) {
             $response = memcached::report_last_error().' (memcached::get)';
             return false;
         }
@@ -116,15 +116,18 @@ class login {
 
     function check_session($session_id) {
         // If this person is logged in
-        if (memcached::get('medusa_sessionid_'.$session_id)) {
+        $user_id = memcached::get('medusa_sessionid_'.$session_id);
+        if (is_numeric($user_id)) {
             // Refresh their session - if it fails, report it
-            if (!memcached::set('medusa_sessionid_'.$session_id, true)) {
+            if (!memcached::set('medusa_sessionid_'.$session_id, $user_id)) {
                 return 'Memcache Error: '.memcached::report_last_error().' (memcached::set)';
             }
-            return 'Login still valid';
+            // Login still valid, tell them who the user is
+            return $user_id;
         }
         else {
-            return 'Login Expired';
+            // Login isn't valid, tell them we aren't a user
+            return null;
         }
     }
 
