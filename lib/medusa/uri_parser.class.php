@@ -23,13 +23,15 @@ class Uri_Parser {
   function __construct($uri) {
     $this->_uri_ = $uri;
 
-    $urihalves = split('\?',$uri,2); # Divide the uri into the class.format and parameters
-    $methodstrings = split('\.',$urihalves[0]);
-    $this->_format_ = array_pop($methodstrings); # drop off the last bit (the format), and...
-    $this->_method_ = join('_',$methodstrings); # ... join them up with a different string
-    $this->_method_ = str_replace(array('<', '>', '\\', '/',',','.'), "", $this->_method_);  # Clean up the method string
+    $urihalves = split('\?', $uri, 2); # Divide the uri into the class.format and parameters
+    $methodstrings = split('\.', $urihalves[0]);
+    $this->_format_ = array_pop($methodstrings); // drop off the last bit (the format), and...
+    $this->_method_ = join('_', $methodstrings); // ... join them up with a different string
+    
+    //TODO turn into whitelist instead of blacklist
+    $this->_method_ = str_replace(array('<', '>', '\\', '/', ',', '.'), "", $this->_method_);  // Clean up the method string
 
-    foreach(split('&',  $urihalves[1]) as $variable) {
+    foreach (split('&',  $urihalves[1]) as $variable) {
       $bits = split('=', $variable);
       $params[$bits[0]] = $bits[1];
     }
