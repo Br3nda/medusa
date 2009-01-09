@@ -52,7 +52,7 @@ class response {
     function render($format = 'html') {
         $method = '__render_' . $format;
         error_logging('DEBUG', 'Render method: '.$method);
-        if(is_callable(array($this, $method))) {
+        if (is_callable(array($this, $method))) {
     		return $this->$method();
     	}
         else {
@@ -69,7 +69,8 @@ class response {
         $html = "<br />Response:<br />";
         if (is_object($this->response) || is_array($this->response)) {
             $html = $this->__recurse_html($this->response); 
-        } elseif (!empty($this->response)) {
+        } 
+        elseif (!empty($this->response)) {
             $html = $this->response;
         }
         else {
@@ -86,15 +87,18 @@ class response {
                 if (is_object($value) && ($value instanceof WrmsBase)) {
                     //Can use this method as WrmsBase defines it
                     $output[] = $value->getData();
-                } else {
+                } 
+                else {
                     //Shove anything else into array
                     $output[] = $value;
                 }
             }
             return json_encode($output);
-        } elseif ($this->response instanceof WrmsBase) {
+        } 
+        elseif ($this->response instanceof WrmsBase) {
             return json_encode($this->response->getData());
-        } else {
+        } 
+        else {
             return json_encode($this->response);
         }
     }
@@ -106,7 +110,7 @@ class response {
         return $output;
     }
     private function __render_dump() {
-        return '<br />Response:<br /><pre>'.print_r($this->response, true).'</pre>';
+        return '<br />Response:<br /><pre>'. print_r($this->response, true) .'</pre>';
     }
     
     function __construct($response = null) {
@@ -116,17 +120,20 @@ class response {
     private function __recurse_html($input) {
         if ($input instanceof WrmsBase) {
             return $this->__recurse_html($input->getData());
-        } elseif (is_array($input) || is_object($input)) {
+        } 
+        elseif (is_array($input) || is_object($input)) {
             $output = '';
             foreach ($input as $key=>$value) {
                 if (is_array($value) || is_object($value)) {
                     $output .= $this->__recurse_html($value);
-                } else {
+                } 
+                else {
                     $output .= htmlentities($key) . ': ' . htmlentities($value) . "<br />\n";
                 }
             }
             return $output;
-        } else {
+        } 
+        else {
             return $input;
         }
     }
@@ -140,34 +147,38 @@ class response {
         if (is_object($input)) {
             if ($input instanceof WrmsBase) {
                 $data = $input->getData();
-            } else {
+            } 
+            else {
                 $data = $input;
             }
             $tag = get_class($input);
             $output = "$tabs<$tag>\n";
             $child_tabs = $tabs.chr(9);
             //$output = "$tabs<$tag>\n".$this->__recurse_xml($data, ++$depth)."$tabs</$tag>\n";
-            foreach ($data as $key=>$value) {
+            foreach ($data as $key => $value) {
                 $child = htmlentities($key);
                 $child_depth = $depth + 2;
                 if (is_object($value) || is_array($value)) {
-                    $output .= "$child_tabs<$child>".$this->__recurse_xml($value, $child_depth)."$child_tabs</$child>\n";
-                } else {
-                    $output .= "$child_tabs<$child>".htmlentities($value)."</$child>\n";
+                    $output .= "$child_tabs<$child>". $this->__recurse_xml($value, $child_depth) ."$child_tabs</$child>\n";
+                } 
+                else {
+                    $output .= "$child_tabs<$child>". htmlentities($value) ."</$child>\n";
                 }
             }
             $output .= "$tabs</$tag>\n";
             return $output;
-        } elseif (is_array($input)) {
+        } 
+        elseif (is_array($input)) {
             $output = '';
-            foreach ($input as $key=>$value) {
+            foreach ($input as $key => $value) {
                 if (is_object($value)) {
                     $output .= $this->__recurse_xml($value, $depth);
                 }
             }
             return $output;
-        } else {
-            return $tabs.$input;
+        } 
+        else {
+            return $tabs . $input;
         }
     }
 
