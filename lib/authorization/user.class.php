@@ -26,7 +26,7 @@ class user {
       return false; 
     }   
     $object = db_fetch_object($result);
-    foreach($object as $key => $val) {
+    foreach ($object as $key => $val) {
         $this->$key = $val; 
     }   
   }
@@ -50,4 +50,3 @@ class user {
   function __destruct() {
   }
 }
-?>
