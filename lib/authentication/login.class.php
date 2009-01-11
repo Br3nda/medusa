@@ -7,11 +7,24 @@
 
 class login {
 
-    // Assumes we've already checked for an existing session - which we do in index
-    // Will hand out as many sessions for a valid login as the user wants
-    // If we had malicious users they could use this to flood memcache and force other users sessions to expire
-    public function do_login($params) {
 
+    /**
+     * Calls all the methods necessary to do a login
+     *
+     * @params $params
+     *      Array of parameters
+     *      - $params['POST']['username']: The username of the user POSTed to the page 
+     *      - $params['POST']['password']: The password of the user POSTed to the page 
+     * @return
+     *      A response object with a session ID on success, an error object on failure to login
+     */
+   public function do_login($params) {
+    /* 
+     * Assumes we've already checked for an existing session - which we do in index
+     * Will hand out as many sessions for a valid login as the user wants
+     * If we had malicious users they could use this to flood memcache and force other users sessions to expire
+     */
+ 
         $username = $params['POST']['username']; # Don't allow logins via GET!
         $password = $params['POST']['password']; # Don't allow logins via GET!
 
@@ -43,8 +56,15 @@ class login {
         }
     }
 
-    /*
-     * Nice and simple: do they have a valid login?
+   /**
+    * Checks the username and password of a user and returns their ID if they are valid
+     * @params
+     *      $username: The username of the person logging in - unclean data
+     *      $password: The password of the person logging in - unclean data
+     *      $user_id: The ID of the user, which we will set if their details are correct (passed by reference)
+     *      $response: A string of text explaining the true/false result
+     * @return
+     *      TRUE if credentials are valid, FALSE if they are not
      */
     private function valid_credentials($username, $password, $user_id, $response) {        
         assert(!is_null($username));
@@ -52,7 +72,7 @@ class login {
 
         error_logging('DEBUG', "checking credentials of $username, $password");
         // See if they even exist
-        $result = db_query("SELECT user_no, password from usr where username = '$username'");
+        $result = db_query("SELECT user_no, password from usr where username = '%s'", $username); // Handles the unclean username - <3 Database Abstraction
         
         $row = db_fetch_object($result);
         $hash = $row->password;
@@ -66,7 +86,7 @@ class login {
             
             // Get the salt and has the password we received
             $salt = $matches[1];
-            $hash_of_received = sprintf("*%s*%s", $salt, md5($salt . $password));
+            $hash_of_received = sprintf("*%s*%s", $salt, md5($salt . $password)); // Handles the unclean password
 
             // Compare our hashes
             if ($hash_of_received == $hash) {
@@ -84,12 +104,19 @@ class login {
         }
     }
 
-    /*
-     * Create a session for this user - if the user already has a session, give them their current one
+    /**
+     * Creates a session for this user - the user can have multiple sessions
      * Allows multiple scripts to run at the same time and not cause each other to fail
+     *
+     * @params
+     *      $user_id: the ID of the current user
+     *      $response: passed by reference, either the reason for the failure or the session ID
+     * @return
+     *      TRUE if the session is created, FALSE if it is not
      */
     private function create_session($user_id, $response) {
 
+        assert(is_numeric($user_id));
         $session_id = login::__generate_session_id();
 
         /*
@@ -112,6 +139,15 @@ class login {
         return true;
     }
 
+    /**
+     * Checks to see if their session is still valid in memcache
+     * @params
+     *      $session_id: The ID of the session we want to check
+     * @return
+     *      An error string if memcache fails
+     *      A user ID if we find their session
+     *      A null if we don't find their session
+     */
     function check_session($session_id) {
         // If this person is logged in
         $user_id = memcached::get('medusa_sessionid_'.$session_id);
@@ -128,7 +164,11 @@ class login {
             return null;
         }
     }
-
+/**
+ * Generates a random ID based on the current timestamp and a random integer
+ * @return
+ *      A session ID in the format timestamp:randomint
+ */
     private function __generate_session_id() {
         return time().':'.rand(0000000000000, 9999999999999);
     }
