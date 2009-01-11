@@ -19,7 +19,7 @@ class response {
     */
     function message($message) {
       assert(!is_null($message));
-      $this->response['message'] = $message;
+      $this->message = $message;
     }
   
   /**
@@ -27,7 +27,7 @@ class response {
     */
     function message_append($message) {
       assert(!is_null($message));
-      $this->response['message'] .= ' ' . $message;
+      $this->message .= ' ' . $message;
     }
     
     /*

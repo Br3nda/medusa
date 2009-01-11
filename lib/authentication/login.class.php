@@ -7,43 +7,41 @@
 
 class login {
 
-    // Assumes we've already checked for an existing session
+    // Assumes we've already checked for an existing session - which we do in index
+    // Will hand out as many sessions for a valid login as the user wants
+    // If we had malicious users they could use this to flood memcache and force other users sessions to expire
     public function do_login($params) {
 
-        $username = $params['POST']['username']; # Don't allow logins via GET
-        $password = $params['POST']['password']; # Don't allow logins via GET
+        $username = $params['POST']['username']; # Don't allow logins via GET!
+        $password = $params['POST']['password']; # Don't allow logins via GET!
 
         /*
          * Make sure we were called properly
          */
-        if (is_null($username)) {
-            return new error('No username supplied');
+        if (is_null($username) || empty($username)) {
+            return new error('No username supplied', 403);
         }
-        if (is_null($password)) {
-            return new error('No password supplied');
+        if (is_null($password) || empty($password)) {
+            return new error('No password supplied', 403);
         }
-
         if (login::valid_credentials($username, $password, &$user_id, &$response)) {
-            /*
-             * Make a session and all that lovely stuff
-             */
+            // Make a session and all that lovely stuff
             // If we successfully put out session into memcache
             if (login::create_session($user_id, &$response)) {
                 currentuser::set(new user($user_id));
-                return new response($response);
+                $resp = new response('Login success');
+                $resp->set_data('session_id', $response);
+                return $resp;
             }
             // If putting our session into memcache failed
             else {
-                return new error($response);
+                return new error($response, 500);
             }
-
         } 
         else {
-                return new error($response);
+                return new error($response, 403);
         }
-
     }
-
 
     /*
      * Nice and simple: do they have a valid login?

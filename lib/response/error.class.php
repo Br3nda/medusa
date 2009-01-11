@@ -4,6 +4,7 @@ class error extends response {
     
     function __construct($message = null, $code = 400) {
     	$this->message = $message;
+        $this->code = $code;
     }
 
   /**
