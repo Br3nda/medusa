@@ -44,8 +44,8 @@ foreach ($_POST as $k => $v) {
         $params['POST'] = $_POST;
 }
 
-if (!is_null($params['GET']['session_id'])) {
-    currentuser::set(new user(login::check_session($params['GET']['session_id'])));
+if (!is_null($params['POST']['session_id'])) {
+    currentuser::set(new user(login::check_session($params['POST']['session_id'])));
 }
 
 $access = access::getInstance();
