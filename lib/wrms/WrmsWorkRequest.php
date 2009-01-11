@@ -40,9 +40,11 @@ class WrmsWorkRequest extends WrmsBase {
   * Force Extending class to define this metho
     */
   public function populate($row) {
+      error_logging('DEBUG', "Running Setting WrmsWorkRequest->populate()");
       // TODO, fill this out!
       foreach ($row as $key => $value) {
         $this->$key = $value; # Horrible horrible hack!
+    	error_logging('DEBUG', "Setting WrmsWorkRequest '$key' to '$value'.");
       }
       $this->populated = true;
   }
