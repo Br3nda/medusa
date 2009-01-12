@@ -32,7 +32,7 @@ require('medusa/common.php');
  * Method Arguments Argument Title 	Name 	Data type 
  * Work Request ID 	wr 	int
  */
- require('methods/wrms_request_allocated_getAllocated.php');
+require('methods/wrms_request_allocated_getAllocated.php');
 class test_wrms_request_allocated_getAllocated extends UnitTestCase {
 	function testgetAllocated() {
 		//You probably need a session
@@ -224,7 +224,7 @@ class CodeStyleTest extends UnitTestCase {
        $d = dir($base);
        if (!$d) {
          $this->assertTrue(false, 'Failed to read dir: "' . $dir .'"');
-         next;
+         continue;
        }
        else {
        	$ignore_list = array('Zend', 'simpletest', '\.');
