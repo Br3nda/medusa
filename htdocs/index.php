@@ -4,17 +4,16 @@
  *
  * Requirements
  * * Convert existing SQL access, fomr catlayst LAN to Read only - see WRMS/Direct Sql Access 
-* Close off psql access from LAN for the general users (that's the one with the super rights) 
-* Create a new API to encapsulate the business logic of WRMS, codename = Medusa 
-* Convert WRMS web app to use Medusa instead of SQL
-* Set up copy if Ned from Egressive, and get working with Medusa
-* Get other apps (and teh scripts used by catalysters) to all user Medusa
+ * Close off psql access from LAN for the general users (that's the one with the super rights) 
+ * Create a new API to encapsulate the business logic of WRMS, codename = Medusa 
+ * Convert WRMS web app to use Medusa instead of SQL
+ * Set up copy if Ned from Egressive, and get working with Medusa
+ * Get other apps (and teh scripts used by catalysters) to all user Medusa
  *
  *   - @link /api/groups Topics @endlink
  *   - @link /api/constants Constants @endlink
  *   - @link /api/globals Global variables @endlink
  * 
- * Auth 
  */
 
 
