@@ -5,7 +5,7 @@
  */
 class wrms_login {
     
-    function run ($params) {
-            return login::do_login($params);
-    }
+  function run($params) {
+    return login::do_login($params);
+  }
 }

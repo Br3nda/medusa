@@ -21,7 +21,7 @@ class wrms_search {
 
 
     public function run($parameters) {
-        	error_logging('DEBUG', "Found '".$parameters['GET']['type']."' for type");
+      	error_logging('DEBUG', "Found '". $parameters['GET']['type'] ."' for type");
         if ($parameters['GET']['type'] == null) {
         	error_logging('WARNING', "No type provided.");
             return null;
@@ -42,7 +42,7 @@ class wrms_search {
             }
     }
 
-    /*
+    /**
     * If a search request is found for workrequests, search for and builds workrequest objects
     * based on the records found.
     */
@@ -60,12 +60,12 @@ class wrms_search {
         $wheresql = array(); # list of where's to join together in abig happy array
 
         foreach ($this->parameters as $parameterkey => $parameterstring) {
-            if (array_key_exists($parameterkey,$this->gettodbfields) && array_key_exists($parameterkey,$this->gettodbjoins)) {
+            if (array_key_exists($parameterkey, $this->gettodbfields) && array_key_exists($parameterkey, $this->gettodbjoins)) {
                 $joinsql[] = $this->gettodbjoins[$parameterkey];
-                $wheresql[] = $this->formatBoolValues($this->gettodbfields[$parameterkey],$parameterstring);
+                $wheresql[] = $this->formatBoolValues($this->gettodbfields[$parameterkey], $parameterstring);
             }
        }
-        $sql = "SELECT * FROM request ".implode(' ',$joinsql)." WHERE " . implode(' AND ',$wheresql);
+        $sql = "SELECT * FROM request ".implode(' ', $joinsql) ." WHERE ". implode(' AND ', $wheresql);
         error_logging('DEBUG', "wrms_search auto generated $sql");
         $result = db_query($sql);
 
@@ -78,7 +78,7 @@ class wrms_search {
         return $matches;
     }
 
-    /*
+    /**
     * creates an SQL string from boolean search
     * @param $string = string to fix up
     * @param $key = db table column name
