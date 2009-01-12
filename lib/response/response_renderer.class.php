@@ -21,7 +21,7 @@ class response_renderer {
     function render($format = 'html') {
         $method = '__render_' . $format;
         error_logging('DEBUG', 'Render method: '.$method);
-        if(is_callable(array($this, $method))) {
+        if (is_callable(array($this, $method))) {
     		return $this->$method();
     	}
         else {
@@ -38,7 +38,8 @@ class response_renderer {
         $html = "<br />Response:<br />";
         if (is_object($this->response) || is_array($this->response)) {
             $html = $this->__recurse_html($this->response); 
-        } elseif (!empty($this->response)) {
+        } 
+        elseif (!empty($this->response)) {
             $html = $this->response;
         }
         else {
@@ -55,7 +56,8 @@ class response_renderer {
                 if (is_object($value) && ($value instanceof WrmsBase)) {
                     //Can use this method as WrmsBase defines it
                     $output[] = $value->getData();
-                } else {
+                } 
+                else {
                     //Shove anything else into array
                     $output[] = $value;
                 }
@@ -91,14 +93,16 @@ class response_renderer {
             foreach ($data as $key=>$value) {
                 $child = htmlentities($key);
                 if (is_object($value) || is_array($value)) {
-                    $output .= "<$child>".$this->__recurse_xml($value)."</$child>\n";
-                } else {
-                    $output .= "<$child>".htmlentities($value)."</$child>\n";
+                    $output .= "<$child>". $this->__recurse_xml($value) ."</$child>\n";
+                } 
+                else {
+                    $output .= "<$child>". htmlentities($value) ."</$child>\n";
                 }
             }
             $output .= "</$tag>\n";
             return $output;
-        } elseif (is_array($input)) {
+        } 
+        elseif (is_array($input)) {
             $output = '';
             foreach ($input as $key=>$value) {
                 if (is_object($value)) {
@@ -106,9 +110,8 @@ class response_renderer {
                 }
             }
             return $output;
-        } else {
-            return $input;
-        }
+        } 
+        return $input;
     }
 
     private function __render_dump() {
@@ -118,17 +121,20 @@ class response_renderer {
     private function __recurse_html($input) {
         if ($input instanceof WrmsBase) {
             return $this->__recurse_html($input->getData());
-        } elseif (is_array($input) || is_object($input)) {
+        } 
+        elseif (is_array($input) || is_object($input)) {
             $output = '';
             foreach ($input as $key=>$value) {
                 if (is_array($value) || is_object($value)) {
                     $output .= $this->__recurse_html($value);
-                } else {
+                } 
+                else {
                     $output .= htmlentities($key) . ': ' . htmlentities($value) . "<br />\n";
                 }
             }
             return $output;
-        } else {
+        } 
+        else {
             return $input;
         }
     }
