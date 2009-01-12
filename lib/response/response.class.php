@@ -49,19 +49,6 @@ class response {
         $this->data['message'] = $this->message;
         return $this->data;
     }
-
-    /*
-     * Get the response code 
-     */
-    function get_code() {
-        return $this->code;
-    }
-    /*
-     * Get the response message
-     */
-    function get_message() {
-        return $this->message;
-    }
 }
 /**
  * @defgroup Response Medusa Response

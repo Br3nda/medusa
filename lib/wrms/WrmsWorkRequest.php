@@ -5,7 +5,7 @@
  */
 class WrmsWorkRequest extends WrmsBase {
   public $id;
-  public $populated;
+  private $populated;
   public $data; // Set of key values
   public $timesheets;
   public $notes;

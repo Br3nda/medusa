@@ -13,11 +13,6 @@ class response_renderer {
    */
     function __construct($to_render) {
         $this->response = $to_render;
-        /*
-         * We force the status code and message to render
-         */
-        //$this->response->code = $this->response->get_code();
-        //$this->response->message = $this->response->get_message();
     }   
 
   /**
