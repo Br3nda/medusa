@@ -4,11 +4,11 @@
  * WorkRequest Object
  */
 class WrmsWorkRequest extends WrmsBase {
-  private $id;
-  private $populated;
-  private $data; // Set of key values
-  private $timesheets;
-  private $notes;
+  public $id;
+  public $populated;
+  public $data; // Set of key values
+  public $timesheets;
+  public $notes;
 
   public function __construct($id = null) {
     $this->data = array();

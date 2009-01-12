@@ -3,8 +3,8 @@
 class error extends response {
     
     function __construct($message = null, $code = 400) {
-    	$this->message = $message;
-        $this->code = $code;
+    	$this->status_message = $message;
+        $this->status_code = $code;
     }
 
   /**
@@ -12,7 +12,7 @@ class error extends response {
     */
     function code($code) {
       assert(!is_null($code));
-      $this->response['code'] = $code;
+      $this->status_code = $code;
     }  
 
   /** 

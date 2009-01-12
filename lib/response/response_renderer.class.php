@@ -13,6 +13,11 @@ class response_renderer {
    */
     function __construct($to_render) {
         $this->response = $to_render;
+        /*
+         * We force the status code and message to render
+         */
+        //$this->response->code = $this->response->get_code();
+        //$this->response->message = $this->response->get_message();
     }   
 
   /**
@@ -61,19 +66,56 @@ class response_renderer {
                 }
             }
             return json_encode($output);
-        } elseif ($this->response instanceof WrmsBase) {
+        }
+        elseif ($this->response instanceof WrmsBase) {
             return json_encode($this->response->getData());
-        } else {
+        } 
+
+        elseif ($this->response instanceof response) {
+            // Our response object contains a code, message and a data array, which should have eberything it wants rendered as public
             return json_encode($this->response);
         }
+        else {
+            // We're stuffed
+        }
     }
+
     private function __render_xml() {
         header('Content-type: application/xml');
-        $output .= "<response>\n";
-        $output .= $this->__recurse_xml($this->response, 1);
-        $output .= '</response>';
+    
+        $output = $this->__recurse_xml($this->response);
         return $output;
     }
+    private function __recurse_xml($input) {
+
+        if (is_object($input)) {
+            $data = $input->getData();
+            $tag = get_class($input);
+            $output = "<$tag>\n";
+
+            foreach ($data as $key=>$value) {
+                $child = htmlentities($key);
+                if (is_object($value) || is_array($value)) {
+                    $output .= "<$child>".$this->__recurse_xml($value)."</$child>\n";
+                } else {
+                    $output .= "<$child>".htmlentities($value)."</$child>\n";
+                }
+            }
+            $output .= "</$tag>\n";
+            return $output;
+        } elseif (is_array($input)) {
+            $output = '';
+            foreach ($input as $key=>$value) {
+                if (is_object($value)) {
+                    $output .= $this->__recurse_xml($value);
+                }
+            }
+            return $output;
+        } else {
+            return $input;
+        }
+    }
+
     private function __render_dump() {
         return '<br />Response:<br /><pre>'.print_r($this->response, true).'</pre>';
     }
@@ -93,46 +135,6 @@ class response_renderer {
             return $output;
         } else {
             return $input;
-        }
-    }
-
-    private function __recurse_xml($input, $depth = 0) {
-        $tabs = '';
-        //Behold the ugly dirty tab builder
-        for ($i = 0; $i < $depth; $i++) {
-            $tabs .= chr(9);
-        }
-        if (is_object($input)) {
-            if ($input instanceof WrmsBase) {
-                $data = $input->getData();
-            } else {
-                $data = $input;
-            }
-            $tag = get_class($input);
-            $output = "$tabs<$tag>\n";
-            $child_tabs = $tabs.chr(9);
-            //$output = "$tabs<$tag>\n".$this->__recurse_xml($data, ++$depth)."$tabs</$tag>\n";
-            foreach ($data as $key=>$value) {
-                $child = htmlentities($key);
-                $child_depth = $depth + 2;
-                if (is_object($value) || is_array($value)) {
-                    $output .= "$child_tabs<$child>".$this->__recurse_xml($value, $child_depth)."$child_tabs</$child>\n";
-                } else {
-                    $output .= "$child_tabs<$child>".htmlentities($value)."</$child>\n";
-                }
-            }
-            $output .= "$tabs</$tag>\n";
-            return $output;
-        } elseif (is_array($input)) {
-            $output = '';
-            foreach ($input as $key=>$value) {
-                if (is_object($value)) {
-                    $output .= $this->__recurse_xml($value, $depth);
-                }
-            }
-            return $output;
-        } else {
-            return $tabs.$input;
         }
     }
 

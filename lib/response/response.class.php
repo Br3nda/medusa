@@ -6,12 +6,14 @@
 
 
 class response {
-  protected $code = 200;
-  protected $message;
+  public $code = 200;
+  public $message;
+  public $data;
   
 
   function __construct($message = null) {
       $this->message($message);
+      $data = array();
   }
 
   /**
@@ -36,7 +38,29 @@ class response {
     function set_data($name, $value) {
         assert(!is_null($name));
         assert(!is_null($value));
-        $this->response[$name] = $value;
+        $this->data[$name] = $value;
+    }
+
+    /*
+     * Allows us to get the data object
+     */
+    function getData() {
+        $this->data['code'] = $this->code;
+        $this->data['message'] = $this->message;
+        return $this->data;
+    }
+
+    /*
+     * Get the response code 
+     */
+    function get_code() {
+        return $this->code;
+    }
+    /*
+     * Get the response message
+     */
+    function get_message() {
+        return $this->message;
     }
 }
 /**
