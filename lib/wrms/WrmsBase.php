@@ -28,9 +28,10 @@ abstract class WrmsBase {
 
     /**
     * When populate is called, it's imperative that we also populate any children
-    * an object might have (eg; time sheets for work requests). 
+    * an object might have (eg; time sheets for work requests).
+    * This is not called automatically, otherwise we'd get recursive objects.
     */
-    abstract protected function populateChildren();
+    abstract public function populateChildren();
 
     /**
     * Method to populate object using external (or internal) source.
@@ -39,7 +40,6 @@ abstract class WrmsBase {
       foreach ($row as $key => $value) {
         $this->$key = $value; # Horrible horrible hack!
       }
-      $this->populateChildren();
       $this->populated = true;
     }
 

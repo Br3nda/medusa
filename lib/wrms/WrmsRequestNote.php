@@ -1,15 +1,15 @@
 <?php
 
 /**
- * WorkTimeSheet Object to attach to Work requests
+ * WrmsRequestNote Object to attach to Work requests
  */
-class WrmsTimeSheet extends WrmsBase {
+class WrmsRequestNote extends WrmsBase {
 
   public function populateNow($id = null) {
     if ($id == null) {
       $id = $this->id;
     }
-    $result = db_query("SELECT * FROM request_timesheet WHERE timesheet_id='%d'", $id);
+    $result = db_query("SELECT * FROM request_note WHERE note_by_id='%d'", $id);
     if (count($result) == 1) {
       $this->populate($result[0]);
     }
@@ -17,7 +17,7 @@ class WrmsTimeSheet extends WrmsBase {
   
   protected function __set($name, $value) {
     switch ($name) {
-      case 'timesheet_id':
+      case 'note_by_id':
         $this->id = $value;
         break;
       default:

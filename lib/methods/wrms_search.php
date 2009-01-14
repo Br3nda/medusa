@@ -59,6 +59,7 @@ class wrms_search {
           error_logging('DEBUG', "Creating WrmsWorkRequest in wrms_search");
             $workreq = new WrmsWorkRequest();
             $workreq->populate($row);
+            $workreq->populateChildren();
             $matches[] = $workreq;
         }
         return $matches;
