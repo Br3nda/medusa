@@ -27,12 +27,19 @@ abstract class WrmsBase {
     abstract public function populateNow($id = null);
 
     /**
+    * When populate is called, it's imperative that we also populate any children
+    * an object might have (eg; time sheets for work requests). 
+    */
+    abstract protected function populateChildren();
+
+    /**
     * Method to populate object using external (or internal) source.
     */
     public function populate($row) {
       foreach ($row as $key => $value) {
         $this->$key = $value; # Horrible horrible hack!
       }
+      $this->populateChildren();
       $this->populated = true;
     }
 

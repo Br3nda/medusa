@@ -4,8 +4,8 @@
  * WorkRequest Object
  */
 class WrmsWorkRequest extends WrmsBase {
-  private $timesheets;
-  private $notes;
+  public $timesheets;
+  public $notes;
 
   public function populateNow($id = null) {
     if ($id == null) {
@@ -15,6 +15,17 @@ class WrmsWorkRequest extends WrmsBase {
     if (count($result) == 1) {
       $this->populate($result[0]);
     }
+  }
+
+  protected function populateChildren() {
+      $this->timesheets = array();
+      $result = db_query("SELECT * FROM request_timesheet WHERE request_id='%d'", $this->id);
+
+      while ($row = db_fetch_assoc($result)) {
+        $newsheet = new WrmsTimeSheet();
+        $newsheet->populate($row);
+        $this->timesheets[] = $newsheet;
+      }
   }
   
   protected function __set($name, $value) {
@@ -32,7 +43,7 @@ class WrmsWorkRequest extends WrmsBase {
     switch ($name) {
       case 'timesheets':
         if ($this->timesheets == null) {
-            $this->timesheets = new WrmsTimeSheets($this->id);
+            $this->timesheets = new WrmsTimeSheet($this->id);
         }
         return $this->timesheets;
         break;
@@ -47,3 +58,4 @@ class WrmsWorkRequest extends WrmsBase {
        parent::__get($name);
   }
 }
+
