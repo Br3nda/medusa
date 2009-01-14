@@ -53,9 +53,8 @@ class response_renderer {
         if (is_array($this->response)) {
             $output = array();
             foreach ($this->response as $key=>$value) {
-                if (is_object($value) && ($value instanceof WrmsBase)) {
-                    //Can use this method as WrmsBase defines it
-                    $output[] = $value->getData();
+                if (is_object($value)) {
+                    $output[] = get_object_vars($value);
                 } 
                 else {
                     //Shove anything else into array
@@ -64,10 +63,6 @@ class response_renderer {
             }
             return json_encode($output);
         }
-        elseif ($this->response instanceof WrmsBase) {
-            return json_encode($this->response->getData());
-        } 
-
         elseif ($this->response instanceof response) {
             // Our response object contains a code, message and a data array, which should have eberything it wants rendered as public
             return json_encode($this->response);
@@ -81,12 +76,12 @@ class response_renderer {
         header('Content-type: application/xml');
     
         $output = $this->__recurse_xml($this->response);
-        return $output;
+        return "<response>\n$output</response>";
     }
     private function __recurse_xml($input) {
 
         if (is_object($input)) {
-            $data = $input->getData();
+            $data = get_object_vars($input);
             $tag = get_class($input);
             $output = "<$tag>\n";
 
@@ -119,10 +114,7 @@ class response_renderer {
     }
     
     private function __recurse_html($input) {
-        if ($input instanceof WrmsBase) {
-            return $this->__recurse_html($input->getData());
-        } 
-        elseif (is_array($input) || is_object($input)) {
+        if (is_array($input) || is_object($input)) {
             $output = '';
             foreach ($input as $key=>$value) {
                 if (is_array($value) || is_object($value)) {

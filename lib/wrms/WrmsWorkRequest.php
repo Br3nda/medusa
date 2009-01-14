@@ -4,24 +4,10 @@
  * WorkRequest Object
  */
 class WrmsWorkRequest extends WrmsBase {
-  public $id;
-  private $populated;
-  public $data; // Set of key values
-  public $timesheets;
-  public $notes;
+  private $timesheets;
+  private $notes;
 
-  public function __construct($id = null) {
-    $this->data = array();
-
-    if ($id == null) {
-      $this->populated = false;
-    }
-    else if (is_set($id) && is_int($id)) {
-      $this->id = $id;
-    }
-  }
-
-  private function populateNow($id = null) {
+  public function populateNow($id = null) {
     if ($id == null) {
       $id = $this->id;
     }
@@ -31,32 +17,23 @@ class WrmsWorkRequest extends WrmsBase {
     }
   }
   
-  public function getData() {
-    //Hack way to get data out
-    return $this->data;
-  }
-
-    /**
-  * Force Extending class to define this metho
-    */
-  public function populate($row) {
-      error_logging('DEBUG', "Running Setting WrmsWorkRequest->populate()");
-      // TODO, fill this out!
-      foreach ($row as $key => $value) {
-        $this->$key = $value; # Horrible horrible hack!
-    	error_logging('DEBUG', "Setting WrmsWorkRequest '$key' to '$value'.");
-      }
-      $this->populated = true;
-  }
-
-  private function __set($name, $value) {
-    $this->data[$name] = $value;
+  protected function __set($name, $value) {
+    switch ($name) {
+      case 'request_id':
+        $this->id = $value;
+        break;
+      default:
+        parent::__set($name,$value);
+        break;
+    }
   }
 
   private function __get($name) {
     switch ($name) {
       case 'timesheets':
-        $this->timesheets = new WrmsTimeSheets($this->id);
+        if ($this->timesheets == null) {
+            $this->timesheets = new WrmsTimeSheets($this->id);
+        }
         return $this->timesheets;
         break;
             
@@ -67,20 +44,6 @@ class WrmsWorkRequest extends WrmsBase {
         return $this->notes;
         break;
     }
-        
-    if (!$this->populated) {
-      $this->populateNow();
-    }
-    if (array_key_exists($name, $this->data)) {
-      return $this->data[$name];
-    }
-  }
-
-  private function __isset($name) {
-    return isset($this->data[$name]);
-  }
-
-  private function __unset($name) {
-    $this->data[$name] = null;
+       parent::__get($name);
   }
 }
