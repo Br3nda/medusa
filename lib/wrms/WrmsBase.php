@@ -6,5 +6,6 @@
 abstract class WrmsBase {
     // Force Extending class to define this method
     abstract public function populate($row);
+    abstract public function getData();
 }
 

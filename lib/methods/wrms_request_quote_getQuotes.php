@@ -14,7 +14,7 @@ class wrms_request_quote_getQuotes {
      *   @return
      *     An array of quotes or an empty array
      */
-    function run ($params) {
+    function run($params) {
         $return = array();
         return $return;
     }

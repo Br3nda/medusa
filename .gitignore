@@ -1,5 +1,6 @@
 *.*~
 lib/config/database.php
+lib/config/general.php
 unittests/simpletest
 unittests/simpletest*
 

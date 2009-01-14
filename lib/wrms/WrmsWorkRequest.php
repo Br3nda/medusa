@@ -4,11 +4,11 @@
  * WorkRequest Object
  */
 class WrmsWorkRequest extends WrmsBase {
-  private $id;
+  public $id;
   private $populated;
-  private $data; // Set of key values
-  private $timesheets;
-  private $notes;
+  public $data; // Set of key values
+  public $timesheets;
+  public $notes;
 
   public function __construct($id = null) {
     $this->data = array();
@@ -30,14 +30,21 @@ class WrmsWorkRequest extends WrmsBase {
       $this->populate($result[0]);
     }
   }
+  
+  public function getData() {
+    //Hack way to get data out
+    return $this->data;
+  }
 
     /**
   * Force Extending class to define this metho
     */
   public function populate($row) {
+      error_logging('DEBUG', "Running Setting WrmsWorkRequest->populate()");
       // TODO, fill this out!
       foreach ($row as $key => $value) {
         $this->$key = $value; # Horrible horrible hack!
+    	error_logging('DEBUG', "Setting WrmsWorkRequest '$key' to '$value'.");
       }
       $this->populated = true;
   }

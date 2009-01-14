@@ -18,7 +18,7 @@ class wrms_user_timesheet_getTimesheets {
      *   @return
      *     An array of timesheets or an empty array if no results
      */
-    function run ($params) {
+    function run($params) {
         $return = array();
         return $return;
     }

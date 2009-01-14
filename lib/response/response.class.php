@@ -6,30 +6,22 @@
 
 
 class response {
-  protected $reponse;
-  private $thing;
+  public $code = 200;
+  public $message;
+  public $data;
   
-  /**
-    * The return code for the response
-    */
-    function code($code) {
-      assert(!is_null($code));
-      $this->response['code'] = $code;
-    }
+
+  function __construct($message = null) {
+      $this->message($message);
+      $data = array();
+  }
+
   /**
     * The human readable message
     */
     function message($message) {
       assert(!is_null($message));
-      $this->response['message'] = $message;
-    }
-  
-  /**
-    * Wrapper for code and message so we can do it on one line
-    */
-    function set($code, $message) {
-      $this->code($code);
-      $this->message($message);
+      $this->message = $message;
     }
   
   /**
@@ -37,104 +29,27 @@ class response {
     */
     function message_append($message) {
       assert(!is_null($message));
-      $this->response['message'] .= ' ' . $message;
+      $this->message .= ' ' . $message;
     }
     
-    function set_var($name, $value) {
+    /*
+     * Allows us to set whatever datas we like
+     */
+    function set_data($name, $value) {
         assert(!is_null($name));
         assert(!is_null($value));
-        $this->response[$name] = $value;
-    }
-  
-  /**
-    * Render the response, in whichever format we want
-    */
-    function render($format = 'html') {
-        $method = '__render_' . $format;
-        error_logging('DEBUG', 'Render method: '.$method);
-        if(is_callable(array($this, $method))) {
-    		return $this->$method();
-    	}
-        else {
-            error_logging('DEBUG', 'Going to default rendering');
-            return $this->__render_html();
-        }
-    }
-  /**
-    * Private functions - we don't want others calling these directly
-    * Yay for php5!
-    */
-    private function __render_html() {
-        error_logging('DEBUG', 'Rendering with __render_html');
-        $html = "<br />Response:<br />";
-        if (is_object($this->response) || is_array($this->response)) {
-            $html = $this->__recurse_html($this->response); 
-        } elseif (!empty($this->response)) {
-            $html = $this->response;
-        }
-        else {
-        	return '<p>No response</p>';
-        }
-        return $html;
-    }
-    private function __render_json() {
-        return json_encode($this->response);
-    }
-    private function __render_xml() {
-    	return $this->__recurse_xml($this->response);
-    }
-    private function __render_dump() {
-        return '<br />Response:<br /><pre>'.print_r($this->response, true).'</pre>';
-    }
-    
-    function __construct($response = null) {
-    	$this->response = $response;
+        $this->data[$name] = $value;
     }
 
-    private function __recurse_html($input) {
-        if (is_object($input) || is_array($input)) {
-            $output = '';
-            foreach ($input as $key=>$value) {
-                if (is_array($value) || is_object($value)) {
-                    $output .= $this->__recurse_html($value);
-                } else {
-                    $output .= htmlentities($key) . ': ' . htmlentities($value) . "<br />\n";
-                }
-            }
-            return $output;
-        } else {
-            return null;
-        }
-    }
-
-    private function __recurse_xml($input, $depth = 0, $parent = 'request') {
-        if (is_object($input) || is_array($input)) {
-            error_logging('DEBUG', 'Is object, depth = '.$depth);
-            $output = '';
-            $next_depth = $depth + 1;
-            foreach ($input as $key=>$value) {
-                $tag = htmlentities($key);
-                if (is_numeric($tag)) {
-                    $tag = $parent;
-                }
-                $tabs = '';
-                for ($i = 0; $i < $depth; $i++) {
-                   //There has to be a more elegant way to do this
-                   $tabs .= chr(9);
-                }
-                if (is_array($value) || is_object($value)) {
-                    $output .= "$tabs<$tag>\n".$this->__recurse_xml($value, $next_depth, $tag)."</$tag>\n";
-                } else {
-                    $output .= "$tabs<$tag>".htmlentities($value)."</$tag>\n";
-                }
-            }
-            return $output;
-        } else {
-            return null;
-        }
+    /*
+     * Allows us to get the data object
+     */
+    function getData() {
+        $this->data['code'] = $this->code;
+        $this->data['message'] = $this->message;
+        return $this->data;
     }
 }
-
 /**
  * @defgroup Response Medusa Response
  * encodes the result of the method call, into the requested format

@@ -2,101 +2,175 @@
 
 /**
  * @author ben
- * Included from htdocs/login.php
+ * Included from htdocs/index.php
  */
 
-/*
- * Nice and simple: do they have a valid login
- */
-function check_credentials($username, $password, $userid, $response) {        
-    assert(!is_null($username));
-    assert(!is_null($password));
+class login {
 
-	error_logging('DEBUG', "checking credentials of $username, $password");
-    // See if they even exist
-    global $db;
-    $query = $db->prepare("SELECT password from usr where username = '$username'");
-    $query->execute();
-    $hash = $query->fetch();
 
-    $hash = $hash['password'];
-
-    /*
-     * WRMS has passwords in the format: *salt*md5hash
-     * We need to get the salt and then salt the password the user provided to us
+    /**
+     * Calls all the methods necessary to do a login
+     *
+     * @params $params
+     *      Array of parameters
+     *      - $params['POST']['username']: The username of the user POSTed to the page 
+     *      - $params['POST']['password']: The password of the user POSTed to the page 
+     * @return
+     *      A response object with a session ID on success, an error object on failure to login
      */
-    // If the password is in the format we expect
-    if (preg_match('/^\*(.+)\*.+$/', $hash, $matches)) { 
-        
-        // Get the salt and has the password we received
-        $salt = $matches[1];
-        $hash_of_received = sprintf("*%s*%s", $salt, md5($salt . $password));
+   public function do_login($params) {
+    /* 
+     * Assumes we've already checked for an existing session - which we do in index
+     * Will hand out as many sessions for a valid login as the user wants
+     * If we had malicious users they could use this to flood memcache and force other users sessions to expire
+     */
+ 
+        $username = $params['POST']['username']; # Don't allow logins via GET!
+        $password = $params['POST']['password']; # Don't allow logins via GET!
 
-        // Compare our hashes
-        if ($hash_of_received == $hash) {
-            // Why no response? Because we still have to make a session, until that happens then no point saying they're logged in
-            return true;
-        } else {
-            $response->set('403', "Invalid username or password");
+        /*
+         * Make sure we were called properly
+         */
+        if (is_null($username) || empty($username)) {
+            return new error('No username supplied', 403);
+        }
+        if (is_null($password) || empty($password)) {
+            return new error('No password supplied', 403);
+        }
+        if (login::valid_credentials($username, $password, &$user_id, &$response)) {
+            // Make a session and all that lovely stuff
+            // If we successfully put out session into memcache
+            if (login::create_session($user_id, &$response)) {
+                currentuser::set(new user($user_id));
+                $resp = new response('Login success');
+                $resp->set_data('session_id', $response);
+                return $resp;
+            }
+            // If putting our session into memcache failed
+            else {
+                return new error($response, 500);
+            }
+        } 
+        else {
+                return new error($response, 403);
+        }
+    }
+
+   /**
+    * Checks the username and password of a user and returns their ID if they are valid
+     * @params
+     *      $username: The username of the person logging in - unclean data
+     *      $password: The password of the person logging in - unclean data
+     *      $user_id: The ID of the user, which we will set if their details are correct (passed by reference)
+     *      $response: A string of text explaining the true/false result
+     * @return
+     *      TRUE if credentials are valid, FALSE if they are not
+     */
+    private function valid_credentials($username, $password, $user_id, $response) {        
+        assert(!is_null($username));
+        assert(!is_null($password));
+
+        error_logging('DEBUG', "checking credentials of $username, $password");
+        // See if they even exist
+        $result = db_query("SELECT user_no, password from usr where username = '%s'", $username); // Handles the unclean username - <3 Database Abstraction
+        
+        $row = db_fetch_object($result);
+        $hash = $row->password;
+
+        /*
+         * WRMS has passwords in the format: *salt*md5hash
+         * We need to get the salt and then salt the password the user provided to us
+         */
+        // If the password is in the format we expect
+        if (preg_match('/^\*(.+)\*.+$/', $hash, $matches)) { 
+            
+            // Get the salt and has the password we received
+            $salt = $matches[1];
+            $hash_of_received = sprintf("*%s*%s", $salt, md5($salt . $password)); // Handles the unclean password
+
+            // Compare our hashes
+            if ($hash_of_received == $hash) {
+                $user_id = $row->user_no;
+                return true;
+            } 
+            else {
+                $response = "Invalid username or password";
+                return false;
+            }
+        }
+        else {
+            $response = "Invalid password format";
             return false;
         }
     }
-    else {
-        $response->set('500', "Invalid password format");
-        return false;
-    }
-}
 
-/*
- * Create a session for this user - if the user already has a session, give them their current one
- * Allows multiple scripts to run at the same time and not cause each other to fail
- */
-function create_session($current_session, $response) {
-
-    // Check if we are already logged in - of so return our current session ID
-    if (is_logged_in($current_session, &$response)) {
-        return;
-    }
-
-    $session_id = __generate_session_id();
-
-    /*
-     * Write value to memcache
+    /**
+     * Creates a session for this user - the user can have multiple sessions
+     * Allows multiple scripts to run at the same time and not cause each other to fail
+     *
+     * @params
+     *      $user_id: the ID of the current user
+     *      $response: passed by reference, either the reason for the failure or the session ID
+     * @return
+     *      TRUE if the session is created, FALSE if it is not
      */
-    // If the write fails
-    if (!memcache::set('medusa_sessionid_'.$session_id, true)) {
-        $response->set('500', memcache::report_last_error()." (memcache::set)");
-        return;
-    }
+    private function create_session($user_id, $response) {
 
-    // Ok, I know this is a bit pedantic and doubles the cost but it's better to be safe than sorry
-    if (!memcache::get('medusa_sessionid_'.$session_id)) {
-        $response->set('500', memcache::report_last_error()." (memcache::get)");
-        return;
-    }
+        assert(is_numeric($user_id));
+        $session_id = login::__generate_session_id();
 
-    // If we get this far we have a value in memcache, let the user login
-    $response->set('200', "Login Success");
-    $response->set_var('session_id', $session_id); 
-}
-
-function is_logged_in($session_id, $response) {
-    if (memcache::get('medusa_sessionid_'.$session_id)) {
-        // Refresh their session
-        if (!memcache::set('medusa_sessionid_'.$session_id, true)) {
-            $response->set('500', memcache::report_last_error()." (memcache::set)");
-            return;
+        /*
+         * Write value to memcache
+         */
+        // If the write fails
+        if (!memcached::set('medusa_sessionid_'.$session_id, $user_id)) {
+            $response = memcached::report_last_error().' (memcached::set)';
+            return false;
         }
-        $response->set('200', 'Login still valid');
+
+        // Ok, I know this is a bit pedantic and doubles the cost but it's better to be safe than sorry
+        if (!is_numeric(memcached::get('medusa_sessionid_'.$session_id))) {
+            $response = memcached::report_last_error().' (memcached::get)';
+            return false;
+        }
+
+        // If we get this far we have a value in memcache, let the user login
+        $response = $session_id; 
         return true;
     }
-    else {
-        return false;
+
+    /**
+     * Checks to see if their session is still valid in memcache
+     * @params
+     *      $session_id: The ID of the session we want to check
+     * @return
+     *      An error string if memcache fails
+     *      A user ID if we find their session
+     *      A null if we don't find their session
+     */
+    function check_session($session_id) {
+        // If this person is logged in
+        $user_id = memcached::get('medusa_sessionid_'.$session_id);
+        if (is_numeric($user_id)) {
+            // Refresh their session - if it fails, report it
+            if (!memcached::set('medusa_sessionid_'.$session_id, $user_id)) {
+                return 'Memcache Error: '.memcached::report_last_error().' (memcached::set)';
+            }
+            // Login still valid, tell them who the user is
+            return $user_id;
+        }
+        else {
+            // Login isn't valid, tell them we aren't a user
+            return null;
+        }
     }
+/**
+ * Generates a random ID based on the current timestamp and a random integer
+ * @return
+ *      A session ID in the format timestamp:randomint
+ */
+    private function __generate_session_id() {
+        return time().':'.rand(0000000000000, 9999999999999);
+    }
+
 }
-
-function __generate_session_id() {
-    return time().':'.rand(0000000000000,9999999999999);
-}
-
-

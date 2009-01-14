@@ -15,7 +15,7 @@ class wrms_request_qa_getActions {
      *   An array of actions on success
      *   An empty array on failure
      */
-    function run ($params) {
+    function run($params) {
         $return = array();
         return $return;
     }

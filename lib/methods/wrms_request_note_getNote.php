@@ -15,7 +15,7 @@ class wrms_request_note_getNote {
      *   An array of notes on success
      *   An empty array on failure
      */
-    function run ($params) {
+    function run($params) {
         $return = array();
         return $return;
     }

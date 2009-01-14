@@ -19,12 +19,14 @@ class wrms_search {
 
     public function run($parameters) {
         if ($parameters['type'] == null) {
+
         	error_logging('WARNING', "No type provided.");
             return null;
         }
         else {
-                $this->parameters = $parameters;
-                switch ($parameters['type']) {
+
+                $this->parameters = $parameters['GET'];
+                switch ($this->parameters['type']) {
                 case 'request':
                         return $this->searchWorkRequests();
                         break;
@@ -38,7 +40,9 @@ class wrms_search {
             }
     }
 
-    /*
+
+    /**
+    * Added the structure for dynamically generated SQL code, and some example stuff.:lib/methods/wrms_search.php
     * If a search request is found for workrequests, search for and builds workrequest objects
     * based on the records found.
     */
@@ -56,6 +60,7 @@ class wrms_search {
         $wheresql = array(); # list of where's to join together in abig happy array
 
         foreach ($this->parameters as $parameterkey => $parameterstring) {
+
             if (array_key_exists($parameterkey,$this->gettodbfields) && array_key_exists($parameterkey,$this->gettodbjoins)) {
                 $joinsql[] = $this->gettodbjoins[$parameterkey];
                 $wheresql[] = $this->formatBoolValues($this->gettodbfields[$parameterkey],$parameterstring);
@@ -65,14 +70,14 @@ class wrms_search {
         $result = db_query($sql);
 
         while ($row = db_fetch_assoc($result)) {
+          error_logging('DEBUG', "Creating WrmsWorkRequest in wrms_search");
             $workreq = new WrmsWorkRequest();
             $workreq->populate($row);
             $matches[] = $workreq;
         }
         return $matches;
     }
-
-    /*
+    /**
     * creates an SQL string from boolean search
     * @param $string = string to fix up
     * @param $key = db table column name
@@ -89,5 +94,4 @@ class wrms_search {
     }
 }
 
-?>
 

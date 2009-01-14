@@ -15,37 +15,16 @@
  
 set_include_path(get_include_path() . PATH_SEPARATOR . realpath('../lib/'));
 
+require('./simpletest/autorun.php');
 require('medusa/common.php');
-require('simpletest/autorun.php');
 
-
+//our tests 
 /**
- * @ingroup Unittests
+ * Created on 8/01/2009
+ *
+ * To change the template for this generated file go to
+ * Window - Preferences - PHPeclipse - PHP - Code Templates
  */
-class TestRequestParsing extends UnitTestCase {
-  function testParsing() {
-    $request = new Uri_Parser('/search.xml?user=brenda');
-    
-    $this->assertEqual($request->get_method(), 'search');
-    $this->assertEqual($request->get_format(), 'xml');
-
-    $param = $request->get_params();
-    $this->assertEqual($param['user'], 'brenda');
-    $this->assertEqual(sizeof($param), 1);
-    
-    
-    $request = new Uri_Parser('/wrms.request.get_request.xml?user=brenda');
-    
-    $this->assertEqual($request->get_method(), 'wrms.request.get_request');
-    $this->assertEqual($request->get_format(), 'xml');
-
-    $param = $request->get_params();
-    $this->assertEqual($param['user'], 'brenda');
-    $this->assertEqual(sizeof($param), 1);
-    
-  }
-   
-}
 
 /**
  * wrms.request.allocated.getAllocated 
@@ -53,12 +32,12 @@ class TestRequestParsing extends UnitTestCase {
  * Method Arguments Argument Title 	Name 	Data type 
  * Work Request ID 	wr 	int
  */
- require('methods/wrms_request_allocated_getAllocated.php');
+require('methods/wrms_request_allocated_getAllocated.php');
 class test_wrms_request_allocated_getAllocated extends UnitTestCase {
 	function testgetAllocated() {
 		//You probably need a session
 		$class = new wrms_request_allocated_getAllocated();
-		$params = array('request_id' => '58286');
+		$params = array('wr' => '58286');
 		$result = $class->run($params);
 		$this->assertTrue(is_array($result));
 		$this->assertEqual(sizeof($result), 4);
@@ -69,7 +48,18 @@ class test_wrms_request_allocated_getAllocated extends UnitTestCase {
 }
 
 class test_wrms_request_getRequest extends UnitTestCase {
-	//TODO
+    function testgetRequest() {
+        //Will need to build session object
+        $class = new wrms_request_getRequest();
+        $params = array('wr' => '58286');
+        $result = $class->run($params);
+        $this->assertTrue(is_object($result));
+        $this->assertTrue($result instanceof WrmsWorkRequest);
+    }
+
+    //function testgetRequest_xml()
+    //function testgetRequest_json()
+    //function testgetRequest_forbidden()
 }
 
 class test_wrms_request_note_getNote  extends UnitTestCase {
@@ -107,6 +97,37 @@ class test_wrms_user_timesheet_addTimesheet extends UnitTestCase{
 class test_wrms_user_timesheet_getTimesheets extends UnitTestCase {
 	//TODO
 }
+
+/**
+ * @ingroup Unittests
+ */
+class TestRequestParsing extends UnitTestCase {
+  function testParsing() {
+    $request = new Uri_Parser('/search.xml?user=brenda');
+    
+    $this->assertEqual($request->get_method(), 'search');
+    $this->assertEqual($request->get_format(), 'xml');
+
+    $param = $request->get_params();
+    $this->assertEqual($param['user'], 'brenda');
+    $this->assertEqual(sizeof($param), 1);
+    
+    
+    $request = new Uri_Parser('/wrms.request.get_request.xml?user=brenda');
+    
+    $this->assertEqual($request->get_method(), 'wrms.request.get_request');
+    $this->assertEqual($request->get_format(), 'xml');
+
+    $param = $request->get_params();
+    $this->assertEqual($param['user'], 'brenda');
+    $this->assertEqual(sizeof($param), 1);
+    
+  }
+   
+}
+
+
+
 class testDatabase extends UnitTestCase {
   function testConnection() {
     
@@ -126,6 +147,13 @@ class TestLogin extends UnitTestCase {
   }
 }*/
 
+
+/**
+ * Created on 8/01/2009
+ *
+ * To change the template for this generated file go to
+ * Window - Preferences - PHPeclipse - PHP - Code Templates
+ */
 
 class CodeStyleTest extends UnitTestCase {
    function pathToCode($docroot) {
@@ -196,7 +224,7 @@ class CodeStyleTest extends UnitTestCase {
        $d = dir($base);
        if (!$d) {
          $this->assertTrue(false, 'Failed to read dir: "' . $dir .'"');
-         next;
+         continue;
        }
        else {
        	$ignore_list = array('Zend', 'simpletest', '\.');
