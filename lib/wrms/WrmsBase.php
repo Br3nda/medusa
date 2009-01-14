@@ -2,6 +2,10 @@
 
 /**
  * Base object for all wrms objects, such as work requests, time sheet entries, users, etc
+ * For most simple objects, implementing the __set, populateNow, and populateChildren() methods
+ * will be sufficient.
+ * An example of a simple implementation is WrmsTimeSheet
+ * An example of a more complicated implementation with child classes is WrmsWorkRequest
  */
 abstract class WrmsBase {
     public $id;
@@ -27,14 +31,17 @@ abstract class WrmsBase {
     abstract public function populateNow($id = null);
 
     /**
-    * When populate is called, it's imperative that we also populate any children
-    * an object might have (eg; time sheets for work requests).
+    * method to populate childen objects of this object, such as time sheets
+    * in the case of a work request.
     * This is not called automatically, otherwise we'd get recursive objects.
+    * If the implemented object is logically an endpoint, such as a request_note
+    * or request_status, it is acceptable to make this method a blank implementation.
     */
     abstract public function populateChildren();
 
     /**
     * Method to populate object using external (or internal) source.
+    * @param $row Array of key value pairs for a single row.
     */
     public function populate($row) {
       foreach ($row as $key => $value) {
