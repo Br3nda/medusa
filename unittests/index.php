@@ -236,3 +236,31 @@ class TestLogin extends UnitTestCase {
   }
 }*/
 
+
+
+function unittest_header($string) {
+  $this->dump($string);
+}
+
+
+class renderertest extends UnitTestCase {
+
+  function testErrorRender() {
+
+    $result = new error("$method does not exist");
+    $response_renderer = new response_renderer($result);
+
+    $xml = $response_renderer->render('xml');
+
+    
+    if (!$this->assertEqual('<response>
+<error>
+<code>200</code>
+<message></message>
+<data></data>
+<status_message> does not exist</status_message>
+<status_code>400</status_code>
+</error>
+</response>', $xml)) $this->dump($xml);
+  }
+}
