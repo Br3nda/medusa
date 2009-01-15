@@ -21,7 +21,7 @@ class WrmsRequestNote extends WrmsBase {
         $this->id = $value;
         break;
       default:
-        parent::__set($name,$value);
+        parent::__set($name, $value);
         break;
     }
   }

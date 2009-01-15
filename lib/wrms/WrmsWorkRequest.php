@@ -45,7 +45,7 @@ class WrmsWorkRequest extends WrmsBase {
         $this->id = $value;
         break;
       default:
-        parent::__set($name,$value);
+        parent::__set($name, $value);
         break;
     }
   }
@@ -54,14 +54,16 @@ class WrmsWorkRequest extends WrmsBase {
     error_logging('DEBUG', "Calling WrmsWorkRequest.__get with $name");
     switch ($name) {
       case 'timesheets':
-        if ($this->timesheets == null)
+        if ($this->timesheets == null) {
             $this->populateChildren();
+        }
         return $this->timesheets;
         break;
             
       case 'notes':
-        if ($this->notes == null)
+        if ($this->notes == null) {
             $this->populateChildren();
+        }
         return $this->notes;
         break;
     }
