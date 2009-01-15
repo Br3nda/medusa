@@ -18,7 +18,23 @@ class wrms_request_allocated_getAllocated {
      *     An empty array on failure
      */
     function run($params) {
-        $return = array();
-        return $return;
+
+        $request_id = $params['GET']['wr'];
+        $access = access::getInstance();
+        if ($access->canUserSeeRequest($request_id)) {
+            $result = db_query('SELECT allocated_to_id FROM request_allocated WHERE request_id = %d', $request_id);
+            $users = array();
+            $response = new response('Success');
+
+            while ($row = db_fetch_object($result)) {
+                $users[] = new user($row->allocated_to_id);
+            }
+            
+            $response->set_data('allocated', $users);
+            return $response;
+        }
+        else {
+            return new error('Access denied', '403');
+        }
     }
 }
