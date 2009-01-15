@@ -130,64 +130,112 @@ class test_wrms_request_allocated_getAllocated extends UnitTestCase {
 		$params = array('wr' => '58286');
 		$result = $class->run($params);
 		$this->assertTrue(is_array($result));
-		$this->assertEqual(sizeof($result), 4);
+		$this->assertEqual(sizeof($result), 4, 'Should have 4 allocated people');
 		foreach ($result as $r) {
 			$this->assertEqual('user', get_class($r));
 		}
 	}	
 }
 
-class test_wrms_request_getRequest extends UnitTestCase {
-    function testgetRequest() {
-        //Will need to build session object
-        $class = new wrms_request_getRequest();
-        $params = array('wr' => '58286');
-        $result = $class->run($params);
-        $this->assertTrue(is_object($result));
-        $this->assertTrue($result instanceof WrmsWorkRequest);
-    }
-
-    //function testgetRequest_xml()
-    //function testgetRequest_json()
-    //function testgetRequest_forbidden()
-}
+// class test_wrms_request_getRequest extends UnitTestCase {
+// 
+// 
+//   //     function testgetRequest() {
+// //         //Will need to build session object
+// //         $class = new wrms_request_getRequest();
+// //         $params = array('wr' => '58286');
+// //         $result = $class->run($params);
+// //       //$this->assertTrue($result instanceof WrmsWorkRequest);
+// //     }
+//   
+//     //function testgetRequest_xml()
+//     //function testgetRequest_json()
+//     //function testgetRequest_forbidden()
+//   
+//   
+// }
 
 class wrms_restful_method_testcase extends UnitTestCase {
-	function testRun(){
-		$classname = get_class($this);
-		$this->dump($classname);		
+	function testRunning(){
 
+    $method_class = preg_replace('!^test_!', '', get_class($this));
+    if ('wrms_restful_method_testcase' == $method_class) {
+      return;
+    }
+
+		$this->dump('testing ' . $method_class);
+    $this->assertTrue(class_exists($method_class), $method_class .' does not exist');
+    if(class_exists($method_class)) {
+      $method = new $method_class();
+      //$result =  $method->run();
+      //$this->assertTrue(is_array($result));
+    }
 	}
+
+
+}
+class test_wrms_request_getRequest extends wrms_restful_method_testcase {
+  
+  function test_pulling_data() {
+    $pg_result = db_query("SELECT * FROM request ORDER BY request_id LIMIT 10");
+    $this->assertTrue($result != false);
+    $this->assertEqual(10, db_num_rows($pg_result));
+    while ($row = db_fetch_object($pg_result)) {
+      $params['GET']['wr'] = $row->request_id;
+      $method = new wrms_request_getRequest();
+      $request = $method->run($params);
+      $this->dump($row);
+      $this->dump($request->data['wr']);
+      $this->assertTrue(is_object($request));
+      
+      $this->assertEqual($request->code, 200);
+      $this->assertEqual($request->message, 'Success');
+
+      //array of WRs
+      $this->assertTrue(is_array($request->data));
+
+      $this->assertEqual($request->data['wr']->id, $row->request_id);
+
+      foreach(array('request_on', 'active', 'last_status', 'sla_response_hours', 'urgency', 'importance', 'severity_code', 'erquest_id', 'eta', 'last_activity', 'sla_response_time', 'sla_response_type', 'requested_by_date', 'agreeded_due_date', 'request_by', 'breif', 'detailed', 'entered_by', 'system_id', 'parent_request', 'invoice_to'
+                   ) as $param) {
+        $this->assertEqual($request->data['wr']->$param, $row->$param, $param .' does not match');
+      }
+    }
+  }
+
+}
+/*
+class test_wrms_login extends wrms_restful_method_testcase {
 }
 
 class test_wrms_request_note_getNote  extends UnitTestCase {
 }
 
-class test_wrms_request_quote_getQuotes extends UnitTestCase {
+class test_wrms_request_quote_getQuotes extends wrms_restful_method_testcase {
 }
 
-class test_wrms_request_status_getCurrentStatus extends UnitTestCase {
+class test_wrms_request_status_getCurrentStatus extends wrms_restful_method_testcase {
 }
 
-class test_wrms_request_status_getStatusHistory extends UnitTestCase {
+class test_wrms_request_status_getStatusHistory extends wrms_restful_method_testcase {
 }
 
-class test_wrms_request_subscriber_getSubscribers extends UnitTestCase {
+class test_wrms_request_subscriber_getSubscribers extends wrms_restful_method_testcase {
 }
 
-class test_wrms_request_timesheet_addTimesheet extends UnitTestCase {
+class test_wrms_request_timesheet_addTimesheet extends wrms_restful_method_testcase {
 }
 
-class test_wrms_request_timesheet_getTimesheets extends UnitTestCase {
+class test_wrms_request_timesheet_getTimesheets extends wrms_restful_method_testcase {
 }
 
-class test_wrms_user_timesheet_addTimesheet extends UnitTestCase{
+class test_wrms_user_timesheet_addTimesheet extends wrms_restful_method_testcase{
 }
 
-class test_wrms_user_timesheet_getTimesheets extends UnitTestCase {
+class test_wrms_user_timesheet_getTimesheets extends wrms_restful_method_testcase {
 
 }
-
+*/
 /**
  * @ingroup Unittests
  */
@@ -222,9 +270,16 @@ class testDatabase extends UnitTestCase {
     
   }
   function testQuery() {
-    $result = db_query("SELECT * FROM request LIMIT 10");
+    $result = db_query("SELECT * FROM request ORDER BY request_id LIMIT 10");
     $this->assertTrue($result != false);
-    
+    while ($row = db_fetch_object($result)) {
+      //$this->dump($row);
+      foreach(array('request_id', 'request_on', 'active', 'last_status', 'requester_id', 'last_activity', 'sla_response_time', 'sla_response_type',  'brief', 'entered_by', 'system_id',  ) as $param) {
+        
+        $this->assertTrue(($row->$param), $param .' missing from object');
+      }
+
+    }
   }
 }
 
@@ -273,3 +328,4 @@ class renderertest extends UnitTestCase {
 </response>', $xml)) $this->dump($xml);
   }
 }
+
