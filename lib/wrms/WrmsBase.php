@@ -20,7 +20,7 @@ abstract class WrmsBase {
     if ($id == null) {
       $this->populated = false;
     }
-    else if (is_set($id) && is_int($id)) {
+    else if (isset($id) && is_int($id)) {
       $this->id = $id;
     }
   }

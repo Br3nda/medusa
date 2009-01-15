@@ -16,7 +16,6 @@ class wrms_request_note_getNotes {
      *   An empty array on failure
      */
     function run($params) {
-
         $request_id = $params['GET']['wr'];
         $access = access::getInstance();
         if ($access->canUserSeeRequest($request_id)) {
@@ -24,8 +23,10 @@ class wrms_request_note_getNotes {
             $response = new response('Success');
             $notes = array();
 
-            while ($row = db_fetch_assoc($result)) {
-                $notes[] = $row;
+            while ($row = db_fetch_object($result)) {
+                $note = new WrmsRequestNote();
+                $note->populateNow($row);
+                $notes[] = $note;
             }
     
             $response->set_data('notes', $notes);
@@ -34,10 +35,5 @@ class wrms_request_note_getNotes {
         else {
             return new error('Access denied', '403');
         }
-
-
-        /*
-        $return = array();
-        return $return;*/
     }
 }
