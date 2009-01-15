@@ -48,7 +48,7 @@ class response_renderer {
         return $html;
     }
     private function __render_json() {
-        header('Content-type: application/x-javascript');
+        $this->header('Content-type: application/x-javascript');
         //Check if the response is an array
         if (is_array($this->response)) {
             $output = array();
@@ -71,9 +71,19 @@ class response_renderer {
             // We're stuffed
         }
     }
+  /**
+    * We decide not to send headers, if they're already sent
+    * This is to make unittests happy
+    */
+  private function header($string) {
+    if (!headers_sent()) {
+      header($string);
+    }
+     
+  }
 
     private function __render_xml() {
-        header('Content-type: application/xml');
+        $this->header('Content-type: application/xml');
     
         $output = $this->__recurse_xml($this->response);
         return "<response>\n$output</response>";
