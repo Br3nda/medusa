@@ -26,27 +26,32 @@ require_once('memcache/memcache.wrapper.class.php');
 
 
 if (DEBUG_MODE) {
-    require_once('medusa/debug.php');
+  require_once('medusa/debug.php');
 }
 
+/**
+ * Pull all the possible include paths out of the include directory into
+ * a var called $path
+ */
 function __autoload($class_name) {
-    # Pull all the possible include paths out of the include directory into
-    # a var called $path
-    foreach (split(':', get_include_path()) as $path) {
-        $filename = $path . '/methods/' . $class_name . '.php';
-        error_logging('DEBUG', "Include path is: '$path'");
-        error_logging('DEBUG', "Including class: $filename");
-        if ($path[0] == '/' && is_file($filename) && is_readable($path)) { # ensure absolute pathing
-            include_once($filename);
-            break;            
-        }
-        $filename = $path . '/wrms/' . $class_name . '.php';
-        error_logging('DEBUG', "Include path is: '$path'");
-        error_logging('DEBUG', "Including class: $filename");
-        if ($path[0] == '/' && is_file($filename) && is_readable($path)) { # ensure absolute pathing
-            include_once($filename);
-            break;            
-        }
+
+  foreach (split(':', get_include_path()) as $path) {
+    $filename = $path . '/methods/' . $class_name . '.php';
+    error_logging('DEBUG', "Include path is: '$path'");
+    error_logging('DEBUG', "Including class: $filename");
+    // ensure absolute pathing
+    if ($path[0] == '/' && is_file($filename) && is_readable($path)) {
+      include_once($filename);
+      break;
     }
+    $filename = $path . '/wrms/' . $class_name . '.php';
+    error_logging('DEBUG', "Include path is: '$path'");
+    error_logging('DEBUG', "Including class: $filename");
+    // ensure absolute pathing
+    if ($path[0] == '/' && is_file($filename) && is_readable($path)) { 
+      include_once($filename);
+      break;
+    }
+  }
 
 }
