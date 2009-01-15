@@ -163,7 +163,7 @@ class wrms_restful_method_testcase extends UnitTestCase {
       return;
     }
 
-		$this->dump('testing ' . $method_class);
+    //$this->dump('testing ' . $method_class);
     $this->assertTrue(class_exists($method_class), $method_class .' does not exist');
     if(class_exists($method_class)) {
       $method = new $method_class();
@@ -178,14 +178,14 @@ class test_wrms_request_getRequest extends wrms_restful_method_testcase {
   
   function test_pulling_data() {
     $pg_result = db_query("SELECT * FROM request ORDER BY request_id LIMIT 10");
-    $this->assertTrue($result != false);
+    $this->assertTrue($pg_result != false, 'Unable to pull database records');
     $this->assertEqual(10, db_num_rows($pg_result));
     while ($row = db_fetch_object($pg_result)) {
       $params['GET']['wr'] = $row->request_id;
       $method = new wrms_request_getRequest();
       $request = $method->run($params);
-      $this->dump($row);
-      $this->dump($request->data['wr']);
+      //$this->dump($row);
+      //$this->dump($request->data['wr']);
       $this->assertTrue(is_object($request));
       
       $this->assertEqual($request->code, 200);
