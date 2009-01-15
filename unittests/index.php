@@ -18,14 +18,6 @@ set_include_path(get_include_path() . PATH_SEPARATOR . realpath('../lib/'));
 require('./simpletest/autorun.php');
 require('medusa/common.php');
 
-//our tests 
-/**
- * Created on 8/01/2009
- *
- * To change the template for this generated file go to
- * Window - Preferences - PHPeclipse - PHP - Code Templates
- */
-
 /**
  * wrms.request.allocated.getAllocated 
  * Gets a list of the people whom this work is currently assigned to. 
@@ -62,40 +54,40 @@ class test_wrms_request_getRequest extends UnitTestCase {
     //function testgetRequest_forbidden()
 }
 
+class wrms_restful_method_testcase extends UnitTestCase {
+	function testRun(){
+		$classname = get_class($this);
+		$this->dump($classname);		
+
+	}
+}
+
 class test_wrms_request_note_getNote  extends UnitTestCase {
-	//TODO
 }
 
 class test_wrms_request_quote_getQuotes extends UnitTestCase {
-	//TODO
 }
 
 class test_wrms_request_status_getCurrentStatus extends UnitTestCase {
-	//TODO
 }
 
 class test_wrms_request_status_getStatusHistory extends UnitTestCase {
-	//TODO
 }
 
 class test_wrms_request_subscriber_getSubscribers extends UnitTestCase {
-	//TODO
 }
 
 class test_wrms_request_timesheet_addTimesheet extends UnitTestCase {
-	//TODO
 }
 
 class test_wrms_request_timesheet_getTimesheets extends UnitTestCase {
-	//TODO
 }
 
 class test_wrms_user_timesheet_addTimesheet extends UnitTestCase{
-	//TODO
 }
 
 class test_wrms_user_timesheet_getTimesheets extends UnitTestCase {
-	//TODO
+
 }
 
 /**
@@ -112,10 +104,9 @@ class TestRequestParsing extends UnitTestCase {
     $this->assertEqual($param['user'], 'brenda');
     $this->assertEqual(sizeof($param), 1);
     
-    
     $request = new Uri_Parser('/wrms.request.get_request.xml?user=brenda');
     
-    $this->assertEqual($request->get_method(), 'wrms.request.get_request');
+    $this->assertEqual($request->get_method(), 'wrms_request_get_request');
     $this->assertEqual($request->get_format(), 'xml');
 
     $param = $request->get_params();
