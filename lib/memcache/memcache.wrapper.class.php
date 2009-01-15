@@ -24,7 +24,7 @@ class memcached {
      * @return
      *      Whatever the Memcache Client cache returns
      */
-    function set($key, $data, $exptime=CONFIG_MEMCACHE_EXPIRY, $forcehost=false) {
+    function set($key, $data, $exptime = CONFIG_MEMCACHE_EXPIRY, $forcehost = false) {
         self::connect();
         return self::$memcache->set($key, $data, $exptime, $forcehost);       
     }
@@ -37,7 +37,7 @@ class memcached {
      * @return
      *       Whatever the Memcache Client cache returns
      */
-    function get($keys,$forcehost=false) {
+    function get($keys, $forcehost = false) {
         self::connect();
         return self::$memcache->get($keys, $forcehost);
     }
@@ -48,7 +48,7 @@ class memcached {
      *      A string reporting the type of error
      */
     function report_last_error() {
-        return "Memcache error (" . self::$memcache->errno.") ". self::$memcache->errstr;
+        return "Memcache error (". self::$memcache->errno .") ". self::$memcache->errstr;
     }
 
 }
