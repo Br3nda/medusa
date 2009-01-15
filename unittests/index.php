@@ -263,4 +263,13 @@ class renderertest extends UnitTestCase {
 </error>
 </response>', $xml)) $this->dump($xml);
   }
+
+  function testArrayRender() {
+    $result = array();
+    $response_renderer = new response_renderer($result);
+    $xml = $response_renderer->render('xml');
+    
+    if (!$this->assertEqual('<response>
+</response>', $xml)) $this->dump($xml);
+  }
 }
