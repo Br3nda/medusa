@@ -109,7 +109,7 @@ class MemCachedClient {
     $results = array();
     
     // group the keys by server so that we can issue ONE multi-key get command for each server
-    $groups = array();
+        $groups = array();
     foreach ($keys as $k=>$key) {
       $socket = $this->_get_socket($key, $forcehost);
       $groups[$socket] .= $key ." ";
@@ -119,7 +119,7 @@ class MemCachedClient {
 
     foreach ($groups as $k => $keygroup) {
       $cmd = "get ". trim($keygroup) ."\r\n";
-      list($key, ) = explode(" ", $keygroup);
+      list($key, $blah) = explode(" ", $keygroup);
             
       if (!$this->_socket_write($key, $cmd, $forcehost)) {
         return false;
@@ -139,35 +139,37 @@ class MemCachedClient {
         }
         $value = trim($value);
                 
-        if ($value=="END") {
+        if ($value == "END") {
           break;
         }
                 
-        list(, $key, $flags, $bytestotal) = explode(' ',$value);
+        list(, $key, $flags, $bytestotal) = explode(' ', $value);
                 
         $bytesread = 0;
         $bytestotal += 2;
         $data = "";
 
-        while ($bytesread<$bytestotal) {
+        while ($bytesread < $bytestotal) {
           $remaining = $bytestotal - $bytesread;
           $bufsize = $remaining > 1024 ? 1024 : $remaining;
                     
-          if (!$buf = $this->_socket_read($key,$bufsize,$forcehost)) return false;
+          if (!$buf = $this->_socket_read($key, $bufsize, $forcehost)) {
+            return false;
+          }
           $data .= $buf;
                     
           $bytesread += strlen($buf);
         }
 
         $data = substr($data, 0, strlen($data) - 2);
-        if ($flags==1) {
+        if ($flags == 1) {
           $data = unserialize($data);
         }
         $results[$key] = $data;
       }
     }
         
-    if (count($results)<=1) {
+    if (count($results) <= 1) {
       $results = array_shift($results);
     }
 
@@ -205,24 +207,26 @@ class MemCachedClient {
   }
 
     /**
-     * wait up to $max_wait tenths of a second for $key to become unlocked;
-     * if $fail is TRUE, the operation will fail if the lock cannot be acquired
-     * in the specified amount of time; if $fail is FALSE, the lock will be reset
-     * and the write forced if it cannot be acquired in the specified amount of time
-     */
-  function wait_lock($key,$fail=true,$max_wait=30) {
+  * wait up to $max_wait tenths of a second for $key to become unlocked;
+  * if $fail is TRUE, the operation will fail if the lock cannot be acquired
+  * in the specified amount of time; if $fail is FALSE, the lock will be reset
+  * and the write forced if it cannot be acquired in the specified amount of time
+    */
+  function wait_lock($key, $fail = true, $max_wait = 30) {
     $iterations = 0;
     while ($this->is_locked($key)) {
       usleep(100000);
-      if ($iterations++==$max_wait) {
-        if (!$fail) $this->set('__lock__'.$key,0);
+      if ($iterations++ == $max_wait) {
+        if (!$fail) {
+          $this->set('__lock__'. $key, 0);
+        }
         return !$fail;
       }
     }
     return true;
   }
 
-  function delete($key,$time=0,$forcehost=false) {
+  function delete($key, $time = 0, $forcehost = false) {
     if (!$key) {
       return $this->_error(ERR_NEED_KEY);
     }
@@ -230,11 +234,15 @@ class MemCachedClient {
     $time = (int) $time;
     $cmd = "delete $key $time\r\n";
         
-    if (!$this->_socket_write($key,$cmd,$forcehost)) return false;
-    if (!$res = $this->_socket_readstr($key,1024,$forcehost)) return false;
+    if (!$this->_socket_write($key, $cmd, $forcehost)) {
+      return false;
+    }
+    if (!$res = $this->_socket_readstr($key, 1024, $forcehost)) {
+      return false;
+    }
     $res = trim($res);
         
-    switch($res) {
+    switch ($res) {
       case "DELETED":
         return $key;
       case "NOT_FOUND":
@@ -245,19 +253,28 @@ class MemCachedClient {
                 
   }
     
-  function flush_all($host=false) {
-    if ($host!==false) $hosts = array($host); else $hosts = $this->hosts;
+  function flush_all($host = false) {
+    if ($host !== false) {
+      $hosts = array($host);
+    }
+    else {
+      $hosts = $this->hosts;
+    }
         
     foreach ($this->hosts as $k=>$host) {
-      if (!$this->_socket_write(-1,"flush_all\r\n",$host)) continue;
-      if (!$res = $this->_socket_readstr(-1,1024,$host)) continue;
+      if (!$this->_socket_write(-1, "flush_all\r\n", $host)) {
+        continue;
+      }
+      if (!$res = $this->_socket_readstr(-1, 1024, $host)) {
+        continue;
+      }
     }
         
     return true;
   }
     
-  function disconnect($host=false) {
-    if ($host!==false) {
+  function disconnect($host = false) {
+    if ($host !== false) {
       $hosts = array($host);
     }
     else {
@@ -275,7 +292,7 @@ class MemCachedClient {
   }
     
   function version($host = false) {
-    if ($host!==false) {
+    if ($host !== false) {
       $hosts = array($host);
     }
     else {
@@ -308,7 +325,7 @@ class MemCachedClient {
   }
     
   function stats($host) {
-    if (!$this->_socket_write(-1,"stats\r\n",$host)) {
+    if (!$this->_socket_write(-1, "stats\r\n", $host)) {
       return false;
     }
 
@@ -405,39 +422,39 @@ class MemCachedClient {
   }
     
     /**
-   * try to write some data to the socket for $key
-  */
+  * try to write some data to the socket for $key
+    */
   function _socket_write($key, $data, $forcehost = false, $attemptnumber = 0) {
     
     // get the appropriate socket
-    $socket = $this->_get_socket($key, $forcehost);
+        $socket = $this->_get_socket($key, $forcehost);
     // if no socket was returned, then there are no memcached servers available
-    if (!$socket) {
+        if (!$socket) {
       return $this->_error(ERR_NO_SOCKET);
-    }
+        }
 
       // try to write our data to the socket
-      if (!$byteswritten = fwrite($socket, $data)) {
+          if (!$byteswritten = fwrite($socket, $data)) {
       // if the data could not be written, then that socket has died (host down, etc.)
 
       // if we've tried all of the possible hosts, then all memcached servers have
       // gone down - bomb out with an error
-      $attemptnumber++;
+          $attemptnumber++;
       if ($attemptnumber >= count($this->hosts)) {
         return $this->_error(ERR_NO_SOCKET);
       }
 
       // mark this socket as dead, and try to get another socket
-      $socket = $this->_get_alternate_socket($key, $forcehost);
+          $socket = $this->_get_alternate_socket($key, $forcehost);
 
       // try the write again
-      return $this->_socket_write($key, $data, $forcehost, $attemptnumber);
-    }
+          return $this->_socket_write($key, $data, $forcehost, $attemptnumber);
+          }
 
-    if ($this->socketdebug) {
-      echo "WRITE [$key:$data]<br />\n";
-    }
-    return $byteswritten;
+          if ($this->socketdebug) {
+            echo "WRITE [$key:$data]<br />\n";
+          }
+          return $byteswritten;
   }
     
   function _socket_read($key, $len = 10240, $forcehost = false, $attemptnumber = 0) {
@@ -504,9 +521,9 @@ class MemCachedClient {
     
     
     /**
-   marks the current socket for $key/$forcehost as dead, and then attempts
+  marks the current socket for $key/$forcehost as dead, and then attempts
     // to get a socket connection to another server to take over
-  */
+    */
   function _get_alternate_socket($key, $forcehost) {
     $this->_remove_socket($key, $forcehost);
     return $this->_get_socket($key, $forcehost);
