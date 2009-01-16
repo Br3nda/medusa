@@ -68,7 +68,7 @@ abstract class WrmsBase {
   * Overloading get status on objects
   * For simple objects, this will be enough.
     */
-  private function __get($name) {
+  protected function __get($name) {
     if (!$this->populated) {
       $this->populateNow();
     }

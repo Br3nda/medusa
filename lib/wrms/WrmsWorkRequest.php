@@ -50,7 +50,7 @@ class WrmsWorkRequest extends WrmsBase {
     }
   }
 
-  private function __get($name) {
+  protected function __get($name) {
     error_logging('DEBUG', "Calling WrmsWorkRequest.__get with $name");
     switch ($name) {
       case 'timesheets':
