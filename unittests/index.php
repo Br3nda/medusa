@@ -28,7 +28,7 @@ class CodeStyleTest extends UnitTestCase {
   }
   function testCodeStyle() {
     $docroot = $_SERVER['DOCUMENT_ROOT'];
-    if (!$docroot) $docroot = '.';
+    if (!$docroot) $docroot = realpath('.');
     $codestyle = $docroot . '/code-style.pl';
     
     foreach ($this->pathToCode($docroot) as $dir) {
@@ -48,6 +48,13 @@ class CodeStyleTest extends UnitTestCase {
         if (!preg_match('!\.inc$!', $entry) && !preg_match('!\.php$!', $entry)) {
           continue;
         }
+/*        $this->dump("$dir/$entry");
+        $this->dump('change to ' .$dir);*/
+        chdir($dir);
+//         $this->dump('/usr/bin/git blame "'. "$entry" .'"');
+        $git_blame = split("\n", shell_exec('/usr/bin/git blame "'. "$entry" .'"'));
+        chdir($docroot);
+//         $this->dump('docroot='. $docroot);
         $contents = file_get_contents("$dir/$entry");
         $code_lines = split("\n", $contents);
         
@@ -57,7 +64,6 @@ class CodeStyleTest extends UnitTestCase {
           $full_code .= "$line_num $l\n";
           $line_num++;
         }
-        
         $result = shell_exec("$codestyle $dir/$entry");
          /*
          if (!$this->assertTrue(empty($result), 'Bad code style in ' . "$dir/$entry")) {
@@ -66,11 +72,16 @@ class CodeStyleTest extends UnitTestCase {
           */
         $lines = split("\n", $result);
         
-        foreach ($lines as $line) {
+        foreach($lines as $line) {
+// //           $this->dump($line);
           if (!$this->asserttrue(empty($line), $line)) {
             preg_match("!$dir/$entry:([0-9]+): !", $line, $matches);
-            $code = $code_lines[$matches[1] -1];
+            $line_number = $matches[1] -1;
+            //$code = $code_lines[$line_number];
             $this->dump($code ."\n");
+            $blame = $git_blame[$line_number-1] ."\n" . $git_blame[$line_number] . "    <-- this line\n" .  $git_blame[$line_number+1] . "\n";
+            $this->dump($blame);
+            
           }
         }
         
@@ -130,23 +141,25 @@ class test_wrms_request_allocated_getAllocated extends UnitTestCase {
 		$params = array('wr' => '58286');
 		$result = $class->run($params);
 		$this->assertTrue(is_array($result));
+
 		$this->assertEqual(sizeof($result), 4, 'Should have 4 allocated people');
 		foreach ($result as $r) {
 			$this->assertEqual('user', get_class($r));
 		}
-	}	
+	}
+  function testgetRequest() {
+    //Will need to build session object
+    $class = new wrms_request_getRequest();
+    $params = array('wr' => '58286');
+    $result = $class->run($params);
+  //$this->assertTrue($result instanceof WrmsWorkRequest);
+  }
 }
 
 // class test_wrms_request_getRequest extends UnitTestCase {
 // 
 // 
-//   //     function testgetRequest() {
-// //         //Will need to build session object
-// //         $class = new wrms_request_getRequest();
-// //         $params = array('wr' => '58286');
-// //         $result = $class->run($params);
-// //       //$this->assertTrue($result instanceof WrmsWorkRequest);
-// //     }
+
 //   
 //     //function testgetRequest_xml()
 //     //function testgetRequest_json()
