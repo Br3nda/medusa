@@ -131,39 +131,7 @@ class CodeStyleTest extends UnitTestCase {
 
 
 
-/**
- * wrms.request.allocated.getAllocated 
- * Gets a list of the people whom this work is currently assigned to. 
- * Method Arguments Argument Title 	Name 	Data type 
- * Work Request ID 	wr 	int
- */
-require('methods/wrms_request_allocated_getAllocated.php');
-class test_wrms_request_allocated_getAllocated extends UnitTestCase {
-	function testgetAllocated() {
-		//You probably need a session
-		$class = new wrms_request_allocated_getAllocated();
-		$params = array('wr' => '58286');
-		$result = $class->run($params);
-		$this->assertTrue(is_array($result));
 
-    if (! $this->assertEqual(sizeof($result), 4, 'Should have 4 allocated people')) {
-      $this->dump($result);
-    }
-    
-		foreach ($result as $r) {
-      if (!$this->assertEqual('user', get_class($r))) {
-        $this->dump($r);
-      }
-		}
-	}
-  function testgetRequest() {
-    //Will need to build session object
-    $class = new wrms_request_getRequest();
-    $params = array('wr' => '58286');
-    $result = $class->run($params);
-  //$this->assertTrue($result instanceof WrmsWorkRequest);
-  }
-}
 
 // class test_wrms_request_getRequest extends UnitTestCase {
 // 
@@ -188,11 +156,21 @@ class wrms_restful_method_testcase extends UnitTestCase {
     //$this->dump('testing ' . $method_class);
     $this->assertTrue(class_exists($method_class), $method_class .' does not exist');
     if(class_exists($method_class)) {
+      $params = array();
       $method = new $method_class();
-      //$result =  $method->run();
+      $result =  $method->run($params);
       //$this->assertTrue(is_array($result));
     }
 	}
+
+  function result_okay($result) {
+    if (!$this->assertEqual($result->code, 200)) {
+      $this->dump($result);
+    }
+    if (!$this->assertEqual($result->message, 'Success')) {
+      $this->dump($result);
+    }
+  }
 
 
 }
@@ -210,8 +188,7 @@ class test_wrms_request_getRequest extends wrms_restful_method_testcase {
       //$this->dump($request->data['wr']);
       $this->assertTrue(is_object($request));
       
-      $this->assertEqual($request->code, 200);
-      $this->assertEqual($request->message, 'Success');
+      $this->result_okay($request);
 
       //array of WRs
       $this->assertTrue(is_array($request->data));
@@ -226,6 +203,43 @@ class test_wrms_request_getRequest extends wrms_restful_method_testcase {
   }
 
 }
+
+/**
+* wrms.request.allocated.getAllocated
+* Gets a list of the people whom this work is currently assigned to.
+* Method Arguments Argument Title  Name  Data type
+* Work Request ID  wr  int
+*/
+require('methods/wrms_request_allocated_getAllocated.php');
+class test_wrms_request_allocated_getAllocated extends wrms_restful_method_testcase {
+  function testgetAllocated() {
+    //You probably need a session
+    $class = new wrms_request_allocated_getAllocated();
+    $params = array('wr' => '58286');
+    $result = $class->run($params);
+    $this->assertTrue(is_array($result));
+    $this->result_okay($request);
+    
+    
+    if (! $this->assertEqual(sizeof($result->data['allocated']), 4, 'Should have 4 allocated people')) {
+      $this->dump($result->data['allocated']);
+    }
+    
+    foreach ($result as $r) {
+      if (!$this->assertEqual('user', get_class($r))) {
+        $this->dump($r);
+      }
+    }
+  }
+  function testgetRequest() {
+    //Will need to build session object
+    $class = new wrms_request_getRequest();
+    $params = array('wr' => '58286');
+    $result = $class->run($params);
+  //$this->assertTrue($result instanceof WrmsWorkRequest);
+  }
+}
+
 /*
 class test_wrms_login extends wrms_restful_method_testcase {
 }
