@@ -15,6 +15,10 @@
  
 set_include_path(get_include_path() . PATH_SEPARATOR . realpath('../lib/'));
 
+if (!is_file('./simpletest/autorun.php')) {
+  echo 'You need to download simpletest and extract into unitests folder';
+  exit;
+}
 require('./simpletest/autorun.php');
 require('medusa/common.php');
 
@@ -142,9 +146,14 @@ class test_wrms_request_allocated_getAllocated extends UnitTestCase {
 		$result = $class->run($params);
 		$this->assertTrue(is_array($result));
 
-		$this->assertEqual(sizeof($result), 4, 'Should have 4 allocated people');
+    if (! $this->assertEqual(sizeof($result), 4, 'Should have 4 allocated people')) {
+      $this->dump($result);
+    }
+    
 		foreach ($result as $r) {
-			$this->assertEqual('user', get_class($r));
+      if (!$this->assertEqual('user', get_class($r))) {
+        $this->dump($r);
+      }
 		}
 	}
   function testgetRequest() {
