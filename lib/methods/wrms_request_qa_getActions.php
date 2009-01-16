@@ -16,7 +16,24 @@ class wrms_request_qa_getActions {
      *   An empty array on failure
      */
     function run($params) {
-        $return = array();
-        return $return;
+        $request_id = $params['GET']['wr'];
+        $access = access::getInstance();
+        if ($access->canUserSeeRequest($request_id)) {
+            $result = db_query('SELECT * FROM request_qa_action WHERE request_id = %d ORDER BY action_on', $request_id);
+            $response = new response('Success');
+            $actions = array();
+
+            while ($row = db_fetch_object($result)) {
+                $action = new WrmsQAAction();
+                $action->populateNow($row);
+                $actions[] = $action;
+            }
+    
+            $response->set_data('actions', $actions);
+            return $response;
+        }
+        else {
+            return new error('Access denied', '403');
+        }
     }
 }

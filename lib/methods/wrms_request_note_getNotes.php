@@ -19,7 +19,7 @@ class wrms_request_note_getNotes {
         $request_id = $params['GET']['wr'];
         $access = access::getInstance();
         if ($access->canUserSeeRequest($request_id)) {
-            $result = db_query('SELECT * FROM request_note WHERE request_id = %d', $request_id);
+            $result = db_query('SELECT * FROM request_note WHERE request_id = %d ORDER BY note_on', $request_id);
             $response = new response('Success');
             $notes = array();
 

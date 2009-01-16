@@ -23,16 +23,6 @@ class WrmsRequestNote extends WrmsBase {
         else {
             return false;
         }
-
-        
-/*    if ($id == null) {
-      $id = $this->id;
-    }
-    $result = db_query("SELECT * FROM request_note WHERE request_id='%d'", $id);
-    while ($row = db_fetch_obj($result));
-    if (count($result) == 1) {
-      $this->populate($result[0]);
-    }*/
   }
   
   protected function __set($name, $value) {
