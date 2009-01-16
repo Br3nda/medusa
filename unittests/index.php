@@ -222,27 +222,29 @@ class test_wrms_request_allocated_getAllocated extends wrms_restful_method_testc
     
     
     if (! $this->assertEqual(sizeof($result->data['allocated']), 4, 'Should have 4 allocated people')) {
-      $this->dump($result->data['allocated']);
+      $this->dump($result);
     }
-    
-    foreach ($result as $r) {
-        $this->dump($r);
-    }
-  }
-  function testgetRequest() {
-    //Will need to build session object
-    $class = new wrms_request_getRequest();
-    $params = array('wr' => '58286');
-    $result = $class->run($params);
-  //$this->assertTrue($result instanceof WrmsWorkRequest);
+
+    //TODO more tests for data types
   }
 }
 
-/*
+
 class test_wrms_login extends wrms_restful_method_testcase {
+  //TODO!
 }
 
-class test_wrms_request_note_getNote  extends UnitTestCase {
+
+class test_wrms_request_note_getNotes  extends wrms_restful_method_testcase {
+  function testGetNote() {
+    $class = new wrms_request_note_getNotes();
+    $params = array('request_id' => 666);
+    $result = $class->run($params);
+    $this->result_okay($result);
+    if (!$this->assertNotEqual(0, sizeof($result->data['notes']), 'No notes found')) {
+      $this->dump($result->data);
+    }
+  }
 }
 
 class test_wrms_request_quote_getQuotes extends wrms_restful_method_testcase {
@@ -269,7 +271,7 @@ class test_wrms_user_timesheet_addTimesheet extends wrms_restful_method_testcase
 class test_wrms_user_timesheet_getTimesheets extends wrms_restful_method_testcase {
 
 }
-*/
+
 /**
  * @ingroup Unittests
  */
