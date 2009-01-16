@@ -218,7 +218,7 @@ class test_wrms_request_allocated_getAllocated extends wrms_restful_method_testc
     $params = array('wr' => '58286');
     $result = $class->run($params);
     $this->assertTrue(is_object($result));
-    $this->result_okay($request);
+    $this->result_okay($result);
     
     
     if (! $this->assertEqual(sizeof($result->data['allocated']), 4, 'Should have 4 allocated people')) {
