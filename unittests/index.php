@@ -23,100 +23,12 @@ require('./simpletest/autorun.php');
 require('medusa/common.php');
 
 
-class CodeStyleTest extends UnitTestCase {
-  function pathToCode($docroot) {
-    $dirs = array(realpath($docroot . '/..'));
-    $dirs = array_merge($this->addSubFolders($dirs), $dirs);
-    $dirs = array_merge($this->addSubFolders($dirs), $dirs);
-    return $dirs;
-  }
-  function testCodeStyle() {
-    $docroot = $_SERVER['DOCUMENT_ROOT'];
-    if (!$docroot) {
-      $docroot = realpath('.');
-    }
-    $codestyle = $docroot . '/code-style.pl';
-    
-    foreach ($this->pathToCode($docroot) as $dir) {
-      
-      if (preg_match('!\.!', $dir)) {
-        continue;
-      }
-      
-      $d = dir($dir);
-      if (!$d) {
-        $this->dump('testCodeStyle: Failed to read dir: "' . $dir .'"');
-        return false;
-      }
-      
-      while ($entry = $d->read()) {
-        
-        if (!preg_match('!\.inc$!', $entry) && !preg_match('!\.php$!', $entry)) {
-          continue;
-        }
-        chdir($dir);
-        $git_blame = split("\n", shell_exec('/usr/bin/git blame "'. "$entry" .'"'));
-        chdir($docroot);
-        $contents = file_get_contents("$dir/$entry");
-        $code_lines = split("\n", $contents);
-        
-        $line_num = 1;
-        $full_code = '';
-        foreach ($code_lines as $l) {
-          $full_code .= "$line_num $l\n";
-          $line_num++;
-        }
-        $result = shell_exec("$codestyle $dir/$entry");
-        $lines = split("\n", $result);
-        
-        foreach ($lines as $line) {
-          if (!$this->asserttrue(empty($line), $line)) {
-            preg_match("!$dir/$entry:([0-9]+): !", $line, $matches);
-            $line_number = $matches[1] -1;
-            //$code = $code_lines[$line_number];
-            $this->dump($code ."\n");
-            $blame = $git_blame[$line_number - 1] ."\n". $git_blame[$line_number] ."    <-- this line\n".  $git_blame[$line_number + 1] ."\n";
-            $this->dump($blame);
-            
-          }
-        }
-        
-         //mark passes for number of lines without error.. just to make it look good
-        
-        for ($i = 0; $i < count($code_lines) - count($lines); $i++) {
-          $this->assertTrue(true);
-        }
-      }
-    }
-  }
-  function addSubFolders($dirs) {
-    $dir = array();
-    foreach ($dirs as $base) {
-      $d = dir($base);
-      if (!$d) {
-        $this->assertTrue(false, 'Failed to read dir: "'. $dir .'"');
-        continue;
-      }
-      else {
-        $ignore_list = array('Zend', 'simpletest', '\.');
-        while ($entry = $d->read()) {
-          
-          if (is_dir($base . '/'. $entry)) {
-            $on_ignore = false;
-            foreach ($ignore_list as $i) {
-              if (preg_match("!$i!", $entry)) {
-                $on_ignore = true;
-              }
-            }
-            if (!$on_ignore) {
-              $dir[] = $base . '/'. $entry;
-            }
-          }
-        }
-      }
-      
-    }
-    return $dir;
+class AllTests extends TestSuite {
+  function allTests() {
+    $this->TestSuite('Medusa WRMS api tests');
+    $this->addFile('codestyle.tests.php');
+    $this->addFile('render.tests.php');
+    $this->addFile('database.tests.php');
   }
 }
 
@@ -298,22 +210,6 @@ class TestRequestParsing extends UnitTestCase {
 
 
 
-class testDatabase extends UnitTestCase {
-  function testConnection() {
-    
-  }
-  function testQuery() {
-    $result = db_query("SELECT * FROM request ORDER BY request_id LIMIT 10");
-    $this->assertTrue($result != false);
-    while ($row = db_fetch_object($result)) {
-      foreach (array('request_id', 'request_on', 'active', 'last_status', 'requester_id', 'last_activity', 'sla_response_time', 'sla_response_type',  'brief', 'entered_by', 'system_id',  ) as $param) {
-        
-        $this->assertTrue(($row->$param), $param .' missing from object');
-      }
-
-    }
-  }
-}
 
 /*
 class TestLogin extends UnitTestCase {
@@ -330,33 +226,5 @@ function unittest_header($string) {
 }
 
 
-class renderertest extends UnitTestCase {
 
-  function testErrorRender() {
-
-    $result = new error("$method does not exist");
-    $response_renderer = new response_renderer($result);
-
-    $xml = $response_renderer->render('xml');
-
-    $xml = preg_replace('!\s!', '', $xml);
-    $correct = preg_replace('!\s!', '', "<error><status><message>doesnotexist</message><code>400</code></status><data></data></error>");
-    if (!$this->assertEqual($correct, $xml)) {
-      //what we g
-      $this->dump('I got this: '. $xml);
-      $this->dump('I expected this: '. $correct);
-    }
-  }
-
-  function testArrayRender() {
-    $result = array();
-    $response_renderer = new response_renderer($result);
-    $xml = preg_replace('!\s!', '', $response_renderer->render('xml'));
-    $correct = "<response></response>";
-    if (!$this->assertEqual($correct, $xml, 'Render empty response object')) {
-      $this->dump('I got: '. $xml);
-      $this->dump('I expected: '. $correct);
-    }
-  }
-}
 
