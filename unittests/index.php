@@ -206,8 +206,9 @@ class test_wrms_request_allocated_getAllocated extends wrms_restful_method_testc
   function testgetAllocated() {
     //You probably need a session
     $class = new wrms_request_allocated_getAllocated();
-    $params = array('wr' => '58286');
+    $params = array('GET'=> array('wr' => '58286'));
     $result = $class->run($params);
+    
     $this->assertTrue(is_object($result));
     $this->result_okay($result);
     
@@ -215,7 +216,6 @@ class test_wrms_request_allocated_getAllocated extends wrms_restful_method_testc
     if (! $this->assertEqual(sizeof($result->data['allocated']), 4, 'Should have 4 allocated people on WR 58286')) {
       $this->dump($result);
     }
-
     //TODO more tests for data types
   }
 }
@@ -229,7 +229,7 @@ class test_wrms_login extends wrms_restful_method_testcase {
 class test_wrms_request_note_getNotes  extends wrms_restful_method_testcase {
   function testGetNote() {
     $class = new wrms_request_note_getNotes();
-    $params = array('request_id' => 666);
+    $params = array('GET' => array('wr' => 666));
     $result = $class->run($params);
     $this->result_okay($result);
     if (!$this->assertNotEqual(0, sizeof($result->data['notes']), 'No notes found')) {
@@ -241,7 +241,7 @@ class test_wrms_request_note_getNotes  extends wrms_restful_method_testcase {
 class test_wrms_request_quote_getQuotes extends wrms_restful_method_testcase {
   function testGetQuotes() {
     $class = new wrms_request_quote_getQuotes();
-    $params = array('request_id' => '56409');
+    $params = array('GET' => array('wr' => '56409'));
     $resylt - $class->run($params);
     
   }
