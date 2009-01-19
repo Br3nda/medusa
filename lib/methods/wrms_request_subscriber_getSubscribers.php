@@ -27,7 +27,7 @@ class wrms_request_subscriber_getSubscribers {
                 $users[] = new user($row->user_no);
             }
                 $response = new response('Success');
-                $response->set_data('users', $users);
+                $response->set('users', $users);
                 return $response;
             }
             else {

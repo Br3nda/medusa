@@ -30,7 +30,7 @@ class wrms_request_allocated_getAllocated {
                 $users[] = new user($row->allocated_to_id);
             }
             
-            $response->set_data('allocated', $users);
+            $response->set('allocated', $users);
             return $response;
         }
         else {

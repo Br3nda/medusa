@@ -43,7 +43,7 @@ class login {
             if (login::create_session($user_id, &$response)) {
                 currentuser::set(new user($user_id));
                 $resp = new response('Login success');
-                $resp->set_data('session_id', $response);
+                $resp->set('session_id', $response);
                 return $resp;
             }
             // If putting our session into memcache failed

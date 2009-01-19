@@ -86,7 +86,7 @@ class response_renderer {
         $this->header('Content-type: application/xml');
     
         $output = $this->__recurse_xml($this->response);
-        return "<response>\n$output</response>";
+        return "$output";
     }
     private function __recurse_xml($input) {
 
@@ -109,9 +109,14 @@ class response_renderer {
         } 
         elseif (is_array($input)) {
             $output = '';
+            $tag = get_class($input);
             foreach ($input as $key=>$value) {
-                if (is_object($value)) {
+                if (is_object($value) || is_array($value)) {
                     $output .= $this->__recurse_xml($value);
+                }
+                else {
+                    $child = htmlentities($key);
+                    $output .= "<$child>$value</$child>";
                 }
             }
             return $output;

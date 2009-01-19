@@ -29,7 +29,7 @@ class wrms_request_note_getNotes {
                 $notes[] = $note;
             }
     
-            $response->set_data('notes', $notes);
+            $response->set('notes', $notes);
             return $response;
         }
         else {

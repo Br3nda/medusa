@@ -32,7 +32,7 @@ class wrms_request_getRequest {
                 $response = new response('Success');
                 $object = new WrmsWorkRequest();
                 $object->populate(db_fetch_object($result));
-                $response->set_data('wr', $object);
+                $response->set('wr', $object);
                 return $response;
             } 
             else {

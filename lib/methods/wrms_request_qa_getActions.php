@@ -29,7 +29,7 @@ class wrms_request_qa_getActions {
                 $actions[] = $action;
             }
     
-            $response->set_data('actions', $actions);
+            $response->set('actions', $actions);
             return $response;
         }
         else {
