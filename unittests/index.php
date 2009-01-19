@@ -30,6 +30,7 @@ class AllTests extends TestSuite {
     $this->addFile('render.tests.php');
     $this->addFile('database.tests.php');
     $this->addFile('methods.tests.php');
+    $this->addFile('parsing.tests.php');
   }
 }
 

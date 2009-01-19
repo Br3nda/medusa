@@ -108,58 +108,67 @@ class test_wrms_request_quote_getQuotes extends wrms_restful_method_testcase {
   function testGetQuotes() {
     $class = new wrms_request_quote_getQuotes();
     $params = array('GET' => array('wr' => '56409'));
-    $resylt - $class->run($params);
+    $result - $class->run($params);
+    $this->result_okay($result);
+    //TODO
     
   }
 }
 
 class test_wrms_request_status_getCurrentStatus extends wrms_restful_method_testcase {
+  function testGetStatus() {
+    $class = new wrms_request_status_getCurrentStatus();
+    $params = array('GET' => array('wr' => '58286'));
+    $result - $class->run($params);
+    $this->result_okay($result);
+    //TODO
+    
+  }
 }
 
 class test_wrms_request_status_getStatusHistory extends wrms_restful_method_testcase {
+  function testGetStatusHistory() {
+    $class = new wrms_request_status_getCurrentStatus();
+    $params = array('GET' => array('wr' => '58286'));
+    $result - $class->run($params);
+    $this->result_okay($result);
+    //TODO
+    
+  }
+    
 }
 
 class test_wrms_request_subscriber_getSubscribers extends wrms_restful_method_testcase {
+  function testGetSubscribers() {
+    $class = new wrms_request_status_getCurrentStatus();
+    $params = array('GET' => array('wr' => ''));
+    $result - $class->run($params);
+    $this->result_okay($result);
+    //TODO
+    
+  }
 }
 
 class test_wrms_request_timesheet_addTimesheet extends wrms_restful_method_testcase {
+  function testaddTimesheet() {
+    $class = new wrms_request_status_getCurrentStatus();
+    //$params = array('GET' => array('wr' => ''));
+    $result - $class->run($params);
+  }
 }
 
 class test_wrms_request_timesheet_getTimesheets extends wrms_restful_method_testcase {
-}
-
-class test_wrms_user_timesheet_addTimesheet extends wrms_restful_method_testcase {
-}
-
-class test_wrms_user_timesheet_getTimesheets extends wrms_restful_method_testcase {
-  
-}
-
-/**
-* @ingroup Unittests
-*/
-class TestRequestParsing extends UnitTestCase {
-  function testParsing() {
-    $request = new Uri_Parser('/search.xml?user=brenda');
-    
-    $this->assertEqual($request->get_method(), 'search');
-    $this->assertEqual($request->get_format(), 'xml');
-    
-    $param = $request->get_params();
-    $this->assertEqual($param['user'], 'brenda');
-    $this->assertEqual(sizeof($param), 1);
-    
-    $request = new Uri_Parser('/wrms.request.get_request.xml?user=brenda');
-    
-    $this->assertEqual($request->get_method(), 'wrms_request_get_request');
-    $this->assertEqual($request->get_format(), 'xml');
-    
-    $param = $request->get_params();
-    $this->assertEqual($param['user'], 'brenda');
-    $this->assertEqual(sizeof($param), 1);
+  function testGetTimesheets() {
+    $class = new wrms_request_status_getCurrentStatus();
+    $params = array('GET' => array('wr' => ''));
+    $result - $class->run($params);
+    $this->result_okay($result);
+    //TODO
     
   }
-  
 }
+
+
+
 
 
