@@ -101,13 +101,38 @@ class test_wrms_login extends wrms_restful_method_testcase {
 
 class test_wrms_request_note_getNotes  extends wrms_restful_method_testcase {
   function testGetNote() {
+    $wr_no = '666';
+    
     $class = new wrms_request_note_getNotes();
-    $params = array('GET' => array('wr' => 666));
+    $params = array('GET' => array('wr' => $wr_no));
     $result = $class->run($params);
     $this->result_okay($result);
     if (!$this->assertNotEqual(0, sizeof($result->data['notes']), 'No notes found')) {
       $this->dump($result->data);
     }
+
+    $this->assertNotNull($result);
+    $this->assertTrue(is_array($result->status));
+    $this->assertTrue(is_array($result->data));
+    $this->assertTrue(is_array($result->data['notes']));
+    $this->assertTrue(sizeof($result->data['notes']) >= 20, 'At least 20 notes');
+    
+    foreach ($result->data['notes'] as $note) {
+      $this->assertEqual(get_class($note), 'WrmsRequestNote');
+      $this->assertNotNull($note->id);
+      $this->assertEqual($note->request_id, $wr_no);
+    }
+    
+    $good = true;
+    $good = $good && $this->assertEqual($result->data['notes'][0]->id, 299);
+    $good = $good && $this->assertEqual($result->data['notes'][0]->note_on, '2006-12-05 13:40:07.949311');
+    $good = $good && $this->assertEqual($result->data['notes'][0]->note_by, '');
+    $good = $good && $this->assertTrue(preg_match('!^The first three are covered. David Zanetti will be in touch regarding firewall questions.!', $result->data['notes'][0]->note_detail));
+    
+    if (!$good) {
+      $this->dump($result->data['notes'][0]);
+    }
+                     
   }
 }
 
