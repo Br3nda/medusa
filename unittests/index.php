@@ -154,10 +154,10 @@ class wrms_restful_method_testcase extends UnitTestCase {
 	}
 
   function result_okay($result) {
-    if (!$this->assertEqual($result->code, 200)) {
+    if (!$this->assertEqual($result->status['code'], 200)) {
       $this->dump($result);
     }
-    if (!$this->assertEqual($result->message, 'Success')) {
+    if (!$this->assertEqual($result->status['message'], 'Success')) {
       $this->dump($result);
     }
   }
