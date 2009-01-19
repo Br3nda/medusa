@@ -202,6 +202,7 @@ class test_wrms_request_getRequest extends wrms_restful_method_testcase {
 */
 require('methods/wrms_request_allocated_getAllocated.php');
 class test_wrms_request_allocated_getAllocated extends wrms_restful_method_testcase {
+  
   function testgetAllocated() {
     //You probably need a session
     $class = new wrms_request_allocated_getAllocated();
@@ -211,7 +212,7 @@ class test_wrms_request_allocated_getAllocated extends wrms_restful_method_testc
     $this->result_okay($result);
     
     
-    if (! $this->assertEqual(sizeof($result->data['allocated']), 4, 'Should have 4 allocated people')) {
+    if (! $this->assertEqual(sizeof($result->data['allocated']), 4, 'Should have 4 allocated people on WR 58286')) {
       $this->dump($result);
     }
 
@@ -239,6 +240,9 @@ class test_wrms_request_note_getNotes  extends wrms_restful_method_testcase {
 
 class test_wrms_request_quote_getQuotes extends wrms_restful_method_testcase {
   function testGetQuotes() {
+    $class = new wrms_request_quote_getQuotes();
+    $params = array('request_id' => '56409');
+    $resylt - $class->run($params);
     
   }
 }
@@ -347,10 +351,11 @@ class renderertest extends UnitTestCase {
   function testArrayRender() {
     $result = array();
     $response_renderer = new response_renderer($result);
-    $xml = $response_renderer->render('xml');
-    
-    if (!$this->assertEqual("<response>\n</response>", $xml)) {
-      $this->dump($xml);
+    $xml = preg_replace('!\s!', '', $response_renderer->render('xml'));
+    $correct = "<response></response>";
+    if (!$this->assertEqual($correct, $xml, 'Render empty response object')) {
+      $this->dump('I got: '. $xml);
+      $this->dump('I expected: '. $correct);
     }
   }
 }
