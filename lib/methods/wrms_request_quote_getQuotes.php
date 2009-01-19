@@ -15,7 +15,24 @@ class wrms_request_quote_getQuotes {
      *     An array of quotes or an empty array
      */
     function run($params) {
-        $return = array();
-        return $return;
+        $request_id = $params['GET']['wr'];
+        $access = access::getInstance();
+        if ($access->canUserSeeRequest($request_id)) {
+            $result = db_query('SELECT * FROM request_quote WHERE request_id = %d ORDER BY quoted_on', $request_id);
+            $response = new response('Success');
+            $actions = array();
+
+            while ($row = db_fetch_object($result)) {
+                $action = new WrmsQuote();
+                $action->populateNow($row);
+                $actions[] = $action;
+            }
+    
+            $response->set('actions', $actions);
+            return $response;
+        }
+        else {
+            return new error('Access denied', '403');
+        }
     }
 }
