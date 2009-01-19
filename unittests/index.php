@@ -26,13 +26,15 @@ require('medusa/common.php');
 class CodeStyleTest extends UnitTestCase {
   function pathToCode($docroot) {
     $dirs = array(realpath($docroot . '/..'));
-    $dirs = $this->addSubFolders($dirs);
-    $dirs = $this->addSubFolders($dirs);
+    $dirs = array_merge($this->addSubFolders($dirs), $dirs);
+    $dirs = array_merge($this->addSubFolders($dirs), $dirs);
     return $dirs;
   }
   function testCodeStyle() {
     $docroot = $_SERVER['DOCUMENT_ROOT'];
-    if (!$docroot) $docroot = realpath('.');
+    if (!$docroot) {
+      $docroot = realpath('.');
+    }
     $codestyle = $docroot . '/code-style.pl';
     
     foreach ($this->pathToCode($docroot) as $dir) {
@@ -52,13 +54,9 @@ class CodeStyleTest extends UnitTestCase {
         if (!preg_match('!\.inc$!', $entry) && !preg_match('!\.php$!', $entry)) {
           continue;
         }
-/*        $this->dump("$dir/$entry");
-        $this->dump('change to ' .$dir);*/
         chdir($dir);
-//         $this->dump('/usr/bin/git blame "'. "$entry" .'"');
         $git_blame = split("\n", shell_exec('/usr/bin/git blame "'. "$entry" .'"'));
         chdir($docroot);
-//         $this->dump('docroot='. $docroot);
         $contents = file_get_contents("$dir/$entry");
         $code_lines = split("\n", $contents);
         
@@ -69,21 +67,15 @@ class CodeStyleTest extends UnitTestCase {
           $line_num++;
         }
         $result = shell_exec("$codestyle $dir/$entry");
-         /*
-         if (!$this->assertTrue(empty($result), 'Bad code style in ' . "$dir/$entry")) {
-           $this->dump($full_code);
-         }
-          */
         $lines = split("\n", $result);
         
-        foreach($lines as $line) {
-// //           $this->dump($line);
+        foreach ($lines as $line) {
           if (!$this->asserttrue(empty($line), $line)) {
             preg_match("!$dir/$entry:([0-9]+): !", $line, $matches);
             $line_number = $matches[1] -1;
             //$code = $code_lines[$line_number];
             $this->dump($code ."\n");
-            $blame = $git_blame[$line_number-1] ."\n" . $git_blame[$line_number] . "    <-- this line\n" .  $git_blame[$line_number+1] . "\n";
+            $blame = $git_blame[$line_number - 1] ."\n". $git_blame[$line_number] ."    <-- this line\n" .  $git_blame[$line_number + 1] . "\n";
             $this->dump($blame);
             
           }
@@ -248,6 +240,9 @@ class test_wrms_request_note_getNotes  extends wrms_restful_method_testcase {
 }
 
 class test_wrms_request_quote_getQuotes extends wrms_restful_method_testcase {
+  function testGetQuotes() {
+    
+  }
 }
 
 class test_wrms_request_status_getCurrentStatus extends wrms_restful_method_testcase {
