@@ -75,7 +75,7 @@ class CodeStyleTest extends UnitTestCase {
             $line_number = $matches[1] -1;
             //$code = $code_lines[$line_number];
             $this->dump($code ."\n");
-            $blame = $git_blame[$line_number - 1] ."\n". $git_blame[$line_number] ."    <-- this line\n" .  $git_blame[$line_number + 1] . "\n";
+            $blame = $git_blame[$line_number - 1] ."\n". $git_blame[$line_number] ."    <-- this line\n".  $git_blame[$line_number + 1] ."\n";
             $this->dump($blame);
             
           }
@@ -83,7 +83,7 @@ class CodeStyleTest extends UnitTestCase {
         
          //mark passes for number of lines without error.. just to make it look good
         
-        for ($i=0; $i < count($code_lines) - count($lines); $i++) {
+        for ($i = 0; $i < count($code_lines) - count($lines); $i++) {
           $this->assertTrue(true);
         }
       }
@@ -94,16 +94,16 @@ class CodeStyleTest extends UnitTestCase {
     foreach ($dirs as $base) {
       $d = dir($base);
       if (!$d) {
-        $this->assertTrue(false, 'Failed to read dir: "' . $dir .'"');
+        $this->assertTrue(false, 'Failed to read dir: "'. $dir .'"');
         continue;
       }
       else {
         $ignore_list = array('Zend', 'simpletest', '\.');
-        while($entry = $d->read()) {
+        while ($entry = $d->read()) {
           
-          if(is_dir($base . '/'. $entry)) {
+          if (is_dir($base . '/'. $entry)) {
             $on_ignore = false;
-            foreach($ignore_list as $i) {
+            foreach ($ignore_list as $i) {
               if (preg_match("!$i!", $entry)) {
                 $on_ignore = true;
               }
@@ -138,20 +138,18 @@ class CodeStyleTest extends UnitTestCase {
 // }
 
 class wrms_restful_method_testcase extends UnitTestCase {
-	function testRunning(){
-
+	
+  function testRunning() {
     $method_class = preg_replace('!^test_!', '', get_class($this));
     if ('wrms_restful_method_testcase' == $method_class) {
       return;
     }
 
-    //$this->dump('testing ' . $method_class);
     $this->assertTrue(class_exists($method_class), $method_class .' does not exist');
-    if(class_exists($method_class)) {
+    if (class_exists($method_class)) {
       $params = array();
       $method = new $method_class();
       $result =  $method->run($params);
-      //$this->assertTrue(is_array($result));
     }
 	}
 
@@ -187,7 +185,7 @@ class test_wrms_request_getRequest extends wrms_restful_method_testcase {
 
       $this->assertEqual($request->data['wr']->id, $row->request_id);
 
-      foreach(array('request_on', 'active', 'last_status', 'sla_response_hours', 'urgency', 'importance', 'severity_code', 'erquest_id', 'eta', 'last_activity', 'sla_response_time', 'sla_response_type', 'requested_by_date', 'agreeded_due_date', 'request_by', 'breif', 'detailed', 'entered_by', 'system_id', 'parent_request', 'invoice_to'
+      foreach (array('request_on', 'active', 'last_status', 'sla_response_hours', 'urgency', 'importance', 'severity_code', 'erquest_id', 'eta', 'last_activity', 'sla_response_time', 'sla_response_type', 'requested_by_date', 'agreeded_due_date', 'request_by', 'breif', 'detailed', 'entered_by', 'system_id', 'parent_request', 'invoice_to'
                    ) as $param) {
         $this->assertEqual($request->data['wr']->$param, $row->$param, $param .' does not match');
       }
@@ -260,7 +258,7 @@ class test_wrms_request_timesheet_addTimesheet extends wrms_restful_method_testc
 class test_wrms_request_timesheet_getTimesheets extends wrms_restful_method_testcase {
 }
 
-class test_wrms_user_timesheet_addTimesheet extends wrms_restful_method_testcase{
+class test_wrms_user_timesheet_addTimesheet extends wrms_restful_method_testcase {
 }
 
 class test_wrms_user_timesheet_getTimesheets extends wrms_restful_method_testcase {
@@ -304,8 +302,7 @@ class testDatabase extends UnitTestCase {
     $result = db_query("SELECT * FROM request ORDER BY request_id LIMIT 10");
     $this->assertTrue($result != false);
     while ($row = db_fetch_object($result)) {
-      //$this->dump($row);
-      foreach(array('request_id', 'request_on', 'active', 'last_status', 'requester_id', 'last_activity', 'sla_response_time', 'sla_response_type',  'brief', 'entered_by', 'system_id',  ) as $param) {
+      foreach (array('request_id', 'request_on', 'active', 'last_status', 'requester_id', 'last_activity', 'sla_response_time', 'sla_response_type',  'brief', 'entered_by', 'system_id',  ) as $param) {
         
         $this->assertTrue(($row->$param), $param .' missing from object');
       }
@@ -339,15 +336,9 @@ class renderertest extends UnitTestCase {
     $xml = $response_renderer->render('xml');
 
     
-    if (!$this->assertEqual('<response>
-<error>
-<code>200</code>
-<message></message>
-<data></data>
-<status_message> does not exist</status_message>
-<status_code>400</status_code>
-</error>
-</response>', $xml)) $this->dump($xml);
+    if (!$this->assertEqual("<response>\n<error>\n<code>200</code>\n<message></message>\n<data></data>\n<status_message> does not exist</status_message>\n<status_code>400</status_code>\n</error>\n</response>", $xml)) {
+      $this->dump($xml);
+    }
   }
 
   function testArrayRender() {
@@ -355,8 +346,9 @@ class renderertest extends UnitTestCase {
     $response_renderer = new response_renderer($result);
     $xml = $response_renderer->render('xml');
     
-    if (!$this->assertEqual('<response>
-</response>', $xml)) $this->dump($xml);
+    if (!$this->assertEqual("<response>\n</response>", $xml)) {
+      $this->dump($xml);
+    }
   }
 }
 
