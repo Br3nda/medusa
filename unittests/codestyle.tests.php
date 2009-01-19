@@ -37,6 +37,8 @@ class CodeStyleTest extends UnitTestCase {
         $contents = file_get_contents("$dir/$entry");
         $code_lines = split("\n", $contents);
         
+        $this->checkForTodos("$dir/$entry", $code_lines, $git_blame);
+        
         $line_num = 1;
         $full_code = '';
         foreach ($code_lines as $l) {
@@ -60,12 +62,25 @@ class CodeStyleTest extends UnitTestCase {
         
 //mark passes for number of lines without error.. just to make it look good
         
-        for ($i = 0; $i < count($code_lines) - count($lines); $i++) {
-          $this->assertTrue(true);
-        }
+//         for ($i = 0; $i < count($code_lines) - count($lines); $i++) {
+//           $this->assertTrue(true);
+//         }
       }
     }
   }
+
+  function checkForTodos($filename, &$code, &$git_blame) {
+    $line_number = 0;
+    foreach ($code as $line) {
+      
+      if (!$this->assertFalse(preg_match('!TODO!i', $line), 'TODO item left undone')) {
+        $this->dump("$filename\n". $git_blame[$line_number]);
+        
+      }
+      $line_number++;
+    }
+  }
+  
   function addSubFolders($dirs) {
     $dir = array();
     foreach ($dirs as $base) {
