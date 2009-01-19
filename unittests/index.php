@@ -26,11 +26,12 @@ require('medusa/common.php');
 class AllTests extends TestSuite {
   function AllTests() {
     $this->TestSuite('Medusa WRMS api tests');
-    $this->addFile('codestyle.tests.php');
     $this->addFile('render.tests.php');
     $this->addFile('database.tests.php');
     $this->addFile('methods.tests.php');
     $this->addFile('parsing.tests.php');
+    $this->addFile('codestyle.tests.php');
+    
   }
 }
 

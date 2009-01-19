@@ -16,6 +16,11 @@ class wrms_restful_method_testcase extends UnitTestCase {
   }
   
   function result_okay($result) {
+    
+    if (!$this->assertNotNull($result, 'Result cannot be null')) {
+      return;
+    }
+    
     if (!$this->assertEqual($result->status['code'], 200)) {
       $this->dump($result);
     }
@@ -26,8 +31,6 @@ class wrms_restful_method_testcase extends UnitTestCase {
   
   
 }
-
-
 
 
 class test_wrms_request_getRequest extends wrms_restful_method_testcase {
@@ -89,6 +92,10 @@ class test_wrms_request_allocated_getAllocated extends wrms_restful_method_testc
 
 class test_wrms_login extends wrms_restful_method_testcase {
   //TODO!
+  function testLogin() {
+    $class = new wrms_login();
+    $params = array();
+  }
 }
 
 
@@ -132,7 +139,7 @@ class test_wrms_request_status_getStatusHistory extends wrms_restful_method_test
     $params = array('GET' => array('wr' => '58286'));
     $result - $class->run($params);
     $this->result_okay($result);
-    //TODO
+    $this->dump($result);
     
   }
     
@@ -144,7 +151,7 @@ class test_wrms_request_subscriber_getSubscribers extends wrms_restful_method_te
     $params = array('GET' => array('wr' => ''));
     $result - $class->run($params);
     $this->result_okay($result);
-    //TODO
+    $this->dump($result);
     
   }
 }
@@ -154,6 +161,7 @@ class test_wrms_request_timesheet_addTimesheet extends wrms_restful_method_testc
     $class = new wrms_request_status_getCurrentStatus();
     //$params = array('GET' => array('wr' => ''));
     $result - $class->run($params);
+    $this->dump($result);
   }
 }
 
@@ -163,6 +171,7 @@ class test_wrms_request_timesheet_getTimesheets extends wrms_restful_method_test
     $params = array('GET' => array('wr' => ''));
     $result - $class->run($params);
     $this->result_okay($result);
+    $this->dump($result);
     //TODO
     
   }
