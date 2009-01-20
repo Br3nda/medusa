@@ -20,8 +20,8 @@ class wrms_user_timesheet_getTimesheets {
      */
     function run($params) {
         $user_id = $params['GET']['person'];
-        $request_id = $params['GET']['wr'];
-        $request_id = $params['GET']['wr'];
+        $from = $params['GET']['start_date'];
+        $to = $params['GET']['end_date'];
         $access = access::getInstance();
         if ($access->canUserSeeRequest($request_id)) {
 
