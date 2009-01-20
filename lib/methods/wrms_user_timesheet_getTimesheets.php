@@ -19,7 +19,25 @@ class wrms_user_timesheet_getTimesheets {
      *     An array of timesheets or an empty array if no results
      */
     function run($params) {
-        $return = array();
-        return $return;
+        $user_id = $params['GET']['person'];
+        $request_id = $params['GET']['wr'];
+        $request_id = $params['GET']['wr'];
+        $access = access::getInstance();
+        if ($access->canUserSeeRequest($request_id)) {
+
+          $result = db_query('SELECT * FROM request_timesheet WHERE work_by_id = %d ORDER BY work_on ASC', $user_id);
+                $timesheets = array();
+                while ($row = db_fetch_object($result)) {
+                    $timesheet = new WrmsTimeSheet();
+                    $timesheet->populate($row);
+                    $timesheets[] = $timesheet;
+                }
+                $response = new response('Success');
+                $response->set('timesheets', $timesheets);
+            return $response;
+        }
+        else {
+            return new error('Access denied', 403);
+        }
     }
 }
