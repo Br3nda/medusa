@@ -159,12 +159,12 @@ class test_wrms_request_status_getCurrentStatus extends wrms_restful_method_test
     $status = $result->data['status'];
     $good = $good && $this->assertEqual('WrmsStatus', get_class($status));
 
-    $good = $good && $this->assertEqual('2008-07-31 16:03:02.382866', $status->status_on);
-    $good = $good && $this->assertEqual('498', $status->status_by_id);
-    $good = $good && $this->assertEqual('', $status->status_by);
-    $good = $good && $this->assertEqual('F', $status->status_code);
+    $good = $this->assertEqual('2008-07-31 16:03:02.382866', $status->status_on) && $good;
+    $good = $this->assertEqual('498', $status->status_by_id) && $good;
+    $good = $this->assertEqual('', $status->status_by) && $good;
+    $good = $this->assertEqual('F', $status->status_code) && $good;
     if (! $good) {
-
+      $this->signal('Failed', $result);
       $this->dump($result->data);
     }
     
