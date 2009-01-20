@@ -140,9 +140,9 @@ class test_wrms_request_quote_getQuotes extends wrms_restful_method_testcase {
   function testGetQuotes() {
     $class = new wrms_request_quote_getQuotes();
     $params = array('GET' => array('wr' => '56409'));
-    $result - $class->run($params);
+    $result = $class->run($params);
     $this->result_okay($result);
-    //TODO
+    //TODO .. this class hasn't been written yet
     
   }
 }
@@ -150,10 +150,24 @@ class test_wrms_request_quote_getQuotes extends wrms_restful_method_testcase {
 class test_wrms_request_status_getCurrentStatus extends wrms_restful_method_testcase {
   function testGetStatus() {
     $class = new wrms_request_status_getCurrentStatus();
-    $params = array('GET' => array('wr' => '58286'));
-    $result - $class->run($params);
+    $params = array('GET' => array('wr' => '10'));
+    $result = $class->run($params);
     $this->result_okay($result);
-    //TODO
+    //TODO .. this class hasn't been written yet
+    $good = true;
+    
+
+    $status = $result->data['status'];
+    $good = $good && $this->assertEqual('WrmsStatus', get_class($status));
+
+    $good = $good && $this->assertEqual('2008-07-31 16:03:02.382866', $status->status_on);
+    $good = $good && $this->assertEqual('498', $status->status_by_id);
+    $good = $good && $this->assertEqual('', $status->status_by);
+    $good = $good && $this->assertEqual('F', $status->status_code);
+    if (! $good) {
+
+      $this->dump($result->data);
+    }
     
   }
 }
@@ -162,10 +176,10 @@ class test_wrms_request_status_getStatusHistory extends wrms_restful_method_test
   function testGetStatusHistory() {
     $class = new wrms_request_status_getCurrentStatus();
     $params = array('GET' => array('wr' => '58286'));
-    $result - $class->run($params);
+    $result = $class->run($params);
     $this->result_okay($result);
-    $this->dump($result);
-    
+    //$this->signal('wrms_request_status_getStatusHistory code not complete', $result);
+    //TODO .. this class hasn't been written yet
   }
     
 }
@@ -174,7 +188,7 @@ class test_wrms_request_subscriber_getSubscribers extends wrms_restful_method_te
   function testGetSubscribers() {
     $class = new wrms_request_status_getCurrentStatus();
     $params = array('GET' => array('wr' => ''));
-    $result - $class->run($params);
+    $result = $class->run($params);
     $this->result_okay($result);
     $this->dump($result);
     
