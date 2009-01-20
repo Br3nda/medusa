@@ -153,7 +153,6 @@ class test_wrms_request_status_getCurrentStatus extends wrms_restful_method_test
     $params = array('GET' => array('wr' => '10'));
     $result = $class->run($params);
     $this->result_okay($result);
-    //TODO .. this class hasn't been written yet
     $good = true;
     
 
