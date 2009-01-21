@@ -29,7 +29,9 @@ if (!$found) {
 require('simpletest/autorun.php');
 require('medusa/common.php');
 
-
+/**
+ * All tests get included in here
+ */
 class AllTests extends TestSuite {
   function AllTests() {
     $this->TestSuite('Medusa WRMS api tests');
