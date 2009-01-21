@@ -203,13 +203,12 @@ class test_wrms_request_status_getStatusHistory extends wrms_restful_method_test
 
 class test_wrms_request_subscriber_getSubscribers extends wrms_restful_method_testcase {
   function testGetSubscribers() {
-    $class = new wrms_request_status_getCurrentStatus();
-    $params = array('GET' => array('wr' => ''));
+    $class = new wrms_request_subscriber_getSubscribers();
+    $params = array('GET' => array('wr' => '10'));
     $result = $class->run($params);
     $this->result_okay($result);
-    $this->dump($result);
-    
   }
+
 }
 
 class test_wrms_request_timesheet_addTimesheet extends wrms_restful_method_testcase {
