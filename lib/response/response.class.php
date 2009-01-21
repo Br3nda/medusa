@@ -46,6 +46,7 @@ class response {
      * Allows us to get the status object
      */
     function getStatus() {
+    	//TODO where does status come from?
        return $status; 
     }
 
