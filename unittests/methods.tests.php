@@ -215,9 +215,9 @@ class test_wrms_request_subscriber_getSubscribers extends wrms_restful_method_te
 class test_wrms_request_timesheet_addTimesheet extends wrms_restful_method_testcase {
   function testaddTimesheet() {
     $class = new wrms_request_status_getCurrentStatus();
-    //$params = array('GET' => array('wr' => ''));
-    $result - $class->run($params);
-    $this->dump($result);
+    $params = array('GET' => array('wr' => ''));
+    $result = $class->run($params);
+    
   }
 }
 
@@ -225,9 +225,9 @@ class test_wrms_request_timesheet_getTimesheets extends wrms_restful_method_test
   function testGetTimesheets() {
     $class = new wrms_request_status_getCurrentStatus();
     $params = array('GET' => array('wr' => ''));
-    $result - $class->run($params);
+    $result = $class->run($params);
     $this->result_okay($result);
-    $this->dump($result);
+    
     //TODO
     
   }
