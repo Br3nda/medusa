@@ -52,19 +52,11 @@ class CodeStyleTest extends UnitTestCase {
           if (!$this->asserttrue(empty($line), $line)) {
             preg_match("!$dir/$entry:([0-9]+): !", $line, $matches);
             $line_number = $matches[1] -1;
-//			$code = $code_lines[$line_number];
-            //$this->dump($code ."\n");
             $blame = $git_blame[$line_number - 1] ."\n". $git_blame[$line_number] ."    <-- this line\n".  $git_blame[$line_number + 1] ."\n";
             $this->dump($blame);
             
           }
         }
-        
-//mark passes for number of lines without error.. just to make it look good
-        
-//         for ($i = 0; $i < count($code_lines) - count($lines); $i++) {
-//           $this->assertTrue(true);
-//         }
       }
     }
   }
