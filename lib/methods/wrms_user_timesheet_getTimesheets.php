@@ -22,8 +22,10 @@ class wrms_user_timesheet_getTimesheets extends wrms_base_method {
         $user_id = $params['GET']['person'];
         $from = $params['GET']['start_date'];
         $to = $params['GET']['end_date'];
+        $request_id = $params['GET']['wr'];
         $access = access::getInstance();
         if ($access->canUserSeeRequest($request_id)) {
+        	//TODO shouldn't this be filtered by request id somewhere?
           $result = db_query('SELECT * FROM request_timesheet WHERE work_by_id = %d ORDER BY work_on ASC', $user_id);
                 $timesheets = array();
                 while ($row = db_fetch_object($result)) {
