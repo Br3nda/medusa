@@ -3,7 +3,7 @@
  * wrms.request.status.getStatusHistory
  * Fetches a list of all status changes made to the specified request
  */
-class wrms_request_status_getStatusHistory {
+class wrms_request_status_getStatusHistory extends wrms_base_method  {
     /**
      * Performs the fetch list action
      *

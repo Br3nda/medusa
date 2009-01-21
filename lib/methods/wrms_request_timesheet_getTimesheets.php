@@ -3,7 +3,7 @@
  * wrms.request.timesheet.getTimesheets
  * Returns timesheets associated with the specified WR
  */
-class wrms_request_timesheet_getTimesheets {
+class wrms_request_timesheet_getTimesheets extends wrms_base_method {
     /**
      * Performs the fetch of the timesheets by work request
      *

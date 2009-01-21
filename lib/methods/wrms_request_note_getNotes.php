@@ -3,7 +3,7 @@
  * wrms.request.note.getNote
  * Gets a list of all notes attached to this work request.
  */
-class wrms_request_note_getNotes {
+class wrms_request_note_getNotes extends wrms_base_method {
     /**
      * Performs the fetch of attached notes
      *

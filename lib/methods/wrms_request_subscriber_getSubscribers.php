@@ -3,7 +3,7 @@
  * wrms.request.subscriber.getSubscribers
  * Gets a list of the current subscribed users
  */
-class wrms_request_subscriber_getSubscribers {
+class wrms_request_subscriber_getSubscribers extends wrms_base_method {
     /**
      * Performs the fetch of the subscribed users
      *

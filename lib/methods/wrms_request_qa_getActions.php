@@ -3,7 +3,7 @@
  * wrms.request.qa.getActions
  * Gets a list of the QA Actions added to the specified request.
  */
-class wrms_request_qa_getActions {
+class wrms_request_qa_getActions extends wrms_base_method {
     /**
      * Performs the fetch of the current QA Actions
      *

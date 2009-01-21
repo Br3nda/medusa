@@ -3,7 +3,7 @@
  * wrms.request.status.getCurrentStatus
  * Returns the current status of the WR
  */
-class wrms_request_status_getCurrentStatus {
+class wrms_request_status_getCurrentStatus extends wrms_base_method {
     /**
      * Performs the fetch of the current status
      *

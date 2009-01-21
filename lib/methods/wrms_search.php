@@ -1,6 +1,6 @@
 <?php
 
-class wrms_search {
+class wrms_search extends wrms_base_method {
   private $parameters;
   private $sqldata;
   private $gettable;

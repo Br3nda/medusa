@@ -3,7 +3,7 @@
  * wrms.user.timesheet.addTimesheet
  * Adds a timesheet for the specified user ID
  */
-class wrms_user_timesheet_addTimesheet {
+class wrms_user_timesheet_addTimesheet extends wrms_base_method {
     /**
      * Performs the insert of the timesheet
      *

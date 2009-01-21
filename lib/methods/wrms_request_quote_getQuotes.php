@@ -3,7 +3,7 @@
  * wrms.request.quote.getQuotes
  * Returns all quotes attached to the specified work request
  */
-class wrms_request_quote_getQuotes {
+class wrms_request_quote_getQuotes extends wrms_base_method  {
     /**
      * Performs the fetch of the quotes
      *

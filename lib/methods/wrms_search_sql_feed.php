@@ -3,7 +3,7 @@
 /*
 * Feed class for wrms_search class
 */
-class wrms_search_sql_feed {
+class wrms_search_sql_feed extends wrms_base_method {
 
     function __construct($search) {
         $this->searchtable = null;

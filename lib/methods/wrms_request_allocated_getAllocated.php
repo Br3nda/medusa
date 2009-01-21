@@ -5,7 +5,7 @@
  * wrms.request.allocated.getAllocated 
  * @ingroup Methods
  */
-class wrms_request_allocated_getAllocated {
+class wrms_request_allocated_getAllocated extends wrms_base_method {
     /**
      * Performs the fetch of allocated users
      *

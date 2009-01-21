@@ -3,7 +3,7 @@
  * wrms.user.timesheet.getTimesheets
  * Get the timesheets of a specified user
  */
-class wrms_user_timesheet_getTimesheets {
+class wrms_user_timesheet_getTimesheets extends wrms_base_method {
     /**
      * Performs the fetch of the timesheets by user
      * 
@@ -24,7 +24,6 @@ class wrms_user_timesheet_getTimesheets {
         $to = $params['GET']['end_date'];
         $access = access::getInstance();
         if ($access->canUserSeeRequest($request_id)) {
-
           $result = db_query('SELECT * FROM request_timesheet WHERE work_by_id = %d ORDER BY work_on ASC', $user_id);
                 $timesheets = array();
                 while ($row = db_fetch_object($result)) {
