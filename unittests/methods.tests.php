@@ -8,25 +8,38 @@ class wrms_restful_method_testcase extends UnitTestCase {
     }
     
     $this->assertTrue(class_exists($method_class), $method_class .' does not exist');
+    
     if (class_exists($method_class)) {
       $params = array();
       $method = new $method_class();
       $result =  $method->run($params);
+      if (!$this->assertTrue(is_object($result), get_class($this) .': Methods should always return an object.')) {
+        $this->dump($result);
+      }
+      
+      if (!$this->assertTrue(get_class($result) == 'error' || get_class($result) == 'response',
+                             'Methods must return an Error or a Response object. '. get_class($this) .' returned a '. get_class($result))) {
+           $this->dump($result);
+      }
+    
     }
   }
   
   function result_okay($result) {
     
     if (!$this->assertNotNull($result, 'Result cannot be null')) {
-      return;
+      return false;
     }
     
     if (!$this->assertEqual($result->status['code'], 200)) {
       $this->dump($result);
+      return false;
     }
     if (!$this->assertEqual($result->status['message'], 'Success')) {
       $this->dump($result);
+      return false;
     }
+    return true;
   }
   
   
@@ -39,15 +52,20 @@ class test_wrms_request_getRequest extends wrms_restful_method_testcase {
     $pg_result = db_query("SELECT * FROM request ORDER BY request_id LIMIT 10");
     $this->assertTrue($pg_result != false, 'Unable to pull database records');
     $this->assertEqual(10, db_num_rows($pg_result));
+    
     while ($row = db_fetch_object($pg_result)) {
-      $params['GET']['wr'] = $row->request_id;
+      
       $method = new wrms_request_getRequest();
+      
+      $params = array('GET' => array('wr' => $row->request_id));
       $request = $method->run($params);
-      //$this->dump($row);
+           //$this->dump($row);
       //$this->dump($request->data['wr']);
       $this->assertTrue(is_object($request));
       
-      $this->result_okay($request);
+      if (!$this->result_okay($request)) {
+        $this->dump($params);
+      }
       
       //array of WRs
       $this->assertTrue(is_array($request->data));
