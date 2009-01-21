@@ -15,11 +15,18 @@
  
 set_include_path(get_include_path() . PATH_SEPARATOR . realpath('../lib/'));
 
-if (!is_file('./simpletest/autorun.php')) {
+$found = false;
+foreach(explode(PATH_SEPARATOR, get_include_path()) as $path) {
+	if (file_exists($path . '/simpletest/autorun.php')) {
+		$found = true;
+		break;
+	}
+}
+if (!$found) {
   echo 'You need to download simpletest and extract into unitests folder';
   exit;
 }
-require('./simpletest/autorun.php');
+require('simpletest/autorun.php');
 require('medusa/common.php');
 
 
