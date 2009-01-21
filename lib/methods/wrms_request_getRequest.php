@@ -10,7 +10,7 @@
   * @ingroup Methods
   * Work Requests
   */
-class wrms_request_getRequest {
+class wrms_request_getRequest extends wrms_base_method {
     /**
      * Performs the fetch of the work request
      *
@@ -23,24 +23,21 @@ class wrms_request_getRequest {
      *     FALSE if permission is denied
      *     NULL if no work request
      */
-	function run($params) {
-        $request_id = $params['GET']['wr'];
-        $access = access::getInstance();
-        if ($access->canUserSeeRequest($request_id)) {
-            $result = db_query('SELECT * FROM request WHERE request_id = %d', $request_id);
-            if (db_num_rows($result) == 1) {
-                $response = new response('Success');
-                $object = new WrmsWorkRequest();
-                $object->populate(db_fetch_object($result));
-                $response->set('wr', $object);
-                return $response;
-            } 
-            else {
-                return false;
-            }
-        } 
-        else {
-            return false;
+    function run($params) {
+      $request_id = $params['GET']['wr'];
+      $access = access::getInstance();
+      if ($access->canUserSeeRequest($request_id)) {
+        $result = db_query('SELECT * FROM request WHERE request_id = %d', $request_id);
+        if (db_num_rows($result) == 1) {
+          $response = new response('Success');
+          $object = new WrmsWorkRequest();
+          $object->populate(db_fetch_object($result));
+          $response->set('wr', $object);
+          return $response;
         }
-	} 
+
+        
+      }
+      return new Error('Request does not exist or you do not have permission to view it');
+    }
 }
