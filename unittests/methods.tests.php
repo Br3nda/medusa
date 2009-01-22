@@ -103,7 +103,16 @@ class test_wrms_request_allocated_getAllocated extends wrms_restful_method_testc
     if (! $this->assertEqual(sizeof($result->data['allocated']), 4, 'Should have 4 allocated people on WR 58286')) {
       $this->dump($result);
     }
-    //TODO more tests for data types
+    foreach($result->data['allocated'] as $user) {
+    	$allocated[] = $user->fullname;
+    }
+    
+    //check the four of us are in the array
+    foreach(array('Brenda Wallace', 'Ben Bradshaw', 'Josh Schmidt', 'Edward Murrell') as $name) {
+    	if (!$this->assertTrue(in_array($name, $allocated), $name .' should be in array')) {
+    		$this->dump($allocated);
+    	}
+    }
   }
 }
 
