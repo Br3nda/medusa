@@ -40,7 +40,7 @@ class AllTests extends TestSuite {
     $this->addFile($dir .'database.tests.php');
     $this->addFile($dir .'methods.tests.php');
     $this->addFile($dir .'parsing.tests.php');
-    //$this->addFile($dir .'codestyle.tests.php');
+    $this->addFile($dir .'codestyle.tests.php');
     
   }
 }
