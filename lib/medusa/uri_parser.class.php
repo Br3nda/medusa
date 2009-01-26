@@ -14,7 +14,7 @@
 class Uri_Parser {
   private $_uri_;
 
-  /*
+  /**
   * Takes a uri /wrms.request.getRequest.xml?a=1&b=2&userb=johnny|John Lewis&usera=sarahANDlewis and creates;
   * $this->method = wrms.request.getRequest
   * $this->format = xml
