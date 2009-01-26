@@ -25,8 +25,34 @@ class wrms_user_timesheet_getTimesheets extends wrms_base_method {
         $request_id = $params['GET']['wr'];
         $access = access::getInstance();
         if ($access->canUserSeeRequest($request_id)) {
-        	//TODO shouldn't this be filtered by request id somewhere?
-          $result = db_query('SELECT * FROM request_timesheet WHERE work_by_id = %d ORDER BY work_on ASC', $user_id);
+
+            $sql = 'SELECT * FROM request_timesheet WHERE work_by_id = %d ';
+            
+            /*
+             * There may be a better way to do this, but it seems like a sensible validation and or injection stopper - any invalid date will be 1970-01-01
+             */
+            if ($from) {
+                $from = date('Y-m-d', strtotime($from));
+                if ($from == "1970-01-01") {
+                    return new error('Invalid date format in start date. Required format: yyyy-mm-dd');
+                }
+                else {
+                    $sql .= "AND work_on >= '$from' ";
+                }            
+            }           
+            if ($to) {
+                $to = date('Y-m-d', strtotime($to));
+                if ($to == "1970-01-01") {
+                    return new error('Invalid date format in end date. Required format: yyyy-mm-dd');
+                }
+                else {
+                    $sql .= "AND work_on <= '$to' ";
+                }
+            }
+
+            $sql .= 'ORDER BY work_on ASC';
+
+            $result = db_query($sql, $user_id);
                 $timesheets = array();
                 while ($row = db_fetch_object($result)) {
                     $timesheet = new WrmsTimeSheet();
