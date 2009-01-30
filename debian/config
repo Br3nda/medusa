@@ -6,12 +6,12 @@
 # Decide how important it is for the user to see this message
 PRIORITY=high
 
-db_input $PRIORITY medusa/db_host || true
-db_input $PRIORITY medusa/db_port || true
-db_input $PRIORITY medusa/db_user || true
-db_input $PRIORITY medusa/db_pass || true
-db_input $PRIORITY medusa/db_database || true
+db_input $PRIORITY medusa/dbhost || true
+db_input $PRIORITY medusa/dbport || true
+db_input $PRIORITY medusa/dbusername || true
+db_input $PRIORITY medusa/dbpassword || true
+db_input $PRIORITY medusa/dbname || true
 db_go
+db_input $PRIORITY medusa/memcache || true
 db_input $PRIORITY medusa/servername || true
-db_input $PRIORITY medusa/serverredirects || true
 db_go
