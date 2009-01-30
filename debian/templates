@@ -1,50 +1,30 @@
-Template: drupal-site-peoplestimes-pilot/db_host
+Template: medusa/dbhost
 Type: string
-Default: 
-Description: Database host:
- Which database host should be used for this drupal site?
- You can leave this blank to connect via UNIX sockets
+Default: dbhost
+Description: Enter the PostgreSQL db hostname
 
-Template: drupal-site-peoplestimes-pilot/db_port
+Template: medusa/dbport
 Type: string
-Default:
-Description: Database port:
- Which database port should be used for this drupal site?
- You can leave this blank for the default
+Default: 5432
+Description: Enter the PostgreSQL db port
 
-Template: drupal-site-peoplestimes-pilot/db_user
+Template: medusa/dbname
 Type: string
-Default: peoplestimes-pilot
-Description: Database username:
- Which username should be used to connect to the database?
+Default: wrms
+Description: Enter the PostgreSQL databasename
 
-Template: drupal-site-peoplestimes-pilot/db_pass
+Template: medusa/dbusername
 Type: string
-Default:
-Description: Database password:
- Which password should be used to connect to the database? - leave blank for none
+Default: general
+Description: Enter the PostgreSQL username
 
-Template: drupal-site-peoplestimes-pilot/db_database
-Type: string
-Default: peoplestimes-pilot-drupal
-Description: Database name
- Which database should be connected to?
+Template: medusa/dbpassword
+Type: password
+Default: password
+Description: Enter the PostgreSQL password
 
-Template: drupal-site-peoplestimes-pilot/servername
+Template: medusa/memcache
 Type: string
-Default:
-Description: Server name:
- This is the servername of the peoplestimes-pilot drupal install.
- .
- Note that this is just the domain name, so for "http://my.site.com" you only
- need to enter "my.site.com"
+Default: localhost
+Description: Enter the memcache hostname
 
-Template: drupal-site-peoplestimes-pilot/serverredirects
-Type: string
-Default:
-Description: Server redirects:
- Comma separated list of domain names that the server should permanently
- redirect to the server name.
- .
- Note that this is just the domain name, so for "http://my.site.com" you only
- need to enter "my.site.com"
