@@ -70,6 +70,7 @@ case "$1" in
         m4 $TMP_M4_FILE /etc/medusa/apache.conf.template > $APACHE_CONF_FILE
         ln -f -s $APACHE_CONF_FILE /etc/apache2/sites-enabled/100-medusa.conf
         
+        rm /var/lib/medusa/config
         ln -s /etc/medusa/config /var/lib/medusa/
 
         a2enmod rewrite
