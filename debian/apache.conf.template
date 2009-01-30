@@ -5,6 +5,9 @@
 
     CustomLog /var/log/apache2/medusa-access.log combined
     ErrorLog  /var/log/apache2/medusa-error.log
+    php_admin_flag log_errors On
+    php_admin_value include_path '.:/var/lib/medusa/'
+    LogLevel warn
 
     <Directory /var/www/medusa/>
         Options -Indexes
