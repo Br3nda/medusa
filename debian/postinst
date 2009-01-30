@@ -24,46 +24,34 @@ set -e
 
 TMP_M4_FILE=/etc/medusa/postinst.m4.tmp
 APACHE_CONF_FILE=/etc/apache2/sites-available/medusa.conf
-SETTINGS_PHP=/var/www/medusa/sites/default/settings.php
+SETTINGS_PHP=/etc/medusa/config/database.php
 
 case "$1" in
     configure)
-        # Configure medusa
-        DB_CONNECTION='pgsql://'
-        # ... database username
-        db_get medusa/dbusername
-        if [ ! -z "${RET}" ];then
-            DB_CONNECTION="${DB_CONNECTION}${RET}"
-        fi
-        # ... database password
-        db_get medusa/dbpassword
-        if [ ! -z "${RET}" ];then
-            DB_CONNECTION="${DB_CONNECTION}:${RET}"
-        fi
-        DB_CONNECTION="${DB_CONNECTION}@"
-        # ... database host
+        echo "<?php"                            > $SETTINGS_PHP
+        echo "/**"                             >> $SETTINGS_PHP
+        echo " * @file Database configuration" >> $SETTINGS_PHP
+        echo " */"                             >> $SETTINGS_PHP
+        echo ""                                >> $SETTINGS_PHP
+        echo "/**"                             >> $SETTINGS_PHP
+        echo " * @ingroup Database database"   >> $SETTINGS_PHP
+        echo " */"                             >> $SETTINGS_PHP 
+        echo "   define(\"CONFIG_DBTYPE\", \"{$RET}\");" >> $SETTINGS_PHP
         db_get medusa/dbhost
-        DB_CONNECTION="${DB_CONNECTION}${RET}"
-        # ... database port
+        echo "   define(\"CONFIG_DBHOST\", \"{$RET}\");" >> $SETTINGS_PHP
         db_get medusa/dbport
-        if [ ! -z "${RET}" ];then
-            DB_CONNECTION="${DB_CONNECTION}:${RET}"
-        fi
-        # ... database name
+        echo "   define(\"CONFIG_DBPORT\", \"{$RET}\");" >> $SETTINGS_PHP
+        db_get medusa/dbusername
+        echo "   define(\"CONFIG_DBNAME\", \"{$RET}\");" >> $SETTINGS_PHP
         db_get medusa/dbname
-        DB_CONNECTION="${DB_CONNECTION}/${RET}"
-
-        echo "<?php"                          >  $SETTINGS_PHP
-        echo "\$db_url = '${DB_CONNECTION}';" >> $SETTINGS_PHP
-        echo "\$db_prefix = '';"              >> $SETTINGS_PHP
-        db_get medusa/servername
-        echo "\$base_url = 'http://${RET}';"  >> $SETTINGS_PHP
-        echo "ini_set('memory_limit', '64M');">> $SETTINGS_PHP
-        echo "?>"                             >> $SETTINGS_PHP
-
-        # create files directory
-        chown -R www-data:www-data /var/lib/sitedata/medusa
-        ln -f -s /var/lib/sitedata/medusa/files /var/www/drupal-site-peoplestimes-pilot/files
+        echo "   define(\"CONFIG_DBUSER\", \"{$RET}\");" >> $SETTINGS_PHP
+        db_get medusa/dbpassword
+        echo "   define(\"CONFIG_DBPASS\", \"{$RET}\");" >> $SETTINGS_PHP
+        echo ""                                >> $SETTINGS_PHP
+        echo "/**"                             >> $SETTINGS_PHP
+        echo " * @defgroup Database Database"  >> $SETTINGS_PHP
+        echo " * connecting and querying and etc - uses PDO" >> $SETTINGS_PHP
+        echo " */"                             >> $SETTINGS_PHP
 
         # ensure cron.log exists and is www-data writable
         touch /var/log/sitelogs/medusa/cron.log
@@ -75,18 +63,6 @@ case "$1" in
 
         m4 $TMP_M4_FILE /etc/medusa/apache.conf.template > $APACHE_CONF_FILE
         ln -f -s $APACHE_CONF_FILE /etc/apache2/sites-enabled/100-medusa.conf
-
-        rm -f $TMP_M4_FILE
-
-        db_get medusa/serverredirects
-
-        if [ -n "${RET}" ]; then
-            echo '<VirtualHost *:80>' >> $APACHE_CONF_FILE
-            echo ${RET} | perl -ne '@s = split /\s*,\s*/; print "    ServerName ", shift @s, "\n" if @s; print map { "    ServerAlias $_\n" } @s;' >> $APACHE_CONF_FILE
-            db_get medusa/servername
-            echo "    Redirect Permanent / http://${RET}/" >> $APACHE_CONF_FILE
-            echo '</VirtualHost>' >> $APACHE_CONF_FILE
-        fi
 
         a2enmod rewrite
         restart_apache2;
