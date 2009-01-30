@@ -1,3 +1,9 @@
+medusa (20090130-1) jaunty; urgency=low
+
+  * structural move around for easier debianizing 
+
+ -- Joshua Waihi <josh@lupe>  Fri, 30 Jan 2009 17:40:05 +1300
+
 medusa (0.0.1) unstable; urgency=low
 
   * Debianised by Joshua Waihi
