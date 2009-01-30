@@ -1,0 +1,17 @@
+#!/bin/sh -e
+
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
+# Decide how important it is for the user to see this message
+PRIORITY=high
+
+db_input $PRIORITY medusa/db_host || true
+db_input $PRIORITY medusa/db_port || true
+db_input $PRIORITY medusa/db_user || true
+db_input $PRIORITY medusa/db_pass || true
+db_input $PRIORITY medusa/db_database || true
+db_go
+db_input $PRIORITY medusa/servername || true
+db_input $PRIORITY medusa/serverredirects || true
+db_go

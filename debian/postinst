@@ -1,0 +1,111 @@
+#!/bin/sh
+# postinst script for drupal-site-peoplestimes-pilot (dh-make-drupal)
+#
+# see: dh_installdeb(1)
+
+set -e
+
+# summary of how this script can be called:
+#        * <postinst> `configure' <most-recently-configured-version>
+#        * <old-postinst> `abort-upgrade' <new version>
+#        * <conflictor's-postinst> `abort-remove' `in-favour' <package>
+#          <new-version>
+#        * <postinst> `abort-remove'
+#        * <deconfigured's-postinst> `abort-deconfigure' `in-favour'
+#          <failed-install-package> <version> `removing'
+#          <conflicting-package> <version>
+# for details, see http://www.debian.org/doc/debian-policy/ or
+# the debian-policy package
+
+#DEBHELPER#
+
+. /usr/share/debconf/confmodule
+. /usr/share/drupal-site-peoplestimes-pilot/common-functions
+
+TMP_M4_FILE=/etc/drupal-site-peoplestimes-pilot/postinst.m4.tmp
+APACHE_CONF_FILE=/etc/apache2/sites-available/drupal-site-peoplestimes-pilot.conf
+SETTINGS_PHP=/var/www/drupal-site-peoplestimes-pilot/sites/default/settings.php
+
+case "$1" in
+    configure)
+        # Configure drupal-site-peoplestimes-pilot
+        DB_CONNECTION='pgsql://'
+        # ... database username
+        db_get drupal-site-peoplestimes-pilot/db_user
+        if [ ! -z "${RET}" ];then
+            DB_CONNECTION="${DB_CONNECTION}${RET}"
+        fi
+        # ... database password
+        db_get drupal-site-peoplestimes-pilot/db_pass
+        if [ ! -z "${RET}" ];then
+            DB_CONNECTION="${DB_CONNECTION}:${RET}"
+        fi
+        DB_CONNECTION="${DB_CONNECTION}@"
+        # ... database host
+        db_get drupal-site-peoplestimes-pilot/db_host
+        DB_CONNECTION="${DB_CONNECTION}${RET}"
+        # ... database port
+        db_get drupal-site-peoplestimes-pilot/db_port
+        if [ ! -z "${RET}" ];then
+            DB_CONNECTION="${DB_CONNECTION}:${RET}"
+        fi
+        # ... database name
+        db_get drupal-site-peoplestimes-pilot/db_database
+        DB_CONNECTION="${DB_CONNECTION}/${RET}"
+
+        echo "<?php"                          >  $SETTINGS_PHP
+        echo "\$db_url = '${DB_CONNECTION}';" >> $SETTINGS_PHP
+        echo "\$db_prefix = '';"              >> $SETTINGS_PHP
+        db_get drupal-site-peoplestimes-pilot/servername
+        echo "\$base_url = 'http://${RET}';"  >> $SETTINGS_PHP
+        echo "ini_set('memory_limit', '64M');">> $SETTINGS_PHP
+        echo "?>"                             >> $SETTINGS_PHP
+
+        # create files directory
+        chown -R www-data:www-data /var/lib/sitedata/drupal-site-peoplestimes-pilot
+        ln -f -s /var/lib/sitedata/drupal-site-peoplestimes-pilot/files /var/www/drupal-site-peoplestimes-pilot/files
+
+        # ensure cron.log exists and is www-data writable
+        touch /var/log/sitelogs/drupal-site-peoplestimes-pilot/cron.log
+        chown www-data:www-data /var/log/sitelogs/drupal-site-peoplestimes-pilot/cron.log
+        # Configure apache2
+        echo "changecom" > $TMP_M4_FILE
+        db_get drupal-site-peoplestimes-pilot/servername
+        echo "define(__SERVERNAME__,${RET})dnl" >> $TMP_M4_FILE
+
+        m4 $TMP_M4_FILE /etc/drupal-site-peoplestimes-pilot/apache.conf.template > $APACHE_CONF_FILE
+        ln -f -s $APACHE_CONF_FILE /etc/apache2/sites-enabled/100-drupal-site-peoplestimes-pilot.conf
+
+        rm -f $TMP_M4_FILE
+
+        db_get drupal-site-peoplestimes-pilot/serverredirects
+
+        if [ -n "${RET}" ]; then
+            echo '<VirtualHost *:80>' >> $APACHE_CONF_FILE
+            echo ${RET} | perl -ne '@s = split /\s*,\s*/; print "    ServerName ", shift @s, "\n" if @s; print map { "    ServerAlias $_\n" } @s;' >> $APACHE_CONF_FILE
+            db_get drupal-site-peoplestimes-pilot/servername
+            echo "    Redirect Permanent / http://${RET}/" >> $APACHE_CONF_FILE
+            echo '</VirtualHost>' >> $APACHE_CONF_FILE
+        fi
+
+        a2enmod rewrite
+        restart_apache2;
+
+        db_get drupal-site-peoplestimes-pilot/servername
+        echo ""
+        echo "The peoplestimes-pilot drupal instance is now running at http://${RET}"
+        echo "If you need to configure/update/install it please visit http://${RET}/install.php"
+        echo ""
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+db_stop
+exit 0

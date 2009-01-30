@@ -1,0 +1,18 @@
+#!/bin/sh
+
+restart_apache2 () {
+        if (apache2ctl configtest >/dev/null 2>&1); then
+            echo "Gracefully restarting apache2"
+            apache2ctl graceful
+        else
+            echo "apache2 configuration error ... not restarting"
+            echo ""
+            apache2ctl configtest
+            echo ""
+        fi
+}
+
+set_config () {
+    #perl -i -e '$field=shift;$value=shift if (scalar(@ARGV)>1);$value||="";while (<>) { s/(?:\s*\/\/\s*)?(\$CFG->$field.*=\s*).*/$1'\''$value'\'';/; print; }' $1 $2 $3
+    perl -i -e '$field=shift;$value=shift if (scalar(@ARGV)>1);$value||="";while (<>) { s/^\s*(\$CFG->$field.*=\s*).*/$1'\''$value'\'';/; print; }' $1 $2 $3
+}

@@ -1,0 +1,4 @@
+etc/medusa
+usr/share/medusa
+var/www/medusa
+var/lib/medusa

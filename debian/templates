@@ -1,0 +1,50 @@
+Template: drupal-site-peoplestimes-pilot/db_host
+Type: string
+Default: 
+Description: Database host:
+ Which database host should be used for this drupal site?
+ You can leave this blank to connect via UNIX sockets
+
+Template: drupal-site-peoplestimes-pilot/db_port
+Type: string
+Default:
+Description: Database port:
+ Which database port should be used for this drupal site?
+ You can leave this blank for the default
+
+Template: drupal-site-peoplestimes-pilot/db_user
+Type: string
+Default: peoplestimes-pilot
+Description: Database username:
+ Which username should be used to connect to the database?
+
+Template: drupal-site-peoplestimes-pilot/db_pass
+Type: string
+Default:
+Description: Database password:
+ Which password should be used to connect to the database? - leave blank for none
+
+Template: drupal-site-peoplestimes-pilot/db_database
+Type: string
+Default: peoplestimes-pilot-drupal
+Description: Database name
+ Which database should be connected to?
+
+Template: drupal-site-peoplestimes-pilot/servername
+Type: string
+Default:
+Description: Server name:
+ This is the servername of the peoplestimes-pilot drupal install.
+ .
+ Note that this is just the domain name, so for "http://my.site.com" you only
+ need to enter "my.site.com"
+
+Template: drupal-site-peoplestimes-pilot/serverredirects
+Type: string
+Default:
+Description: Server redirects:
+ Comma separated list of domain names that the server should permanently
+ redirect to the server name.
+ .
+ Note that this is just the domain name, so for "http://my.site.com" you only
+ need to enter "my.site.com"

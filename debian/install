@@ -1,0 +1,4 @@
+htdocs                        var/www/medusa
+lib                           var/lib/medusa
+debian/apache.conf.template   etc/medusa
+debian/common-functions       usr/share/medusa

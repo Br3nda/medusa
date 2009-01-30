@@ -1,0 +1,13 @@
+Source: medusa
+Section: web
+Priority: optional
+Maintainer: Joshua Waihi <>
+Build-Depends: debhelper (>= 5)
+Standards-Version: 3.7.2
+
+Package: medusa
+Architecture: all
+Depends: ${misc:Depends}, apache2, libapache2-mod-php5, php5-memcache, php5-pgsql, cron, php5-cli 
+Recommends: postgresql-8.1
+Suggests: php5-imagick
+Pre-Depends: m4, perl, postgresql-client-8.1

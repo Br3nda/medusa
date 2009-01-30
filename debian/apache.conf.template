@@ -1,0 +1,25 @@
+<VirtualHost *:80>
+    ServerName __SERVERNAME__
+
+    DocumentRoot /var/www/medusa
+
+    CustomLog /var/log/apache2/medusa-access.log combined
+    ErrorLog  /var/log/apache2/medusa-error.log
+
+    <Directory /var/www/medusa/>
+        Options -Indexes
+        AllowOverride All
+
+        # Set the default handler.
+        DirectoryIndex index.php
+
+        php_value magic_quotes_gpc                0
+        php_value register_globals                0
+        php_value session.auto_start              0
+        php_value mbstring.http_input             pass
+        php_value mbstring.http_output            pass
+        php_value mbstring.encoding_translation   0
+        php_value session.gc_probability          1
+
+    </Directory>
+</VirtualHost>

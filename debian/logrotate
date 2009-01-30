@@ -1,0 +1,29 @@
+# logrotate definition for the 'peoplestimes-pilot' Drupal instance
+# Automatically installed for medusa
+#
+
+/var/log/apache2/medusa-access.log /var/log/apache2/medusa-error.log {
+    weekly 
+    missingok
+    rotate 365
+    compress
+    delaycompress
+    ifempty
+    create 640 root adm
+    sharedscripts
+    postrotate
+        if [ -f /var/run/apache2.pid ]; then
+            /etc/init.d/apache2 reload
+        fi
+    endscript
+}
+
+/var/log/medusa.cron.log {
+    weekly
+    missingok
+    rotate 365
+    compress
+    delaycompress
+    ifempty
+    create 640 www-data www-data
+}
