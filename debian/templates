@@ -28,3 +28,7 @@ Type: string
 Default: localhost
 Description: Enter the memcache hostname
 
+Template: medusa/servername
+Type: string
+Default: localhost
+Description: Enter the URI for medusa to resolve to

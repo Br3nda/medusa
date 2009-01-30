@@ -1,5 +1,5 @@
 #!/bin/sh
-# postinst script for drupal-site-peoplestimes-pilot (dh-make-drupal)
+# postinst script for medusa (dh-make-drupal)
 #
 # see: dh_installdeb(1)
 
@@ -20,70 +20,70 @@ set -e
 #DEBHELPER#
 
 . /usr/share/debconf/confmodule
-. /usr/share/drupal-site-peoplestimes-pilot/common-functions
+. /usr/share/medusa/common-functions
 
-TMP_M4_FILE=/etc/drupal-site-peoplestimes-pilot/postinst.m4.tmp
-APACHE_CONF_FILE=/etc/apache2/sites-available/drupal-site-peoplestimes-pilot.conf
-SETTINGS_PHP=/var/www/drupal-site-peoplestimes-pilot/sites/default/settings.php
+TMP_M4_FILE=/etc/medusa/postinst.m4.tmp
+APACHE_CONF_FILE=/etc/apache2/sites-available/medusa.conf
+SETTINGS_PHP=/var/www/medusa/sites/default/settings.php
 
 case "$1" in
     configure)
-        # Configure drupal-site-peoplestimes-pilot
+        # Configure medusa
         DB_CONNECTION='pgsql://'
         # ... database username
-        db_get drupal-site-peoplestimes-pilot/db_user
+        db_get medusa/dbusername
         if [ ! -z "${RET}" ];then
             DB_CONNECTION="${DB_CONNECTION}${RET}"
         fi
         # ... database password
-        db_get drupal-site-peoplestimes-pilot/db_pass
+        db_get medusa/dbpassword
         if [ ! -z "${RET}" ];then
             DB_CONNECTION="${DB_CONNECTION}:${RET}"
         fi
         DB_CONNECTION="${DB_CONNECTION}@"
         # ... database host
-        db_get drupal-site-peoplestimes-pilot/db_host
+        db_get medusa/dbhost
         DB_CONNECTION="${DB_CONNECTION}${RET}"
         # ... database port
-        db_get drupal-site-peoplestimes-pilot/db_port
+        db_get medusa/dbport
         if [ ! -z "${RET}" ];then
             DB_CONNECTION="${DB_CONNECTION}:${RET}"
         fi
         # ... database name
-        db_get drupal-site-peoplestimes-pilot/db_database
+        db_get medusa/dbname
         DB_CONNECTION="${DB_CONNECTION}/${RET}"
 
         echo "<?php"                          >  $SETTINGS_PHP
         echo "\$db_url = '${DB_CONNECTION}';" >> $SETTINGS_PHP
         echo "\$db_prefix = '';"              >> $SETTINGS_PHP
-        db_get drupal-site-peoplestimes-pilot/servername
+        db_get medusa/servername
         echo "\$base_url = 'http://${RET}';"  >> $SETTINGS_PHP
         echo "ini_set('memory_limit', '64M');">> $SETTINGS_PHP
         echo "?>"                             >> $SETTINGS_PHP
 
         # create files directory
-        chown -R www-data:www-data /var/lib/sitedata/drupal-site-peoplestimes-pilot
-        ln -f -s /var/lib/sitedata/drupal-site-peoplestimes-pilot/files /var/www/drupal-site-peoplestimes-pilot/files
+        chown -R www-data:www-data /var/lib/sitedata/medusa
+        ln -f -s /var/lib/sitedata/medusa/files /var/www/drupal-site-peoplestimes-pilot/files
 
         # ensure cron.log exists and is www-data writable
-        touch /var/log/sitelogs/drupal-site-peoplestimes-pilot/cron.log
-        chown www-data:www-data /var/log/sitelogs/drupal-site-peoplestimes-pilot/cron.log
+        touch /var/log/sitelogs/medusa/cron.log
+        chown www-data:www-data /var/log/sitelogs/medusa/cron.log
         # Configure apache2
         echo "changecom" > $TMP_M4_FILE
-        db_get drupal-site-peoplestimes-pilot/servername
+        db_get medusa/servername
         echo "define(__SERVERNAME__,${RET})dnl" >> $TMP_M4_FILE
 
-        m4 $TMP_M4_FILE /etc/drupal-site-peoplestimes-pilot/apache.conf.template > $APACHE_CONF_FILE
-        ln -f -s $APACHE_CONF_FILE /etc/apache2/sites-enabled/100-drupal-site-peoplestimes-pilot.conf
+        m4 $TMP_M4_FILE /etc/medusa/apache.conf.template > $APACHE_CONF_FILE
+        ln -f -s $APACHE_CONF_FILE /etc/apache2/sites-enabled/100-medusa.conf
 
         rm -f $TMP_M4_FILE
 
-        db_get drupal-site-peoplestimes-pilot/serverredirects
+        db_get medusa/serverredirects
 
         if [ -n "${RET}" ]; then
             echo '<VirtualHost *:80>' >> $APACHE_CONF_FILE
             echo ${RET} | perl -ne '@s = split /\s*,\s*/; print "    ServerName ", shift @s, "\n" if @s; print map { "    ServerAlias $_\n" } @s;' >> $APACHE_CONF_FILE
-            db_get drupal-site-peoplestimes-pilot/servername
+            db_get medusa/servername
             echo "    Redirect Permanent / http://${RET}/" >> $APACHE_CONF_FILE
             echo '</VirtualHost>' >> $APACHE_CONF_FILE
         fi
@@ -91,10 +91,9 @@ case "$1" in
         a2enmod rewrite
         restart_apache2;
 
-        db_get drupal-site-peoplestimes-pilot/servername
+        db_get medusa/servername
         echo ""
-        echo "The peoplestimes-pilot drupal instance is now running at http://${RET}"
-        echo "If you need to configure/update/install it please visit http://${RET}/install.php"
+        echo "The medua instance is now running at http://${RET}"
         echo ""
     ;;
 
