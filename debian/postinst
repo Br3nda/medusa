@@ -24,7 +24,7 @@ set -e
 
 TMP_M4_FILE=/etc/medusa/postinst.m4.tmp
 APACHE_CONF_FILE=/etc/apache2/sites-available/medusa.conf
-SETTINGS_PHP=/etc/medusa/config/database.php
+SETTINGS_PHP=/etc/medusa/config/config.php
 
 case "$1" in
     configure)
@@ -52,6 +52,12 @@ case "$1" in
         echo " * @defgroup Database Database"  >> $SETTINGS_PHP
         echo " * connecting and querying and etc - uses PDO" >> $SETTINGS_PHP
         echo " */"                             >> $SETTINGS_PHP
+        echo ""                                >> $SETTINGS_PHP
+        echo "define(\"CONFIG_OUTPUT\", \"json\");"                 >> $SETTINGS_PHP
+        echo "define(\"CONFIG_MEMCACHE_HOST\", \"memcache\");"      >> $SETTINGS_PHP
+        echo "define(\"CONFIG_MEMCACHE_PORT\", \"11211\");"         >> $SETTINGS_PHP
+        echo "define(\"CONFIG_MEMCACHE_EXPIRY\", \"600\"); // 10 Minutes"             >> $SETTINGS_PHP
+        echo "define(\"DEBUG_MODE\", false); // Set to true to enable debug functions" >> $SETTINGS_PHP
 
         # ensure cron.log exists and is www-data writable
         touch /var/log/medusa.cron.log
