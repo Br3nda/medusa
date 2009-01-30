@@ -36,17 +36,17 @@ case "$1" in
         echo "/**"                             >> $SETTINGS_PHP
         echo " * @ingroup Database database"   >> $SETTINGS_PHP
         echo " */"                             >> $SETTINGS_PHP 
-        echo "   define(\"CONFIG_DBTYPE\", \"{$RET}\");" >> $SETTINGS_PHP
+        echo "   define(\"CONFIG_DBTYPE\", \"pgsql\");" >> $SETTINGS_PHP
         db_get medusa/dbhost
-        echo "   define(\"CONFIG_DBHOST\", \"{$RET}\");" >> $SETTINGS_PHP
+        echo "   define(\"CONFIG_DBHOST\", \"$RET\");" >> $SETTINGS_PHP
         db_get medusa/dbport
-        echo "   define(\"CONFIG_DBPORT\", \"{$RET}\");" >> $SETTINGS_PHP
+        echo "   define(\"CONFIG_DBPORT\", \"$RET\");" >> $SETTINGS_PHP
         db_get medusa/dbusername
-        echo "   define(\"CONFIG_DBNAME\", \"{$RET}\");" >> $SETTINGS_PHP
+        echo "   define(\"CONFIG_DBNAME\", \"$RET\");" >> $SETTINGS_PHP
         db_get medusa/dbname
-        echo "   define(\"CONFIG_DBUSER\", \"{$RET}\");" >> $SETTINGS_PHP
+        echo "   define(\"CONFIG_DBUSER\", \"$RET\");" >> $SETTINGS_PHP
         db_get medusa/dbpassword
-        echo "   define(\"CONFIG_DBPASS\", \"{$RET}\");" >> $SETTINGS_PHP
+        echo "   define(\"CONFIG_DBPASS\", \"$RET\");" >> $SETTINGS_PHP
         echo ""                                >> $SETTINGS_PHP
         echo "/**"                             >> $SETTINGS_PHP
         echo " * @defgroup Database Database"  >> $SETTINGS_PHP
@@ -54,8 +54,8 @@ case "$1" in
         echo " */"                             >> $SETTINGS_PHP
 
         # ensure cron.log exists and is www-data writable
-        touch /var/log/sitelogs/medusa/cron.log
-        chown www-data:www-data /var/log/sitelogs/medusa/cron.log
+        touch /var/log/medusa.cron.log
+        chown www-data:www-data /var/log/medusa.cron.log
         # Configure apache2
         echo "changecom" > $TMP_M4_FILE
         db_get medusa/servername

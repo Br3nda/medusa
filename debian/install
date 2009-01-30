@@ -1,5 +1,13 @@
-htdocs                        var/www/medusa
-lib                           var/lib/medusa
+htdocs/index.php              var/www/medusa
+lib/authentication            var/lib/medusa
+lib/authorization             var/lib/medusa
+lib/database                  var/lib/medusa
+lib/logging                   var/lib/medusa
+lib/medusa                    var/lib/medusa
+lib/memcache                  var/lib/medusa
+lib/methods                   var/lib/medusa
+lib/response                  var/lib/medusa
+lib/wrms                      var/lib/medusa
 lib/config                    etc/medusa
 debian/apache.conf.template   etc/medusa
 debian/common-functions       usr/share/medusa

@@ -1,5 +1,5 @@
 #! /bin/sh
-# preinst script for drupal-site-peoplestimes-pilot (dh-make-drupal)
+# preinst script for medusa (dh-make-drupal)
 #
 # see: dh_installdeb(1)
 
@@ -19,19 +19,19 @@ set -e
 case "$1" in
     install)
         CMD="psql"
-        db_get drupal-site-peoplestimes-pilot/db_host
+        db_get medusa/dbhost
         if [ -n "$RET" ];then
                 CMD="$CMD -h$RET"
         fi
-        db_get drupal-site-peoplestimes-pilot/db_port
+        db_get medusa/dbport
         if [ -n "$RET" ];then
                 CMD="$CMD -p$RET"
         fi
-        db_get drupal-site-peoplestimes-pilot/db_user
+        db_get medusa/dbusername
         if [ -n "$RET" ];then
                 CMD="$CMD -U$RET"
         fi
-        db_get drupal-site-peoplestimes-pilot/db_database
+        db_get medusa/dbname
         CMD="$CMD $RET"
 
         echo -n "Testing for database connectivity ..."
@@ -41,30 +41,30 @@ case "$1" in
             echo " failed"
             echo "You need to ensure that the database exists and is accessible ..."
             echo "The database details should be as follows ..."
-            db_get drupal-site-peoplestimes-pilot/db_host
+            db_get medusa/dbhost
             echo "Host: ${RET}"
-            db_get drupal-site-peoplestimes-pilot/db_port
+            db_get medusa/dbport
             echo "Port: ${RET}"
-            db_get drupal-site-peoplestimes-pilot/db_user
+            db_get medusa/dbusername
             echo "Username: ${RET}"
-            db_get drupal-site-peoplestimes-pilot/db_database
+            db_get medusa/dbname
             echo "Database name: ${RET}"
             echo ""
 
-            for VAR in db_host db_port db_user db_database; do
-                db_get drupal-site-peoplestimes-pilot/$VAR
+            for VAR in dbhost dbport dbusername db_name; do
+                db_get medusa/$VAR
                 TMP="$RET"
-                db_reset drupal-site-peoplestimes-pilot/$VAR
-                db_set drupal-site-peoplestimes-pilot/$VAR $TMP
+                db_reset medusa/$VAR
+                db_set medusa/$VAR $TMP
             done
 
             exit 1
         fi
 
-        db_get drupal-site-peoplestimes-pilot/servername
+        db_get medusa/servername
         if [ -z "$RET" ];then
             echo "You must specify a servername"
-            db_reset drupal-site-peoplestimes-pilot/servername
+            db_reset medusa/servername
             exit 1;
         fi
     ;;
