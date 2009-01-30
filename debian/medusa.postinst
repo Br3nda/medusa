@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+use strict;
+
+exit 0 unless $ARGV[0] =~ /configure/;
+use Debconf::Client::ConfModule ':all';
+use Fcntl; #The Module
+version('2.0');
+
+input("critical", "medusa/memcache");
+input("critical", "medusa/dbhost");
+input("high", "medusa/dbport");
+input("high", "medusa/dbname");
+input("high", "medusa/dbusername");
+input("high", "medusa/dbpassword");
+
+my @ret=go();
+
+if ($ret[0] == 30) {
+               # Back button pressed.	
+} else {
+	search_replace(['memcachehost'],["medusa/memcache"],'/etc/medusa/general.example.php','/etc/medusa/general.php');
+	search_replace(['mydbhost','mydbport','mydbname','mydbuser','mydbpass'],
+				   ["medusa/dbhost", "medusa/dbport", "medusa/dbname", "medusa/dbusername","medusa/dbpassword"],
+					'/etc/medusa/database.example.php','/etc/medusa/database.php');
+}
+
+exec '/etc/init.d/apache2 reload';
+
+sub search_replace {
+	my ($search,$replace,$inputfile,$outputfile) = @_;
+	open (INP,$inputfile);
+	sysopen (OUT, $outputfile, O_WRONLY|O_CREAT, 0640);
+
+	my @search = @{$search};
+	my @replace = @{$replace};
+
+	my $size = @$search;
+	foreach my $line (<INP>) {
+		for (my $i=0;$i<$size;$i++) {
+			my $searcht = $search[$i];
+			my $replacet = get($replace[$i]);
+#			print STDERR "$i Replacing $searcht with $replacet on line; '$line'";
+			$line =~ s/$searcht/$replacet/;
+#			print STDERR "->'$line'\n";
+		}
+		print OUT $line;
+	}
+	close INP;
+	close OUT;
+	my $gid  = getgrnam('www-data');
+    chown (0, $gid, $outputfile);
+}
+

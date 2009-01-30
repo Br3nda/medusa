@@ -1,0 +1,30 @@
+Template: medusa/dbhost
+Type: string
+Default: dbhost
+Description: Enter the PostgreSQL db hostname
+
+Template: medusa/dbport
+Type: string
+Default: 5432
+Description: Enter the PostgreSQL db port
+
+Template: medusa/dbname
+Type: string
+Default: wrms
+Description: Enter the PostgreSQL databasename
+
+Template: medusa/dbusername
+Type: string
+Default: general
+Description: Enter the PostgreSQL username
+
+Template: medusa/dbpassword
+Type: password
+Default: password
+Description: Enter the PostgreSQL password
+
+Template: medusa/memcache
+Type: string
+Default: localhost
+Description: Enter the memcache hostname
+
