@@ -1,3 +1,9 @@
+medusa (20090202-1) jaunty; urgency=low
+
+  * fixed preinst error 
+
+ -- Joshua Waihi <josh@lupe>  Mon, 02 Feb 2009 12:02:51 +1300
+
 medusa (20090130-1) jaunty; urgency=low
 
   * structural move around for easier debianizing 
