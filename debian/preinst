@@ -51,7 +51,7 @@ case "$1" in
             echo "Database name: ${RET}"
             echo ""
 
-            for VAR in dbhost dbport dbusername db_name; do
+            for VAR in dbhost dbport dbusername dbname; do
                 db_get medusa/$VAR
                 TMP="$RET"
                 db_reset medusa/$VAR

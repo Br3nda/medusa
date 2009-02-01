@@ -7,7 +7,7 @@ Standards-Version: 3.7.2
 
 Package: medusa
 Architecture: all
-Depends: ${misc:Depends}, apache2, libapache2-mod-php5, php5-memcache, php5-pgsql, cron, php5-cli 
+Depends: ${misc:Depends}, apache2, libapache2-mod-php5, php5-memcache, php5-pgsql
 Recommends: postgresql-8.1
 Suggests: php5-imagick
 Pre-Depends: m4
