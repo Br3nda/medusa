@@ -1,3 +1,9 @@
+medusa (20090202-2) jaunty; urgency=low
+
+  * added .htaccess to package
+
+ -- Joshua Waihi <josh@lupe>  Mon, 02 Feb 2009 14:27:28 +1300
+
 medusa (20090202-1) jaunty; urgency=low
 
   * fixed preinst error 
