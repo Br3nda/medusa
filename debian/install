@@ -1,4 +1,5 @@
 htdocs/index.php              var/www/medusa
+htdocs/.htaccess              var/www/medusa
 lib/authentication            var/lib/medusa
 lib/authorization             var/lib/medusa
 lib/database                  var/lib/medusa

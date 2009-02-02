@@ -1,4 +1,4 @@
-<VirtualHost *:80>
+<VirtualHost *>
     ServerName __SERVERNAME__
 
     DocumentRoot /var/www/medusa

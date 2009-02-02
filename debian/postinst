@@ -41,9 +41,9 @@ case "$1" in
         echo "   define(\"CONFIG_DBHOST\", \"$RET\");" >> $SETTINGS_PHP
         db_get medusa/dbport
         echo "   define(\"CONFIG_DBPORT\", \"$RET\");" >> $SETTINGS_PHP
-        db_get medusa/dbusername
-        echo "   define(\"CONFIG_DBNAME\", \"$RET\");" >> $SETTINGS_PHP
         db_get medusa/dbname
+        echo "   define(\"CONFIG_DBNAME\", \"$RET\");" >> $SETTINGS_PHP
+        db_get medusa/dbusername
         echo "   define(\"CONFIG_DBUSER\", \"$RET\");" >> $SETTINGS_PHP
         db_get medusa/dbpassword
         echo "   define(\"CONFIG_DBPASS\", \"$RET\");" >> $SETTINGS_PHP
@@ -69,8 +69,10 @@ case "$1" in
 
         m4 $TMP_M4_FILE /etc/medusa/apache.conf.template > $APACHE_CONF_FILE
         ln -f -s $APACHE_CONF_FILE /etc/apache2/sites-enabled/100-medusa.conf
-        
-        rm /var/lib/medusa/config
+       
+        if [ -d /var/lib/medusa/config ]; then
+          rm /var/lib/medusa/config
+        fi
         ln -s /etc/medusa/config /var/lib/medusa/
 
         a2enmod rewrite
