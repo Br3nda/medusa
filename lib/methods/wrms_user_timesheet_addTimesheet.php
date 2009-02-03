@@ -19,6 +19,7 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
      */
     function run($params) {
 
+        // All the things we might need to enter a WR
         $wr = $params['GET']['wr']; 
         $datetime = $params['GET']['datetime'];
         $quantity = $params['GET']['quantity']; 
@@ -26,48 +27,13 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
         $rate = $params['GET']['rate']; 
         $description = $params['GET']['description']; 
 
-        // Okay, so we want to add time to a WR
-        
-/*medusa=> \d request_timesheet
-                                             Table "public.request_timesheet"
-      Column      |            Type             |                                Modifiers                                 
-------------------+-----------------------------+--------------------------------------------------------------------------
- timesheet_id     | integer                     | not null default nextval('request_timesheet_timesheet_id_seq'::regclass)
- request_id       | integer                     | 
- work_on          | timestamp without time zone | 
- ok_to_charge     | boolean                     | default false
- work_quantity    | double precision            | 
- work_duration    | interval                    | 
- work_by_id       | integer                     | 
- work_by          | text                        | 
- work_description | text                        | 
- work_rate        | double precision            | 
- work_charged     | timestamp without time zone | 
- charged_amount   | double precision            | 
- charged_by_id    | integer                     | 
- work_units       | text                        | 
- charged_details  | text                        | 
- entry_details    | text                        | 
- dav_etag         | text                        | 
- review_needed    | boolean                     | default false
-Indexes:
-    "request_timesheet_pkey" PRIMARY KEY, btree (timesheet_id)
-    "request_timesheet_dupe_catcher_index" UNIQUE, btree (request_id, work_quantity, work_on, work_description, work_by_id)
-    "request_timesheet_etag_skey" UNIQUE, btree (work_by_id, dav_etag)
-    "request_timesheet_req" btree (request_id, timesheet_id) CLUSTER
-    "request_timesheet_skey1" btree (work_on, work_by_id, request_id)
-    "request_timesheet_skey2" btree (ok_to_charge, request_id)
-Foreign-key constraints:
-    "request_timesheet_charged_by_id_fkey" FOREIGN KEY (charged_by_id) REFERENCES usr(user_no) ON UPDATE CASCADE ON DELETE RESTRICT
-    "request_timesheet_request_id_fkey" FOREIGN KEY (request_id) REFERENCES request(request_id) ON UPDATE CASCADE ON DELETE RESTRICT
-    "request_timesheet_work_by_id_fkey" FOREIGN KEY (work_by_id) REFERENCES usr(user_no) ON UPDATE CASCADE ON DELETE RESTRICT
-*/
-
+        // Who are we logged in as, and can we actually add timesheets?
         $user = currentuser::getInstance();
         $access = access::getInstance();
+
         if ($access->canUserAddTimesheets()) {
  
-            // Validate that this is a real WR
+            // Is this a real WR?
             $result = db_query("SELECT request_id FROM request WHERE request_id = %d", $wr);
             if (db_fetch_object($result) == null) {
                 return new error("You cannot put time against a non-existant work request", '405');
@@ -76,11 +42,14 @@ Foreign-key constraints:
             // Make sure the date and time are valid - convert to wrms-happy timestamp
             $timestamp = date('Y-m-d H:i:s', strtotime($datetime));
 
+            if ($timestamp == '1970-01-01 12:00:00') {
+                return new error('Unable to add timesheet: Invalid date', 400);
+            }
+            
             // Get the amount of time worked -- CAN'T BE NEGATIVE
             if ($quantity <= 0)  {
-                return new error("You can't work 0 hours or less on a WR", '405');
+                return new error("Unable to add timesheet: You can't work 0 hours or less on a WR", '405');
             }
-
        
             /*
              * So there's more than one way to log 'time' on a WR
