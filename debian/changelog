@@ -1,3 +1,9 @@
+medusa (20090203-1) jaunty; urgency=low
+
+  * added authentication fix and added user_id to returned session information 
+
+ -- Joshua Waihi <josh@lupe>  Tue, 03 Feb 2009 14:28:09 +1300
+
 medusa (20090202-2) jaunty; urgency=low
 
   * added .htaccess to package
