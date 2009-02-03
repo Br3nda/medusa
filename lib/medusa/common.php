@@ -51,6 +51,14 @@ function __autoload($class_name) {
       include_once($filename);
       break;
     }
+    $filename = $path . '/medusa/' . $class_name . '.php';
+    error_logging('DEBUG', "Include path is: '$path'");
+    error_logging('DEBUG', "Including class: $filename");
+    // ensure absolute pathing
+    if ($path[0] == '/' && is_file($filename) && is_readable($path)) { 
+      include_once($filename);
+      break;
+    }
   }
 
 }

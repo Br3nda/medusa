@@ -29,7 +29,9 @@ class wrms_search extends wrms_base_method {
     }
 
     $this->parameters = $parameters['GET'];
-    return $this->search();
+	$resp = new response('Success');
+	$resp->set('responses', $this->search());
+    return $resp;
   }
 
     /**

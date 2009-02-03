@@ -40,7 +40,7 @@ class wrms_search_sql_feed extends wrms_base_method {
         return $this->gettodbfields;
     }
 
-    private function run($input = null) {
+    public function run($input = null) {
         // TODO return fail here.
     }
 
