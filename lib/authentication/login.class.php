@@ -37,7 +37,7 @@ class login {
         if (is_null($password) || empty($password)) {
             return new error('No password supplied', 403);
         }
-        if (login::valid_credentials($username, $password, &$user_id, &$response)) {
+        if (login::valid_credentials($username, $password, $user_id, $response)) {
             // Make a session and all that lovely stuff
             // If we successfully put out session into memcache
             if (login::create_session($user_id, &$response)) {
@@ -66,7 +66,7 @@ class login {
      * @return
      *      TRUE if credentials are valid, FALSE if they are not
      */
-    private function valid_credentials($username, $password, $user_id, $response) {        
+    private function valid_credentials($username, $password, &$user_id, &$response) {        
         assert(!is_null($username));
         assert(!is_null($password));
 
@@ -74,7 +74,11 @@ class login {
         // See if they even exist
         $result = db_query("SELECT user_no, password from usr where username = '%s'", $username); // Handles the unclean username - <3 Database Abstraction
         
-        $row = db_fetch_object($result);
+        if (!$row = db_fetch_object($result)) {
+          // Invalid username, but lets not give any clues.
+          $response = "Invalid username or password";
+          return false;
+        }
         $hash = $row->password;
 
         /*
