@@ -49,6 +49,8 @@ if (!is_null($params['POST']['session_id'])) {
 
 $access = access::getInstance();
 $access->updateInfo(currentuser::getInstance());
+$response_renderer = response_renderer::getInstance();
+$response_renderer->set_format($format);
 
 if (!$method) {
 	error_logging('WARNING', "No method");
@@ -57,7 +59,8 @@ if (!$method) {
 elseif (!$format) {
 	$result = new error("Format required");
 }
-elseif (class_exists($method)) {
+// Make sure they are calling a wrms_ class method
+elseif (substr($method, 0, 5) == 'wrms_' && class_exists($method)) {
 	error_logging('DEBUG', "method $method exists");
 	$class = new $method();
 	error_logging('DEBUG', "about to run $method");
@@ -68,7 +71,5 @@ else {
 	$result = new error("$method does not exist");	
 }
 
-//$response = new response($result);
 error_logging('DEBUG', "Sending response");
-$response_renderer = new response_renderer($result);
-echo $response_renderer->render($format);
+echo $response_renderer->render($result);

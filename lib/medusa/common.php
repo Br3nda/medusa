@@ -28,6 +28,8 @@ if (DEBUG_MODE) {
   require_once('medusa/debug.php');
 }
 
+set_error_handler('errorHandler'); // We want to catch errors and return them in a user-can-understand-them format
+
 /**
  * Pull all the possible include paths out of the include directory into
  * a var called $path
