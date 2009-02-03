@@ -1,3 +1,15 @@
+medusa (20090204-1) jaunty; urgency=low
+
+  * made get request handle retriving mulitple requests
+
+ -- Joshua Waihi <josh@lupe>  Wed, 04 Feb 2009 10:10:15 +1300
+
+medusa (20090203-1) jaunty; urgency=low
+
+  * added authentication fix and added user_id to returned session information 
+
+ -- Joshua Waihi <josh@lupe>  Tue, 03 Feb 2009 14:28:09 +1300
+
 medusa (20090202-2) jaunty; urgency=low
 
   * added .htaccess to package

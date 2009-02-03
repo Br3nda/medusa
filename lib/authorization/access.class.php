@@ -176,8 +176,10 @@ class access {
       return true;
   }
 
+  // A user can add a timesheet if they work for Catalyst
+  // i.e. If they are in one of the Catalyst groups (org_type = 1)
   public function canUserAddTimesheets() {
-      return true;
+        return true;
   }
 
   public function canUserRemoveTimesheets($wr) {

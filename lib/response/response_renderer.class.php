@@ -6,20 +6,41 @@
 
 
 class response_renderer {
+  private static $instance;
   protected $reponse;
-  
+  protected $format;
+
   /**
-   * Give it a response object
-   */
-    function __construct($to_render) {
-        $this->response = $to_render;
+    * Nice singleton, lets us grab the renderer part way through execution if the errorHandler kicks in
+    */
+  public static function getInstance() {
+    if (!isset(self::$instance)) {
+      $c = __CLASS__;
+      self::$instance = new $c();
     }   
+    return self::$instance;
+  }
+ 
+    /**
+     * Empty constructor - you need to call set_format else the renderer will just default to html
+     */ 
+    function __construct() {
+    }   
+
+
+    /**
+     * Set the format you want to render in
+     */
+    function set_format($format = 'html') {
+        $this->format = $format;
+    }
 
   /**
     * Render the response, in whichever format we want
     */
-    function render($format = 'html') {
-        $method = '__render_' . $format;
+    function render($response) {
+        $this->response = $response;
+        $method = '__render_' . $this->format;
         error_logging('DEBUG', 'Render method: '.$method);
         if (is_callable(array($this, $method))) {
     		return $this->$method();
