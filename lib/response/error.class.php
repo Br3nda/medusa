@@ -46,9 +46,6 @@ function errorHandler($errno, $errstr, $errfile, $errline){
             error_logging('ERROR', $errstr.' in '.$errfile.' on line '.$errline);
             $response_renderer = response_renderer::getInstance();
             $error = new error($errstr, 500);
-            $error->set('error_value', $errno);
-            $error->set('error_file', $errfile);
-            $error->set('error_line', $errline);
             echo $response_renderer->render($error);
             exit;
         break;
@@ -57,11 +54,18 @@ function errorHandler($errno, $errstr, $errfile, $errline){
         case E_COMPILE_WARNING:
         case E_USER_WARNING:
             error_logging('WARNING', $errstr.' in '.$errfile.' on line '.$errline);
+            $error_array = explode(' ', $errstr);
             $response_renderer = response_renderer::getInstance();
+
+            /*
+             * As we hit errors, we should add nice explainations here
+             */
+            switch($error_array[0]) {
+                case 'pg_query()':
+                    $errstr = 'An error occured with a database query, please try again. If the issue persists, please contact support';
+                break;
+            }
             $error = new error($errstr, 500);
-            $error->set('error_value', $errno);
-            $error->set('error_file', $errfile);
-            $error->set('error_line', $errline);
             echo $response_renderer->render($error);
             exit;
         break;

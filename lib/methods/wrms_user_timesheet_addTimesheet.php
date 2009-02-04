@@ -13,7 +13,8 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
      *   - $params->datetime: The date and time to record the timesheet for in ISO format
      *   - $params->quantity: The quantity of units to add
      *   - $params->units: The units to use (default: hours)
-     *   - $params->description: A description about the time
+     *   - $params->rate: Optional rate of charge - if not supplied we apply the WRMS logic. - Note: If units is 'amount' then rate is required
+     *   - $params->description: A description about what the time was spent on
      * @return
      *   TRUE on success, FALSE on failure to add
      */
@@ -52,7 +53,7 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
                 return new error('Unable to add timesheet: Invalid date', 400);
             }
             
-            // Get the amount of time worked -- CAN'T BE NEGATIVE
+            // Get the amount of time worked -- Can't be negative or zero
             if ($quantity <= 0)  {
                 return new error("Unable to add timesheet: You can't work 0 hours or less on a WR", '405');
             }
@@ -72,7 +73,13 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
                     // If we are in days, then our job is very simple - we do nothing and the SQL figures itself out        
                 break;
                 case 'amount':
-                    // TODO
+                    if (empty($rate)) {
+                        return new error('Unable to add timesheet: you must specify a rate when adding an amount to a WR', '400');
+                    }
+                    else if (!is_numeric($rate)) {
+                        return new error('Unable to add timesheet: rate must be a numeric value', '400');
+                    }
+                    // So long as we've got this far the below rate calculation logic won't be applied
                 break;
                 case 'dollars':
                     return new error('dollars not implemented for this method - please use hours, days or amount', 406);
@@ -150,10 +157,16 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
 
             // Description - URL Encoded
             $description = urldecode($description);
-
+            
             // I know "$quantity $units" looks bad, postgres puts this into an 'interval' database field, so _it_ figures out how to make it nice, not us
+            if ($units != 'amount') {
+                $duration = "'$quantity $units'";
+            }
+            else {
+                $duration = "null";
+            }
             $result = db_query("INSERT INTO request_timesheet (request_id, work_on, work_quantity, work_duration, work_by_id, work_description, work_rate, work_units) 
-                                VALUES (%d, '%s', %d, '%s', %d, '%s', %d, '%s')", $wr, $timestamp, $quantity, "$quantity $units", $id, $description, $rate, $units);
+                                VALUES (%d, '%s', %d, %s, %d, '%s', %d, '%s')", $wr, $timestamp, $quantity, $duration, $id, $description, $rate, $units);
 
             if ($result == false) {
                 return new error('Database query failed', '500');
