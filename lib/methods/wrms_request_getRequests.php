@@ -35,7 +35,8 @@ class wrms_request_getRequests extends wrms_base_method {
       $placeholders = array();
       $placeholders = array_pad($placeholders, count($wr), '%d');
       $sql = 'SELECT * FROM request WHERE request_id IN (' . implode(', ', $placeholders)  . ')';
-      $params = array($sql) + array_keys($wr);
+	  $params = array_keys($wr);
+      array_unshift($params,$sql);
       $result = call_user_func_array('db_query', $params);
       if (!db_num_rows($result)) {
         return new Error('Request does not exist or you do not have permission to view it');
@@ -44,9 +45,8 @@ class wrms_request_getRequests extends wrms_base_method {
       while ($row = db_fetch_object($result)) {
         $object = new WrmsWorkRequest();
         $object->populate($row);
-        $wr[$row->request_id] = $object;
+		$response->data[] = $object;
       }
-      $response->set('wr', $wr);
       return $response;
     }
 }
