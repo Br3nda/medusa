@@ -32,6 +32,12 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
         $access = access::getInstance();
 
         if ($access->canUserAddTimesheets()) {
+
+            // Get the ID of the user
+            $id = $user->getUserID();
+            if ($id == null) {
+                return new error('You must be logged in to add a timesheet', '403');
+            }
  
             // Is this a real WR?
             $result = db_query("SELECT request_id FROM request WHERE request_id = %d", $wr);
@@ -89,14 +95,62 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
                 
             }
 
-            // Get the rate - how the heck will we know this? From the logged in user?
-            $rate = $user->base_rate; 
+            /*
+             * Okay, I'm not saying this logic is any good, but it's what WRMS 2.0 does (pick the first that applies)
+             * 1. If the user has specified a rate in the call to this method, use that
+             * 2. If the client has a rate set, use that rate
+             * 3. If the user has a rate set, use that rate
+             * 4. If the supplier has a rate set, use that rate
+             * 5. Default to the config value (120 at time of coding, but configurable from lib/medusa/config/config.php)
+             */
 
-            $id = $user->getUserID();
-            if ($id == null) {
-                return new error('You must be logged in to add a timesheet', '403');
+            // If we haven't got a rate, set $rate to null so the default rate logic will kick in
+            if (empty($rate)) {
+                $rate = null;
             }
-            // Description - TODO: encoded somehow?
+            // If we have been given a stupid value for rate
+            else if (!is_numeric($rate)) {
+                return new error('Unable to add timesheet: rate must be numeric', '400');
+            }
+
+            // Check the rate for the client (requestor)
+            if ($rate == null) {
+                $result = db_query("SELECT work_rate FROM request 
+                                        INNER JOIN usr ON (request.requester_id = usr.user_no) 
+                                        INNER JOIN organisation_plus ON (usr.org_code = organisation_plus.org_code) 
+                                        WHERE request.request_id=%d LIMIT 1", $wr);
+
+                while ($row = db_fetch_object($result)) {
+                    $rate = $row->work_rate;
+                }
+            }
+           
+            // If we didn't have any luck there, check the rate for the user 
+            if ($rate == null) {
+                $result = db_query("SELECT base_rate FROM usr WHERE user_no=%d LIMIT 1", $id);
+                while ($row = db_fetch_object($result)) {
+                   $rate = $row->base_rate;
+                }
+            }
+            
+            // Still no luck? Check the supplier rate
+            if ($rate == null) {
+                $result = db_query("SELECT work_rate FROM usr INNER JOIN organisation_plus ON (usr.org_code = organisation_plus.org_code) 
+                                        WHERE usr.user_no=%d LIMIT 1", $id);
+
+                while ($row = db_fetch_object($result)) {
+                    $rate = $row->work_rate;
+                }
+            }
+
+            // If all our options have failed us, set a default rate from config
+            if ($rate == null) {
+               $rate = DEFAULT_CHARGE_RATE; 
+            }
+
+            // Description - URL Encoded
+            $description = urldecode($description);
+
             // I know "$quantity $units" looks bad, postgres puts this into an 'interval' database field, so _it_ figures out how to make it nice, not us
             $result = db_query("INSERT INTO request_timesheet (request_id, work_on, work_quantity, work_duration, work_by_id, work_description, work_rate, work_units) 
                                 VALUES (%d, '%s', %d, '%s', %d, '%s', %d, '%s')", $wr, $timestamp, $quantity, "$quantity $units", $id, $description, $rate, $units);
@@ -107,14 +161,9 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
             else {
                 return new response('Success');
             }
-
-                //return new error('Not implemented');
-            }
-            else {
-                return new error('You are not authorised to add timesheets', 403);    
-            }
-
-       
-        
+        }
+        else {
+            return new error('You are not authorised to add timesheets', 403);    
+        }
     }
 }

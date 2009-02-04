@@ -45,7 +45,7 @@ function errorHandler($errno, $errstr, $errfile, $errline){
         case E_RECOVERABLE_ERROR:
             error_logging('ERROR', $errstr.' in '.$errfile.' on line '.$errline);
             $response_renderer = response_renderer::getInstance();
-            $error = new error($errstr);
+            $error = new error($errstr, 500);
             $error->set('error_value', $errno);
             $error->set('error_file', $errfile);
             $error->set('error_line', $errline);
@@ -58,7 +58,7 @@ function errorHandler($errno, $errstr, $errfile, $errline){
         case E_USER_WARNING:
             error_logging('WARNING', $errstr.' in '.$errfile.' on line '.$errline);
             $response_renderer = response_renderer::getInstance();
-            $error = new error($errstr);
+            $error = new error($errstr, 500);
             $error->set('error_value', $errno);
             $error->set('error_file', $errfile);
             $error->set('error_line', $errline);
