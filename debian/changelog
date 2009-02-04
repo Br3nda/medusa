@@ -1,3 +1,9 @@
+medusa (20090205-1) jaunty; urgency=low
+
+  * More tweaking of addTimesheet - support for amount, less verbose but more friendly error messages
+
+ -- Ben Bradshaw <ben@cloud.abutan>  Thu, 05 Feb 2009 10:32:40 +1300
+
 medusa (20090204-3) jaunty; urgency=low
 
   * releasing an upgraded addTimesheet and a tweaked error handler
