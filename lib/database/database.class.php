@@ -34,50 +34,54 @@ class db {
   /**
     * append query to transaction block -> can be called the same way as db_query
     */
-    public static function block_query($query) {
-      $args = func_get_args();
-      array_shift($args);
-      if ($args) {
-        _sort_db_query($args, true);
-        $query = preg_replace_callback('/(%d|%s|%f)/', '_sort_db_query', $query);
-      }
-      self::$query[] = $query;
+    public static function block_query($query, $args) {
+      self::$query[] = array($query, $args);
       return true;
     }
-  
+
   /**
     * commits database queries built up from block_query
     */
     public static function commit($commit = true) {
   	  error_logging('DEBUG', "commit() called");
-      self::query("BEGIN");
+  	  $con = self::connect();
+  	  $con->beginTransaction();
       $rollback = false;
       foreach (self::$query as $query) {
-        if (!db_query($query)) {
-          errorLogging('ERROR', "QUERY FAILED: $query");
-          self::query("ROLLBACK");
+        try {
+          $stmt = $con->prepare($query[0]);
+          $stmt->execute($query[1]);
+        }
+        catch (PDOException $e) {
+          errorLogging('ERROR', "QUERY FAILED: $query[0]");
+          $con->rollback();
           $rollback = true;
           break;
         }
       }
+
       self::$query = array();
       /**
         * this allows testing to see if queries run without fail
         * without commiting at the end
         */
         if ($commit && !$rollback) {
-          self::query("COMMIT");
-          return true;
+          try {
+            $con->commit();
+            return true;
+          }
+          catch (PDOException $e) {
+            return false;
+          }
         } 
         else {
-          self::query("ROLLBACK");
+          $con->rollBack();
         }
       if ($rollback) {
         return false;
       }
       return true;
-    }
-  
+    }  
   
   /**
     * insure connection creditials are available
@@ -104,7 +108,7 @@ class db {
   
   /**
     * Connection function
-    * @return connection object or exit on failure
+    * @return PDO connection object or exit on failure
     */
     public static function connect() {
       if (self::$con) {
@@ -112,10 +116,14 @@ class db {
       }
       if (self::init()) {
         $str = 'host='.CONFIG_DBHOST.' dbname='.CONFIG_DBNAME.' user='.CONFIG_DBUSER . ' port='.CONFIG_DBPORT;
-        self::$con = pg_connect($str);
-        if (!self::$con) {
-          errorLogging('CRITICAL', "Could not connect to database: $str");
-          exit("Could Not Connect to Database");
+        try {
+          self::$con = new PDO('pgsql:'.$str, null, null, array(
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+          ));
+        }
+        catch (PDOException $e) {
+          error_logging('CRITICAL', 'Could not connect to database: '.$e->getMessage());
+          exit('Could not Connect to Database');
         }
         return self::$con;
       }
@@ -130,22 +138,41 @@ class db {
   
   /**
     * query database
-    * @param query string
-    * @return recordset object on success or false on failure
+    * @param array two-element array with SQL query in 0 and binds array in 1
+    * @return PDOStatement PDO statement that may be iterated over
     */
     public static function query($query) {
-      return pg_query(self::connect(), $query);
+      try {
+        $stmt = self::connect()->prepare($query[0]);
+        $stmt->execute($query[1]);
+        return $stmt;
+      }
+      catch (PDOException $e) {
+        error_logging('ERROR', 'QUERY FAILED: '.$query[0].' '.print_r($query[1], true).' '.$e->getMessage());
+        return false;
+      }
     }
   
   /**
     * returns number of rows in given dataset
-    * @param recordset
+    * @param PDOStatement $stmt the PDO executed statement handle
     */
-    public static function num_rows($rs) {
-      if (get_resource_type($rs) == 'pgsql result') {
-        return pg_num_rows($rs);
+    public static function num_rows(PDOStatement $stmt) {
+      if ($stmt instanceof PDOStatement) {
+        return count($stmt->fetchAll());
       }
-      return false;
+      return 0;
+    }
+
+    /**
+     * Converts a SQL query with Drupal syntax (%s, %d, %f, %b) to prepared
+     * statement syntax
+     *
+     * @param string $query the incoming query
+     * @return string the PDO query with ? placeholders
+     */
+    public static function _to_pdo_format($query) {
+      return str_replace(array('%s', "'%s'", '%d', '%f', '%b'), '?', $query);
     }
 }//end class
 
@@ -231,82 +258,48 @@ function db_query($query) {
   $args = func_get_args();
   array_shift($args);
   if ($args) {
-    _sort_db_query($args, true);
-    $query = preg_replace_callback('/(%d|%s|%f|%b)/', '_sort_db_query', $query);
+    $query = db::_to_pdo_format($query);
   }
+  if (is_array($args[0])) {
+    $args = $args[0];
+  }
+
   //Record time to make query
   error_logging('DEBUG-SQL', $query);
   $watch->reset();
-  $rs = db::query($query);
+  $stmt = db::query(array($query, $args));
   $time = $watch->stop();
   if ($time > 1 && !DEBUG_MODE) {
     $query = preg_replace('/\\n/', '', $query);
     error_logging("ERROR", "SQL Query Took $time seconds: $query");
   }
-  if (!$rs) {
+  if (!$stmt) {
     $query = preg_replace('/\\n/', '', $query);
     error_logging("ERROR", "SQL query failed: $query");
   }
-  return $rs;
-}
-
-/**
- * makes db querys safe
- * @param $matches - if $reset is true, $matches should be an array of arguments else $matches is populated
- *                                from preg_replace_callback in db_query()
- * @return db query safe string
- * @ingroup Database
- */
-function _sort_db_query($matches, $reset = false) {
-  static $args;
-  if ($reset) {
-    $args = $matches;
-    return;
-  }
-  switch ($matches[1]) {
-    case '%d':
-      if (!is_int($args[0])) {
-        return intval(array_shift($args));
-      }
-    return array_shift($args);
-    break;
-    case '%s':
-      if (is_string($args[0])) {
-        return db::escape_string(array_shift($args));
-      }
-    $str = array_shift($args);
-    return db::escape_string("$str");
-    break;
-    case '%f':
-      return floatvar(array_shift($args));
-    break;
-    case '%b':
-        //echo "Boolean found.\n";
-      return "'". pg_escape_bytea(array_shift($args)) ."'";
-    break;
-  }
+  return $stmt;
 }
 
 /**
  * Fetch associative array from row of recordset
- * @param recordset
- * @param offset of row
+ * @param PDOStatement result of executed query
+ * @param int offset of row
  * @return array
  * @ingroup Database
  */
-function db_fetch_assoc($result, $int = false) {
+function db_fetch_assoc(PDOStatement $result, $int = false) {
   if ($result && is_int($int)) {
-    return pg_fetch_assoc($result);
+    return $result->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_FIRST, $int);
   } 
   elseif ($result) {
-    return pg_fetch_assoc($result);
+    return $result->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT);
   }
   return false;
 }
 
 /**
- * @return number of rows
- * @param recordset
+ * @return int number of rows
+ * @param PDOStatement recordset
  * @ingroup Database
  */
 function db_num_rows($rs) {
@@ -321,11 +314,12 @@ function db_num_rows($rs) {
  */
 function db_fetch_object($result, $int = false) {
   if ($result && is_int($int)) {
-    return pg_fetch_object($result, $int);
+    return $result->fetch(PDO::FETCH_OBJ, PDO::FETCH_ORI_FIRST, $int);
   } 
   elseif ($result) {
-    return pg_fetch_object($result);
+    return $result->fetch(PDO::FETCH_OBJ, PDO::FETCH_ORI_NEXT);
   }
+  return false;
 }
 
 /**
@@ -344,10 +338,9 @@ function db_block_query($query) {
   $args = func_get_args();
   array_shift($args);
   if ($args) {
-    _sort_db_query($args, true);
-    $query = preg_replace_callback('/(%d|%s|%f|%b)/', '_sort_db_query', $query);
+    $query = db::_to_pdo_format($query);
   }
-  db::block_query($query);
+  return db::block_query($query, $args);
 }
 
 /**
@@ -371,7 +364,7 @@ function db_commit($bool = true) {
  * @ingroup Database
  */
 function update_sql($sql) {
-  $result = db_query($sql, true);
+  $result = db_query($sql);
   return array('success' => $result !== FALSE, 'query' => check_plain($sql));
 }
 
