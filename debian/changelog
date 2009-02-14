@@ -1,3 +1,9 @@
+medusa (20090214-1) jaunty; urgency=low
+
+  * Changed getTimeSheets to use user object. 
+
+ -- Joshua Waihi <josh@lupe>  Sat, 14 Feb 2009 15:58:24 +1300
+
 medusa (20090205-1) jaunty; urgency=low
 
   * More tweaking of addTimesheet - support for amount, less verbose but more friendly error messages
