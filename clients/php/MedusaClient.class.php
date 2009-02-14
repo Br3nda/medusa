@@ -227,6 +227,15 @@ class MedusaRequest {
     return $this;
   }
 
+  /**
+   * Debug dump function.
+   *
+   * Don't use this for production.
+   */
+  public function dumpResponse() {
+    throw new WRMSException($this->response, 500, 'DEBUG');
+  }
+
 }
 
 class WRMSException extends Exception {
