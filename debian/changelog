@@ -1,3 +1,9 @@
+medusa (20090216-1) jaunty; urgency=low
+
+  * implement urldecode on wrms.request.getRequests 
+
+ -- Joshua Waihi <josh@lupe>  Mon, 16 Feb 2009 16:52:16 +1300
+
 medusa (20090214-1) jaunty; urgency=low
 
   * Changed getTimeSheets to use user object. 
