@@ -45,6 +45,7 @@ class wrms_request_getRequests extends wrms_base_method {
       while ($row = db_fetch_object($result)) {
         $object = new WrmsWorkRequest();
         $object->populate($row);
+		$object->populateChildren();
 		$response->data[] = $object;
       }
       return $response;
