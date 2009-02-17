@@ -24,7 +24,7 @@ class wrms_request_getRequests extends wrms_base_method {
      *     NULL if no work request
      */
     function run($params) {
-      $requests = explode(',', $params['GET']['wr']);
+      $requests = explode(',', urldecode($params['GET']['wr']));
       $access = access::getInstance();
       $wr = array();
       foreach ($requests as $request_id) {
