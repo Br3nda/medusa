@@ -73,7 +73,7 @@ class login {
 
         error_logging('DEBUG', "checking credentials of $username, $password");
         // See if they even exist
-        $result = db_query("SELECT user_no, password from usr where username = '%s'", $username); // Handles the unclean username - <3 Database Abstraction
+        $result = db_query("SELECT user_no, password, active from usr where username = '%s'", $username); // Handles the unclean username - <3 Database Abstraction
         
         if (!$row = db_fetch_object($result)) {
           // Invalid username, but lets not give any clues.
@@ -95,8 +95,16 @@ class login {
 
             // Compare our hashes
             if ($hash_of_received == $hash) {
-                $user_id = $row->user_no;
-                return true;
+
+                // Check to see if they are still active.
+                if ($row->active == 't') {
+                    $user_id = $row->user_no;
+                    return true;
+                }
+                else {
+                    $response = "Your account has been disabled.";
+                    return false;
+                }
             } 
             else {
                 $response = "Invalid username or password";

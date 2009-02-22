@@ -8,15 +8,19 @@ class WrmsWorkRequest extends WrmsBase {
   public function __construct($id = null) {
     $this->timesheets = array();
     $this->notes = array();    
+    $this->id = $id;
   }
 
   public function populateNow($id = null) {
     if ($id == null) {
       $id = $this->id;
     }
+    if ($id == null) {
+        return new error("Unable to populate a null work request", 500);
+    }
     $result = db_query("SELECT * FROM request WHERE request_id='%d'", $id);
     if (count($result) == 1) {
-      $this->populate($result[0]);
+      $this->populate(db_fetch_object($result));
     }
     $this->populateChildren();
   }
@@ -36,6 +40,10 @@ class WrmsWorkRequest extends WrmsBase {
         $newnote->populate($row);
         $this->notes[] = $newnote;
       }
+  }
+
+  public function writeToDatabase() {
+    return false;
   }
   
   protected function __set($name, $value) {

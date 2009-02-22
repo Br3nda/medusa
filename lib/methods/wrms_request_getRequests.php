@@ -28,12 +28,15 @@ class wrms_request_getRequests extends wrms_base_method {
       $access = access::getInstance();
       $wr = array();
       foreach ($requests as $request_id) {
-        if ($access->canUserSeeRequest($request_id)) {
+        if ($access->permitted('wr/view', $request_id)) {
           $wr[$request_id] = null;
         }
       }
       $placeholders = array();
       $placeholders = array_pad($placeholders, count($wr), '%d');
+      if (empty($placeholders)) {
+            return new error('You do not have sufficient permissions to view the request', 400);
+      }
       $sql = 'SELECT * FROM request WHERE request_id IN (' . implode(', ', $placeholders)  . ')';
 	  $params = array_keys($wr);
       array_unshift($params,$sql);

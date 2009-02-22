@@ -84,6 +84,77 @@ class access {
   }
 */
     }
+
+/*
+ * Edward start on this - ben is going to be redoing it so Ben's methods like here
+ */
+
+  /*
+   * Action can be any string that's predefined
+   * Object is what they are calling the action on
+   * e.g. 'wr/create', WrmsWorkRequest object
+   */
+  public function permitted($action, $object) {
+    switch ($action) {
+    case 'wr/create':
+        return access::permitted_wr_create($object);
+        break;
+    case 'wr/view':
+        return access::permitted_wr_view($object);
+        break;
+    case 'wr/edit':
+        return false;
+        break;
+    case 'wr/delete':
+        return false;
+        break;
+    }
+  }
+
+  private function permitted_wr_create($wr) {
+        return false;
+  }
+
+  private function permitted_wr_view($wr) {
+      // We can deal with either a WR object or an ID
+      if (!($wr instanceof WrmsWorkRequest)) {
+          $wr = new WrmsWorkRequest(intval($wr));
+          $wr->populateNow();
+      }
+
+      /*
+       * Viewing rules!
+       * 1. If you're a support user then you can just see everything because you're considered to be special
+       * 2. If you're not support then you have to have 'View', 'Enter', 'Own' or 'Coordinate' role on the System the WR is for
+       * 3. I don't know if there's a 3rd option
+       */
+      $user = currentuser::getInstance();
+
+      if ($user->getUserID() == null) {
+          return false; // If they aren't logged in then tell them to go away -- TODO figure out the anonymous access use case for a WR
+      }
+      
+      // Are we a support role?
+      $result = db_query("SELECT role_name FROM roles INNER JOIN role_member ON roles.role_no = role_member.role_no WHERE user_no = %d", $user->getUserID());
+      while ($row = db_fetch_object($result)) {
+          if ($row->role_name == "Support") {
+              return true;
+          }
+      }
+
+      // Do we have any access to the system the WR is for?
+      $result = db_query("SELECT role FROM system_usr WHERE system_id = %d AND user_no = %d", $wr->system_id, $user->getUserID());
+
+      // We only need one permission in this group to be allowed to view a WR - doesn't matter which
+      while (db_fetch_object($result)) {
+          return true;
+      }
+      return false;
+  }
+
+/*
+ * Ben's methods end here
+ */
   
   
   private function getAccessLevel($taskid, $level) {
