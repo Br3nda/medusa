@@ -29,9 +29,7 @@ class wrms_search extends wrms_base_method {
     }
 
     $this->parameters = $parameters['GET'];
-	$resp = new response('Success');
-	$resp->set('responses', $this->search());
-    return $resp;
+    return $this->search();
   }
 
     /**
@@ -39,8 +37,6 @@ class wrms_search extends wrms_base_method {
   * based on the records found.
     */
   private function search() {
-    $matches = array();
-
   /**
     * Acceptable paramters are;
     * requester
@@ -48,24 +44,29 @@ class wrms_search extends wrms_base_method {
     * watchers (users)
     * todo (users)
   */
-    foreach ($this->parameters as $parameterkey => $parameterstring) {
+    $found = false;
+    foreach ($this->parameters as $parameterkey => $parameterstring) { 
       if (array_key_exists($parameterkey, $this->gettodbfields) && array_key_exists($parameterkey, $this->gettodbjoins)) {
+        $found = true;
         $joinsql[] = $this->gettodbjoins[$parameterkey];
         $wheresql[] = $this->formatBoolValues($this->gettodbfields[$parameterkey], $parameterstring);
       }
     }
+    if ($found == false)
+      return new error("No usable search terms found.");
     $sql = "SELECT ". $this->gettable .".* FROM ". $this->gettable ." ". implode(' ', $joinsql) ." WHERE ". implode(' AND ', $wheresql);
     error_logging('DEBUG', "wrms_search auto generated $sql");
     $result = db_query($sql);
 
+	$resp = new response('Success');
     while ($row = db_fetch_assoc($result)) {
       error_logging('DEBUG', "Creating WrmsWorkRequest in wrms_search");
       $workreq = new WrmsWorkRequest();
       $workreq->populate($row);
       $workreq->populateChildren();
-      $matches[] = $workreq;
+      $resp->data[] = $workreq;
     }
-    return $matches;
+    return $resp;
   }
 
   /**
