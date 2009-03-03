@@ -20,7 +20,7 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
      */
     function run($params) {
 
-        // All the things we might need to enter a WR
+        // All the things we might need to enter a timesheet
         $wr = $params['GET']['wr']; 
         $datetime = $params['GET']['datetime'];
         $quantity = $params['GET']['quantity']; 
