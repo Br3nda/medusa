@@ -27,3 +27,5 @@ define("CONFIG_MEMCACHE_HOST", "memcache");
 define("CONFIG_MEMCACHE_PORT", "11211");
 define("CONFIG_MEMCACHE_EXPIRY", "600"); // 10 Minutes
 define("DEBUG_MODE", false); // Set to true to enable debug functions
+define("AUTHORIZE_FREE_ACCESS", false); //Set to true to allow anon users to access all methods
+define("AUTHORIZE_ALLOW_ALL", false); //Set to true to allow all logged users to access all methods
