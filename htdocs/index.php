@@ -48,7 +48,7 @@ if (!is_null($params['POST']['session_id'])) {
 }
 
 $access = access::getInstance();
-$access->updateInfo(currentuser::getInstance());
+$access->setUser(currentuser::getInstance());
 $response_renderer = response_renderer::getInstance();
 $response_renderer->set_format($format);
 
