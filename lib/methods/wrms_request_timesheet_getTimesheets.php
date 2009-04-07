@@ -23,7 +23,7 @@ class wrms_request_timesheet_getTimesheets extends wrms_base_method {
         $from = $params['GET']['start_date'];
         $to = $params['GET']['end_date'];
         $request_id = $params['GET']['wr'];
-        if ($access->canUserSeeStatus($request_id)) {
+        if ($access->permitted('wr/timesheets/view', $request_id)) {
             $sql = 'SELECT * FROM request_timesheet WHERE request_id = %d ';
 
             /*

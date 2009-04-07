@@ -24,7 +24,7 @@ class wrms_user_timesheet_getTimesheets extends wrms_base_method {
         $to = $params['GET']['end_date'];
         $request_id = $params['GET']['wr'];
         $access = access::getInstance();
-        if ($access->canUserSeeRequest($request_id)) {
+        if ($access->permitted('user/timesheets/view', $user)) {
 
             $sql = 'SELECT * FROM request_timesheet WHERE work_by_id = %d ';
             

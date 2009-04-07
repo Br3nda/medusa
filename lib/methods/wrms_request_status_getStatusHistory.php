@@ -19,7 +19,7 @@ class wrms_request_status_getStatusHistory extends wrms_base_method  {
         $return = array();
         $access = access::getInstance();
         $request_id = $params['GET']['wr'];
-        if ($access->canUserSeeStatus($request_id)) {
+        if ($access->permitted('wr/view',$request_id)) {
             $result = db_query('SELECT * FROM request_status WHERE request_id = %d ORDER BY status_on DESC', $request_id);
             $response = new response('Success');
             if (db_num_rows($result) > 0) {

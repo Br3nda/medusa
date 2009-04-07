@@ -17,7 +17,7 @@ class wrms_request_quote_getQuotes extends wrms_base_method  {
     function run($params) {
         $request_id = $params['GET']['wr'];
         $access = access::getInstance();
-        if ($access->canUserSeeRequest($request_id)) {
+        if ($access->permitted('wr/view', $request_id)) {
             $result = db_query('SELECT * FROM request_quote WHERE request_id = %d ORDER BY quoted_on', $request_id);
             $response = new response('Success');
             $actions = array();

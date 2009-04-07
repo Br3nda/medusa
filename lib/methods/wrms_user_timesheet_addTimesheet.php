@@ -32,7 +32,7 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
         $user = currentuser::getInstance();
         $access = access::getInstance();
 
-        if ($access->canUserAddTimesheets()) {
+        if ($access->permitted('wr/timesheet/add', $wr)) {
 
             // Get the ID of the user
             $id = $user->getUserID();
