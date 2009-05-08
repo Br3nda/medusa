@@ -1,5 +1,13 @@
 <?php
 /**
+ * @file
+ * @ingroup Methods
+ * wrms.request.note.getNote
+ * Gets a list of all notes attached to this work request.
+ */
+
+/**
+ * @ingroup Methods
  * wrms.request.note.getNote
  * Gets a list of all notes attached to this work request.
  */

@@ -1,5 +1,6 @@
 <?php
 /**
+ * @ingroup Methods
  * wrms.request.status.getCurrentStatus
  * Returns the current status of the WR
  */
