@@ -6,14 +6,15 @@
 
 
 class response {
-  public $code = 200;
-  public $message;
+  public $status;
   public $data;
   
 
-  function __construct($message = null) {
-      $this->message($message);
+  function __construct($message = 'None') {
+      $status = array();
       $data = array();
+      $this->status['code'] = 200;
+      $this->status['message'] = $message;
   }
 
   /**
@@ -21,7 +22,7 @@ class response {
     */
     function message($message) {
       assert(!is_null($message));
-      $this->message = $message;
+      $this->status['message'] = $message;
     }
   
   /**
@@ -29,24 +30,30 @@ class response {
     */
     function message_append($message) {
       assert(!is_null($message));
-      $this->message .= ' ' . $message;
+      $this->status['message'] .= ' ' . $message;
     }
     
     /*
-     * Allows us to set whatever datas we like
+     * Allows us to set whatever data we like, but we can't touch the status through this
      */
-    function set_data($name, $value) {
+    function set($name, $value) {
         assert(!is_null($name));
         assert(!is_null($value));
         $this->data[$name] = $value;
     }
 
     /*
+     * Allows us to get the status object
+     */
+    function getStatus() {
+    	//TODO where does status come from?
+       return $status; 
+    }
+
+    /*
      * Allows us to get the data object
      */
     function getData() {
-        $this->data['code'] = $this->code;
-        $this->data['message'] = $this->message;
         return $this->data;
     }
 }

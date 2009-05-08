@@ -3,7 +3,7 @@
  * wrms.request.timesheet.addTimesheet
  * Adds a timesheet to the specified WR
  */
-class wrms_request_timesheet_addTimesheet {
+class wrms_request_timesheet_addTimesheet extends wrms_base_method {
     /**
      * Performs the insert of the timesheet
      *
@@ -20,8 +20,4 @@ class wrms_request_timesheet_addTimesheet {
      * @return
      *   TRUE on success, FALSE on failure to add
      */
-    function run($params) {
-        $return = false;
-        return $return;
-    }
 }

@@ -3,7 +3,7 @@
  * wrms.user.timesheet.getTimesheets
  * Get the timesheets of a specified user
  */
-class wrms_user_timesheet_getTimesheets {
+class wrms_user_timesheet_getTimesheets extends wrms_base_method {
     /**
      * Performs the fetch of the timesheets by user
      * 
@@ -19,7 +19,52 @@ class wrms_user_timesheet_getTimesheets {
      *     An array of timesheets or an empty array if no results
      */
     function run($params) {
-        $return = array();
-        return $return;
+        $user = new user($params['GET']['person']);
+        $from = $params['GET']['start_date'];
+        $to = $params['GET']['end_date'];
+        $request_id = $params['GET']['wr'];
+        $access = access::getInstance();
+        if ($access->permitted('user/timesheets/view', $user)) {
+
+            $sql = 'SELECT * FROM request_timesheet WHERE work_by_id = %d ';
+            
+            /*
+             * There may be a better way to do this, but it seems like a sensible validation and or injection stopper - any invalid date will be 1970-01-01
+             */
+            if ($from) {
+                $from = date('Y-m-d', strtotime($from));
+                if ($from == "1970-01-01") {
+                    return new error('Invalid date format in start date. Required format: yyyy-mm-dd');
+                }
+                else {
+                    $sql .= "AND work_on >= '$from' ";
+                }            
+            }           
+            if ($to) {
+                $to = date('Y-m-d', strtotime($to));
+                if ($to == "1970-01-01") {
+                    return new error('Invalid date format in end date. Required format: yyyy-mm-dd');
+                }
+                else { 
+                    $sql .= "AND work_on <= '$to' ";
+                }
+            }
+
+            $sql .= 'ORDER BY work_on ASC';
+			
+            $result = db_query($sql, $user->getUserID());
+                $timesheets = array();
+                while ($row = db_fetch_object($result)) {
+                    $timesheet = new WrmsTimeSheet();
+                    $timesheet->populate($row);
+                    $timesheets[] = $timesheet;
+                }
+                $response = new response('Success');
+                $response->set('timesheets', $timesheets);
+            return $response;
+        }
+        else {
+            return new error('Access denied', 403);
+        }
     }
 }

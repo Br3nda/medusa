@@ -1,0 +1,98 @@
+#!/bin/sh
+# postinst script for medusa (dh-make-drupal)
+#
+# see: dh_installdeb(1)
+
+set -e
+
+# summary of how this script can be called:
+#        * <postinst> `configure' <most-recently-configured-version>
+#        * <old-postinst> `abort-upgrade' <new version>
+#        * <conflictor's-postinst> `abort-remove' `in-favour' <package>
+#          <new-version>
+#        * <postinst> `abort-remove'
+#        * <deconfigured's-postinst> `abort-deconfigure' `in-favour'
+#          <failed-install-package> <version> `removing'
+#          <conflicting-package> <version>
+# for details, see http://www.debian.org/doc/debian-policy/ or
+# the debian-policy package
+
+#DEBHELPER#
+
+. /usr/share/debconf/confmodule
+. /usr/share/medusa/common-functions
+
+TMP_M4_FILE=/etc/medusa/postinst.m4.tmp
+APACHE_CONF_FILE=/etc/apache2/sites-available/medusa.conf
+SETTINGS_PHP=/etc/medusa/config/config.php
+
+case "$1" in
+    configure)
+        echo "<?php"                            > $SETTINGS_PHP
+        echo "/**"                             >> $SETTINGS_PHP
+        echo " * @file Database configuration" >> $SETTINGS_PHP
+        echo " */"                             >> $SETTINGS_PHP
+        echo ""                                >> $SETTINGS_PHP
+        echo "/**"                             >> $SETTINGS_PHP
+        echo " * @ingroup Database database"   >> $SETTINGS_PHP
+        echo " */"                             >> $SETTINGS_PHP 
+        echo "   define(\"CONFIG_DBTYPE\", \"pgsql\");" >> $SETTINGS_PHP
+        db_get medusa/dbhost
+        echo "   define(\"CONFIG_DBHOST\", \"$RET\");" >> $SETTINGS_PHP
+        db_get medusa/dbport
+        echo "   define(\"CONFIG_DBPORT\", \"$RET\");" >> $SETTINGS_PHP
+        db_get medusa/dbname
+        echo "   define(\"CONFIG_DBNAME\", \"$RET\");" >> $SETTINGS_PHP
+        db_get medusa/dbusername
+        echo "   define(\"CONFIG_DBUSER\", \"$RET\");" >> $SETTINGS_PHP
+        db_get medusa/dbpassword
+        echo "   define(\"CONFIG_DBPASS\", \"$RET\");" >> $SETTINGS_PHP
+        echo ""                                >> $SETTINGS_PHP
+        echo "/**"                             >> $SETTINGS_PHP
+        echo " * @defgroup Database Database"  >> $SETTINGS_PHP
+        echo " * connecting and querying and etc - uses PDO" >> $SETTINGS_PHP
+        echo " */"                             >> $SETTINGS_PHP
+        echo ""                                >> $SETTINGS_PHP
+        echo "define(\"CONFIG_OUTPUT\", \"json\");"                 >> $SETTINGS_PHP
+        db_get medusa/memcache
+        echo "define(\"CONFIG_MEMCACHE_HOST\", \"$RET\");"      >> $SETTINGS_PHP
+        echo "define(\"CONFIG_MEMCACHE_PORT\", \"11211\");"         >> $SETTINGS_PHP
+        echo "define(\"CONFIG_MEMCACHE_EXPIRY\", \"600\"); // 10 Minutes"             >> $SETTINGS_PHP
+        echo "define(\"DEBUG_MODE\", false); // Set to true to enable debug functions" >> $SETTINGS_PHP
+
+        # ensure cron.log exists and is www-data writable
+        touch /var/log/medusa.cron.log
+        chown www-data:www-data /var/log/medusa.cron.log
+        # Configure apache2
+        echo "changecom" > $TMP_M4_FILE
+        db_get medusa/servername
+        echo "define(__SERVERNAME__,${RET})dnl" >> $TMP_M4_FILE
+
+        m4 $TMP_M4_FILE /etc/medusa/apache.conf.template > $APACHE_CONF_FILE
+        ln -f -s $APACHE_CONF_FILE /etc/apache2/sites-enabled/100-medusa.conf
+       
+        if [ -d /var/lib/medusa/config ]; then
+          rm /var/lib/medusa/config
+        fi
+        ln -s /etc/medusa/config /var/lib/medusa/
+
+        a2enmod rewrite
+        restart_apache2;
+
+        db_get medusa/servername
+        echo ""
+        echo "The medua instance is now running at http://${RET}"
+        echo ""
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+db_stop
+exit 0

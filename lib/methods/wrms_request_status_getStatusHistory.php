@@ -3,7 +3,7 @@
  * wrms.request.status.getStatusHistory
  * Fetches a list of all status changes made to the specified request
  */
-class wrms_request_status_getStatusHistory {
+class wrms_request_status_getStatusHistory extends wrms_base_method  {
     /**
      * Performs the fetch list action
      *
@@ -19,8 +19,9 @@ class wrms_request_status_getStatusHistory {
         $return = array();
         $access = access::getInstance();
         $request_id = $params['GET']['wr'];
-        if ($access->canUserSeeStatus($request_id)) {
+        if ($access->permitted('wr/view',$request_id)) {
             $result = db_query('SELECT * FROM request_status WHERE request_id = %d ORDER BY status_on DESC', $request_id);
+            $response = new response('Success');
             if (db_num_rows($result) > 0) {
                 while ($row = db_fetch_object($result)) {
                     $obj = new WrmsStatus();
@@ -28,7 +29,11 @@ class wrms_request_status_getStatusHistory {
                     $return[] = $obj;
                 }
             }
+            $response->set('history', $return);
+            return $response;
         }
-        return $return;
+        else {
+            return new error('Access denied', 403);
+        }
     }
 }

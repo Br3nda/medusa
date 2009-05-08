@@ -15,129 +15,54 @@
  
 set_include_path(get_include_path() . PATH_SEPARATOR . realpath('../lib/'));
 
-require('./simpletest/autorun.php');
+$found = false;
+foreach(explode(PATH_SEPARATOR, get_include_path()) as $path) {
+	if (file_exists($path . '/simpletest/autorun.php')) {
+		$found = true;
+		break;
+	}
+}
+if (!$found) {
+  echo 'You need to download simpletest and extract into unitests folder';
+  exit;
+}
+require('simpletest/autorun.php');
 require('medusa/common.php');
 
-//our tests 
 /**
- * Created on 8/01/2009
- *
- * To change the template for this generated file go to
- * Window - Preferences - PHPeclipse - PHP - Code Templates
+ * All tests get included in here
  */
-
-/**
- * wrms.request.allocated.getAllocated 
- * Gets a list of the people whom this work is currently assigned to. 
- * Method Arguments Argument Title 	Name 	Data type 
- * Work Request ID 	wr 	int
- */
-require('methods/wrms_request_allocated_getAllocated.php');
-class test_wrms_request_allocated_getAllocated extends UnitTestCase {
-	function testgetAllocated() {
-		//You probably need a session
-		$class = new wrms_request_allocated_getAllocated();
-		$params = array('wr' => '58286');
-		$result = $class->run($params);
-		$this->assertTrue(is_array($result));
-		$this->assertEqual(sizeof($result), 4);
-		foreach ($result as $r) {
-			$this->assertEqual('user', get_class($r));
-		}
-	}	
-}
-
-class test_wrms_request_getRequest extends UnitTestCase {
-    function testgetRequest() {
-        //Will need to build session object
-        $class = new wrms_request_getRequest();
-        $params = array('wr' => '58286');
-        $result = $class->run($params);
-        $this->assertTrue(is_object($result));
-        $this->assertTrue($result instanceof WrmsWorkRequest);
-    }
-
-    //function testgetRequest_xml()
-    //function testgetRequest_json()
-    //function testgetRequest_forbidden()
-}
-
-class test_wrms_request_note_getNote  extends UnitTestCase {
-	//TODO
-}
-
-class test_wrms_request_quote_getQuotes extends UnitTestCase {
-	//TODO
-}
-
-class test_wrms_request_status_getCurrentStatus extends UnitTestCase {
-	//TODO
-}
-
-class test_wrms_request_status_getStatusHistory extends UnitTestCase {
-	//TODO
-}
-
-class test_wrms_request_subscriber_getSubscribers extends UnitTestCase {
-	//TODO
-}
-
-class test_wrms_request_timesheet_addTimesheet extends UnitTestCase {
-	//TODO
-}
-
-class test_wrms_request_timesheet_getTimesheets extends UnitTestCase {
-	//TODO
-}
-
-class test_wrms_user_timesheet_addTimesheet extends UnitTestCase{
-	//TODO
-}
-
-class test_wrms_user_timesheet_getTimesheets extends UnitTestCase {
-	//TODO
-}
-
-/**
- * @ingroup Unittests
- */
-class TestRequestParsing extends UnitTestCase {
-  function testParsing() {
-    $request = new Uri_Parser('/search.xml?user=brenda');
-    
-    $this->assertEqual($request->get_method(), 'search');
-    $this->assertEqual($request->get_format(), 'xml');
-
-    $param = $request->get_params();
-    $this->assertEqual($param['user'], 'brenda');
-    $this->assertEqual(sizeof($param), 1);
-    
-    
-    $request = new Uri_Parser('/wrms.request.get_request.xml?user=brenda');
-    
-    $this->assertEqual($request->get_method(), 'wrms.request.get_request');
-    $this->assertEqual($request->get_format(), 'xml');
-
-    $param = $request->get_params();
-    $this->assertEqual($param['user'], 'brenda');
-    $this->assertEqual(sizeof($param), 1);
-    
-  }
-   
-}
-
-
-
-class testDatabase extends UnitTestCase {
-  function testConnection() {
-    
-  }
-  function testQuery() {
-    $result = db_query("SELECT * FROM request LIMIT 10");
-    $this->assertTrue($result != false);
+class AllTests extends TestSuite {
+  function AllTests() {
+    $this->TestSuite('Medusa WRMS api tests');
+    $dir = $_SERVER['DOCUMENT_ROOT'];
+    $this->addFile($dir .'render.tests.php');
+    $this->addFile($dir .'database.tests.php');
+    $this->addFile($dir .'methods.tests.php');
+    $this->addFile($dir .'parsing.tests.php');
+    $this->addFile($dir .'codestyle.tests.php');
     
   }
 }
+
+
+
+
+
+
+// class test_wrms_request_getRequest extends UnitTestCase {
+// 
+// 
+
+//   
+//     //function testgetRequest_xml()
+//     //function testgetRequest_json()
+//     //function testgetRequest_forbidden()
+//   
+//   
+// }
+
+
 
 /*
 class TestLogin extends UnitTestCase {
@@ -148,104 +73,11 @@ class TestLogin extends UnitTestCase {
 }*/
 
 
-/**
- * Created on 8/01/2009
- *
- * To change the template for this generated file go to
- * Window - Preferences - PHPeclipse - PHP - Code Templates
- */
 
-class CodeStyleTest extends UnitTestCase {
-   function pathToCode($docroot) {
-     $dirs = array(realpath($docroot . '/..'));
-     $dirs = $this->addSubFolders($dirs);
-     $dirs = $this->addSubFolders($dirs);
-     return $dirs;
-   }
-   function testCodeStyle() {
-   	$docroot = $_SERVER['DOCUMENT_ROOT'];
-   	if (!$docroot) $docroot = '.';
-     $codestyle = $docroot . '/code-style.pl';
+function unittest_header($string) {
+  $this->dump($string);
+}
 
-     foreach ($this->pathToCode($docroot) as $dir) {
-     	
-       if (preg_match('!\.!', $dir)) {
-         continue;
-       }
 
-       $d = dir($dir);
-       if (!$d) {
-         $this->dump('testCodeStyle: Failed to read dir: "' . $dir .'"');
-         return false;
-       }
 
-       while ($entry = $d->read()) {
-
-         if (!preg_match('!\.inc$!', $entry) && !preg_match('!\.php$!', $entry)) {
-           continue;
-         }
-         $contents = file_get_contents("$dir/$entry");
-         $code_lines = split("\n", $contents);
-
-         $line_num = 1;
-         $full_code = '';
-         foreach ($code_lines as $l) {
-           $full_code .= "$line_num $l\n";
-           $line_num++;
-         }
-
-         $result = shell_exec("$codestyle $dir/$entry");
-         /*
-         if (!$this->assertTrue(empty($result), 'Bad code style in ' . "$dir/$entry")) {
-           $this->dump($full_code);
-         }
-          */
-         $lines = split("\n", $result);
-
-         foreach ($lines as $line) {
-           if (!$this->asserttrue(empty($line), $line)) {
-             preg_match("!$dir/$entry:([0-9]+): !", $line, $matches);
-             $code = $code_lines[$matches[1] -1];
-             $this->dump($code ."\n");
-           }
-         }
-
-         //mark passes for number of lines without error.. just to make it look good
-
-         for ($i=0; $i < count($code_lines) - count($lines); $i++) {
-           $this->assertTrue(true);
-         }
-       }
-     }
-   }
-   function addSubFolders($dirs) {
-     $dir = array();
-     foreach ($dirs as $base) {
-       $d = dir($base);
-       if (!$d) {
-         $this->assertTrue(false, 'Failed to read dir: "' . $dir .'"');
-         continue;
-       }
-       else {
-       	$ignore_list = array('Zend', 'simpletest', '\.');
-       while($entry = $d->read()) {
-
-         if(is_dir($base . '/'. $entry)) {
-         	$on_ignore = false;
-       	  foreach($ignore_list as $i) {
-       	  	if (preg_match("!$i!", $entry)) {
-       	  		$on_ignore = true;
-       	  	}
-       	  }
-       	  if (!$on_ignore) {
-           $dir[] = $base . '/'. $entry;
-       	  }
-         }
-       }
-       }
-
-     }
-     return $dir;
-   }
- }
 

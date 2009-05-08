@@ -134,11 +134,11 @@ while (<>) {
     $msg = "missing space before '{'";
   }
   # there should be a space after ','
-  elsif (/[,][^ \n\r]/ && $program) {
-    $msg = "missing space after ','";
+    elsif (/[^\\][,][^ \n\r]/ && $program) {
+    $msg = " missing space after ','";
   }
   # spaces before and after, only foreach may use $foo=>bar
-  elsif (/[^ =|\-|\+](\+|\-)[^ =>|\-|\+]/ && $program && !/foreach/) {
+  elsif (/[^ =|\-|\+\(](\+|\-)[^ =>|\-|\+]/ && $program && !/foreach/) {
     $msg = "'$1' -> ' $1 '";
   }
   elsif (/[^ =](\*|==|\.=|=>|=|\|\|)[^ =>]/ && $program && !/foreach/) {

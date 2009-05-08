@@ -37,13 +37,14 @@ class login {
         if (is_null($password) || empty($password)) {
             return new error('No password supplied', 403);
         }
-        if (login::valid_credentials($username, $password, &$user_id, &$response)) {
+        if (login::valid_credentials($username, $password, $user_id, $response)) {
             // Make a session and all that lovely stuff
             // If we successfully put out session into memcache
             if (login::create_session($user_id, &$response)) {
                 currentuser::set(new user($user_id));
                 $resp = new response('Login success');
-                $resp->set_data('session_id', $response);
+                $resp->set('session_id', $response);
+                $resp->set('user_id', $user_id);
                 return $resp;
             }
             // If putting our session into memcache failed
@@ -66,15 +67,19 @@ class login {
      * @return
      *      TRUE if credentials are valid, FALSE if they are not
      */
-    private function valid_credentials($username, $password, $user_id, $response) {        
+    private function valid_credentials($username, $password, &$user_id, &$response) {        
         assert(!is_null($username));
         assert(!is_null($password));
 
         error_logging('DEBUG', "checking credentials of $username, $password");
         // See if they even exist
-        $result = db_query("SELECT user_no, password from usr where username = '%s'", $username); // Handles the unclean username - <3 Database Abstraction
+        $result = db_query("SELECT user_no, password, active from usr where username = '%s'", $username); // Handles the unclean username - <3 Database Abstraction
         
-        $row = db_fetch_object($result);
+        if (!$row = db_fetch_object($result)) {
+          // Invalid username, but lets not give any clues.
+          $response = "Invalid username or password";
+          return false;
+        }
         $hash = $row->password;
 
         /*
@@ -90,9 +95,44 @@ class login {
 
             // Compare our hashes
             if ($hash_of_received == $hash) {
-                $user_id = $row->user_no;
-                return true;
+
+                // Check to see if they are still active.
+                if ($row->active == 't') {
+                    $user_id = $row->user_no;
+                    return true;
+                }
+                else {
+                    $response = "Your account has been disabled.";
+                    return false;
+                }
             } 
+            else {
+                $response = "Invalid username or password";
+                return false;
+            }
+        }
+        /*
+         * This is a cheap and easy way to check mulitple passwords, should eventually refactor into something better
+         * 
+         * Alternate password format: *salt*SHA1hash
+         */
+        elseif (preg_match('/^\*(.+)\*{[A-Z]+}.+$/', $hash, $matches)) {
+            //Get the salf and the hash of the password received
+            $salt = $matches[1];
+            $hash_of_received = sprintf("*%s*{SSHA}%s", $salt, base64_encode(sha1($password.$salt, true) . $salt));
+
+            //Compare our hashes
+            if ($hash_of_received == $hash) {
+                //Check to see if they are still active
+                if ($row->active == 't') {
+                    $user_id = $row->user_no;
+                    return true;
+                }
+                else {
+                    $response = "Your account has been disabled.";
+                    return false;
+                }
+            }
             else {
                 $response = "Invalid username or password";
                 return false;

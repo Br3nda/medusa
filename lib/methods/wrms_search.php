@@ -1,43 +1,33 @@
 <?php
 
-class wrms_search {
-    private $parameters;
-    private $gettodbfields;
-    private $gettodbjoins;
+class wrms_search extends wrms_base_method {
+  private $parameters;
+  private $gettable;
+  private $gettodbjoins;
+  private $gettodbfields;
 
-    function __construct() {
-        $this->gettodbfields = array();
-        $this->gettodbjoins = array();
+  function __construct() {
+  }
 
-        $this->gettodbfields['requesterusername'] = 'requsrname.username';
-        $this->gettodbjoins ['requesterusername'] = 'INNER JOIN usr AS requsrname ON requsrname.user_no=request.requester_id';
-
-        $this->gettodbfields['assignedusername'] = 'assusrname.username';
-        $this->gettodbjoins ['assignedusername'] = 'INNER JOIN request_allocated ON request_allocated.request_id=request.request_id INNER JOIN usr AS assusrname ON assusrname.user_no=request_allocated.allocated_to_id';
+  public function run($parameters) {
+    if ($parameters['GET']['type'] == null) {
+      error_logging('WARNING', "No type provided.");
+      return null;
     }
-
-
-    public function run($parameters) {
-        if ($parameters['type'] == null) {
-
-        	error_logging('WARNING', "No type provided.");
-            return null;
+    else {
+      $this->parameters = $parameters['GET'];
+        switch ($this->parameters['type']) {
+          case 'request':
+            return $this->searchWorkRequests();
+            break;
+          case 'workrequest':
+            return $this->searchWorkRequests();
+            break;
+          default:
+            error_logging('WARNING', "Search type ". $parameters['type']." doesn't exist.");
+            break;
         }
-        else {
-
-                $this->parameters = $parameters['GET'];
-                switch ($this->parameters['type']) {
-                case 'request':
-                        return $this->searchWorkRequests();
-                        break;
-                case 'workrequest':
-                        return $this->searchWorkRequests();
-                        break;
-                default:
-                        error_logging('WARNING', "Search type ". $parameters['type']." doesn't exist.");
-                        break;
-                }
-            }
+      }
     }
 
 
@@ -60,13 +50,13 @@ class wrms_search {
         $wheresql = array(); # list of where's to join together in abig happy array
 
         foreach ($this->parameters as $parameterkey => $parameterstring) {
-
-            if (array_key_exists($parameterkey,$this->gettodbfields) && array_key_exists($parameterkey,$this->gettodbjoins)) {
+            if (array_key_exists($parameterkey, $this->gettodbfields) && array_key_exists($parameterkey, $this->gettodbjoins)) {
                 $joinsql[] = $this->gettodbjoins[$parameterkey];
-                $wheresql[] = $this->formatBoolValues($this->gettodbfields[$parameterkey],$parameterstring);
+                $wheresql[] = $this->formatBoolValues($this->gettodbfields[$parameterkey], $parameterstring);
             }
-       }
-        $sql = "SELECT * FROM request ".implode(' ',$joinsql)." WHERE " . implode(' AND ',$wheresql);
+        }
+        $sql = "SELECT * FROM request ".implode(' ', $joinsql) ." WHERE ". implode(' AND ', $wheresql);
+        error_logging('DEBUG', "wrms_search auto generated $sql");
         $result = db_query($sql);
 
         while ($row = db_fetch_assoc($result)) {
@@ -77,21 +67,60 @@ class wrms_search {
         }
         return $matches;
     }
-    /**
-    * creates an SQL string from boolean search
-    * @param $string = string to fix up
-    * @param $key = db table column name
-    * Example;
-    * usr.username, "joe OR alice AND bob"
-    * usr.username='joe' OR usr.username='alice' AND usr.username='bob'
-    */
-    private function formatBoolValues($key,$string) {
-        # TODO add some function checking here        
-        return preg_replace(array('/([a-zA-Z0-9]+)/','/\+/','/\|/'),array($key.'=\'${1}\'',' AND ',' OR '),$string);
-    }
 
-    function __destruct() {
+  /**
+  * If a search request is found for workrequests, search for and builds workrequest objects
+  * based on the records found.
+  */
+  private function search() {
+  /**
+    * Acceptable paramters are;
+    * requester
+    * status history
+    * watchers (users)
+    * todo (users)
+  */
+    $found = false;
+    foreach ($this->parameters as $parameterkey => $parameterstring) { 
+      if (array_key_exists($parameterkey, $this->gettodbfields) && array_key_exists($parameterkey, $this->gettodbjoins)) {
+        $found = true;
+        $joinsql[] = $this->gettodbjoins[$parameterkey];
+        $wheresql[] = $this->formatBoolValues($this->gettodbfields[$parameterkey], $parameterstring);
+      }
     }
+    if ($found == false)
+      return new error("No usable search terms found.");
+    $sql = "SELECT ". $this->gettable .".* FROM ". $this->gettable ." ". implode(' ', $joinsql) ." WHERE ". implode(' AND ', $wheresql);
+    error_logging('DEBUG', "wrms_search auto generated $sql");
+    $result = db_query($sql);
+
+	$resp = new response('Success');
+    while ($row = db_fetch_assoc($result)) {
+      error_logging('DEBUG', "Creating WrmsWorkRequest in wrms_search");
+      $workreq = new WrmsWorkRequest();
+      $workreq->populate($row);
+      $workreq->populateChildren();
+      $resp->data[] = $workreq;
+    }
+    return $resp;
+  }
+
+  /**
+  * creates an SQL string from boolean search
+  * @param $string = string to fix up
+  * @param $key = db table column name
+  * Example;
+  * usr.username, "joe OR alice AND bob"
+  * usr.username='joe' OR usr.username='alice' AND usr.username='bob'
+  */
+  private function formatBoolValues($key, $string) {
+    // TODO add some function checking here
+    return preg_replace(array('/([a-zA-Z0-9]+)/', '/\+/', '/\|/'), array($key .'=\'${1}\'', ' AND ', ' OR '), $string);
+  }
+
+  function __destruct() {
+  }
 }
+
 
 

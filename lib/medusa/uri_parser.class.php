@@ -14,7 +14,7 @@
 class Uri_Parser {
   private $_uri_;
 
-  /*
+  /**
   * Takes a uri /wrms.request.getRequest.xml?a=1&b=2&userb=johnny|John Lewis&usera=sarahANDlewis and creates;
   * $this->method = wrms.request.getRequest
   * $this->format = xml
@@ -29,7 +29,7 @@ class Uri_Parser {
     $this->_method_ = join('_', $methodstrings); // ... join them up with a different string
     
     //TODO turn into whitelist instead of blacklist
-    $this->_method_ = str_replace(array('<', '>', '\\', '/', ',', '.'), "", $this->_method_);  // Clean up the method string
+    $this->_method_ = str_replace(array('<', '>', '\\', '/', "\,", '.'), "", $this->_method_);  // Clean up the method string
 
     foreach (split('&',  $urihalves[1]) as $variable) {
       $bits = split('=', $variable);

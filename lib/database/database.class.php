@@ -221,7 +221,8 @@ class stopwatch {
  * @return
  *   A database query result resource, or FALSE if the query was not
  *   executed correctly.
-*/
+ * @ingroup Database
+ */
 function db_query($query) {
   static $watch;
   if (get_class($watch) != 'stopwatch') {
@@ -250,11 +251,12 @@ function db_query($query) {
 }
 
 /**
-* makes db querys safe
-* @param $matches - if $reset is true, $matches should be an array of arguments else $matches is populated
-*                                from preg_replace_callback in db_query()
-* @return db query safe string
-*/
+ * makes db querys safe
+ * @param $matches - if $reset is true, $matches should be an array of arguments else $matches is populated
+ *                                from preg_replace_callback in db_query()
+ * @return db query safe string
+ * @ingroup Database
+ */
 function _sort_db_query($matches, $reset = false) {
   static $args;
   if ($reset) {
@@ -286,11 +288,12 @@ function _sort_db_query($matches, $reset = false) {
 }
 
 /**
-* Fetch associative array from row of recordset
-* @param recordset
-* @param offset of row
-* @return array
-*/
+ * Fetch associative array from row of recordset
+ * @param recordset
+ * @param offset of row
+ * @return array
+ * @ingroup Database
+ */
 function db_fetch_assoc($result, $int = false) {
   if ($result && is_int($int)) {
     return pg_fetch_assoc($result);
@@ -302,18 +305,20 @@ function db_fetch_assoc($result, $int = false) {
 }
 
 /**
-* @return number of rows
-* @param recordset
-*/
+ * @return number of rows
+ * @param recordset
+ * @ingroup Database
+ */
 function db_num_rows($rs) {
   return db::num_rows($rs);
 }
 
 /**
-* @return object as recordset rows
-* @param recordset
-* @param offset of row
-*/
+ * @return object as recordset rows
+ * @param recordset
+ * @param offset of row
+ * @ingroup Database
+ */
 function db_fetch_object($result, $int = false) {
   if ($result && is_int($int)) {
     return pg_fetch_object($result, $int);
@@ -324,15 +329,17 @@ function db_fetch_object($result, $int = false) {
 }
 
 /**
-* Begins a block transaction
-*/
+ * Begins a block transaction
+ * @ingroup Database
+ */
 function db_begin() {
   db::begin();
 }
 
 /**
-* appends a query to a block transaction
-*/
+ * appends a query to a block transaction
+ * @ingroup Database
+ */
 function db_block_query($query) {
   $args = func_get_args();
   array_shift($args);
@@ -344,8 +351,9 @@ function db_block_query($query) {
 }
 
 /**
-* commits a block transaction
-*/
+ * commits a block transaction
+ * @ingroup Database
+ */
 function db_commit($bool = true) {
   return db::commit($bool);
 }
@@ -360,6 +368,7 @@ function db_commit($bool = true) {
  *   An array containing the keys:
  *      success: a boolean indicating whether the query succeeded
  *      query: the SQL query executed, passed through check_plain()
+ * @ingroup Database
  */
 function update_sql($sql) {
   $result = db_query($sql, true);

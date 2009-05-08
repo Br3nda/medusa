@@ -6,20 +6,41 @@
 
 
 class response_renderer {
+  private static $instance;
   protected $reponse;
-  
+  protected $format;
+
   /**
-   * Give it a response object
-   */
-    function __construct($to_render) {
-        $this->response = $to_render;
+    * Nice singleton, lets us grab the renderer part way through execution if the errorHandler kicks in
+    */
+  public static function getInstance() {
+    if (!isset(self::$instance)) {
+      $c = __CLASS__;
+      self::$instance = new $c();
     }   
+    return self::$instance;
+  }
+ 
+    /**
+     * Empty constructor - you need to call set_format else the renderer will just default to html
+     */ 
+    function __construct() {
+    }   
+
+
+    /**
+     * Set the format you want to render in
+     */
+    function set_format($format = 'html') {
+        $this->format = $format;
+    }
 
   /**
     * Render the response, in whichever format we want
     */
-    function render($format = 'html') {
-        $method = '__render_' . $format;
+    function render($response) {
+        $this->response = $response;
+        $method = '__render_' . $this->format;
         error_logging('DEBUG', 'Render method: '.$method);
         if (is_callable(array($this, $method))) {
     		return $this->$method();
@@ -48,14 +69,13 @@ class response_renderer {
         return $html;
     }
     private function __render_json() {
-        header('Content-type: application/x-javascript');
+        $this->header('Content-type: application/x-javascript');
         //Check if the response is an array
         if (is_array($this->response)) {
             $output = array();
             foreach ($this->response as $key=>$value) {
-                if (is_object($value) && ($value instanceof WrmsBase)) {
-                    //Can use this method as WrmsBase defines it
-                    $output[] = $value->getData();
+                if (is_object($value)) {
+                    $output[] = get_object_vars($value);
                 } 
                 else {
                     //Shove anything else into array
@@ -64,10 +84,6 @@ class response_renderer {
             }
             return json_encode($output);
         }
-        elseif ($this->response instanceof WrmsBase) {
-            return json_encode($this->response->getData());
-        } 
-
         elseif ($this->response instanceof response) {
             // Our response object contains a code, message and a data array, which should have eberything it wants rendered as public
             return json_encode($this->response);
@@ -76,17 +92,27 @@ class response_renderer {
             // We're stuffed
         }
     }
+  /**
+    * We decide not to send headers, if they're already sent
+    * This is to make unittests happy
+    */
+  private function header($string) {
+    if (!headers_sent()) {
+      header($string);
+    }
+     
+  }
 
     private function __render_xml() {
-        header('Content-type: application/xml');
+        $this->header('Content-type: application/xml');
     
         $output = $this->__recurse_xml($this->response);
-        return $output;
+        return "$output";
     }
     private function __recurse_xml($input) {
 
         if (is_object($input)) {
-            $data = $input->getData();
+            $data = get_object_vars($input);
             $tag = get_class($input);
             $output = "<$tag>\n";
 
@@ -104,9 +130,14 @@ class response_renderer {
         } 
         elseif (is_array($input)) {
             $output = '';
+            $tag = get_class($input);
             foreach ($input as $key=>$value) {
-                if (is_object($value)) {
+                if (is_object($value) || is_array($value)) {
                     $output .= $this->__recurse_xml($value);
+                }
+                else {
+                    $child = htmlentities($key);
+                    $output .= "<$child>$value</$child>";
                 }
             }
             return $output;
@@ -119,10 +150,7 @@ class response_renderer {
     }
     
     private function __recurse_html($input) {
-        if ($input instanceof WrmsBase) {
-            return $this->__recurse_html($input->getData());
-        } 
-        elseif (is_array($input) || is_object($input)) {
+        if (is_array($input) || is_object($input)) {
             $output = '';
             foreach ($input as $key=>$value) {
                 if (is_array($value) || is_object($value)) {
