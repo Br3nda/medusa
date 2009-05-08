@@ -19,38 +19,28 @@ class wrms_request_getRequests extends wrms_base_method {
      *   - $params->wr: Work Request ID or array of
      *   - $params->user: User ID making the request
      *   @return
-     *     The request object on success
-     *     FALSE if permission is denied
-     *     NULL if no work request
+     *    - The request object on success
+     *    - Error message if access is denied, or wr was not filled.
      */
     function run($params) {
-      $requests = explode(',', urldecode($params['GET']['wr']));
       $access = access::getInstance();
-      $wr = array();
-      foreach ($requests as $request_id) {
-        if ($access->permitted('wr/view', $request_id)) {
-          $wr[$request_id] = null;
+
+      if ($params['GET']['wr'] == null) {
+        error_logging('WARNING', "No work request number (wr) provided.");
+        return new error('No work request number (wr) provided.');
+      }
+      $requests = explode(',', $params['GET']['wr']); // requested ids
+      $response = new response('Success');
+      $sql = 'SELECT * FROM request WHERE request_id IN (' . implode(', ', $requests)  . ')';
+      while ($row = db_fetch_object($result)) {
+        if ($access->permitted('wr/view', $row->id)) {
+          $object = new WrmsWorkRequest();
+          $object->populate($row);
+          $object->populateChildren();
+          $response->data[] = $object;
+#        } else {
+#          $response->data[] =  new error('No work request number (wr) provided.',403); # EKM TODO add id not allowed option
         }
       }
-      $placeholders = array();
-      $placeholders = array_pad($placeholders, count($wr), '%d');
-      if (empty($placeholders)) {
-            return new error('You do not have sufficient permissions to view the request', 401);
-      }
-      $sql = 'SELECT * FROM request WHERE request_id IN (' . implode(', ', $placeholders)  . ')';
-	  $params = array_keys($wr);
-      array_unshift($params,$sql);
-      $result = call_user_func_array('db_query', $params);
-      if (!db_num_rows($result)) {
-        return new Error('Request does not exist or you do not have permission to view it', 401);
-      }
-      $response = new response('Success');
-      while ($row = db_fetch_object($result)) {
-        $object = new WrmsWorkRequest();
-        $object->populate($row);
-		$object->populateChildren();
-		$response->data[] = $object;
-      }
       return $response;
-    }
 }
