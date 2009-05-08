@@ -1,5 +1,15 @@
 <?php
+/**
+ * @file 
+ * @ingroup Methods
+ * wrms.request.search
+ * Returns a list specified objects based on a dynamic list of arguments
+ */
 
+ /**
+  * @ingroup Methods
+  * Work Requests
+  */
 class wrms_search extends wrms_base_method {
   private $parameters;
   private $gettable;
@@ -9,10 +19,22 @@ class wrms_search extends wrms_base_method {
   function __construct() {
   }
 
+  /**
+   * Search on the requested options
+   *
+   * @param $params
+   *   Associative array of parameters
+   *   - $params->type: Type of object to search for. See wrms_search_sql_feed for more details.
+   *   - $params->xxx: Attributes to search against. See wrms_search_sql_feed and wrms_search::formatBoolValues for formatting for more details.
+   * @return
+   *   - An array of object on success
+   *   - An empty array if the request was valid, but no matches were found
+   *   - An error on failure
+   */
   public function run($parameters) {
     if ($parameters['GET']['type'] == null) {
       error_logging('WARNING', "No type provided.");
-      return null;
+      return new error('"No type provided.');
     }
     else {
       $this->parameters = $parameters['GET'];
@@ -32,7 +54,7 @@ class wrms_search extends wrms_base_method {
 
 
     /**
-    * Added the structure for dynamically generated SQL code, and some example stuff.:lib/methods/wrms_search.php
+    * Adds the structure for dynamically generated SQL code, and some example stuff.:lib/methods/wrms_search.php
     * If a search request is found for workrequests, search for and builds workrequest objects
     * based on the records found.
     */
