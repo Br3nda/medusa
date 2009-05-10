@@ -29,18 +29,23 @@ class wrms_request_getRequests extends wrms_base_method {
         error_logging('WARNING', "No work request number (wr) provided.");
         return new error('No work request number (wr) provided.');
       }
-      $requests = explode(',', $params['GET']['wr']); // requested ids
+      if (!preg_match('/^(\d+)(,\d+)*$/',$params['GET']['wr'])) {
+        error_logging('WARNING', 'Provided work request (wr) of; "'. $params['GET']['wr'] .'" argument does not match required format.');
+        return new error('Bad work request (wr) argument. Argument must be in the format of one or more integers seperated by commas. IE; 101,42 or 42');
+      }
+
       $response = new response('Success');
-      $sql = 'SELECT * FROM request WHERE request_id IN (' . implode(', ', $requests)  . ')';
+      $sql = 'SELECT * FROM request WHERE request_id IN (' . $params['GET']['wr']  . ')';
       while ($row = db_fetch_object($result)) {
         if ($access->permitted('wr/view', $row->id)) {
           $object = new WrmsWorkRequest();
           $object->populate($row);
           $object->populateChildren();
           $response->data[] = $object;
-#        } else {
-#          $response->data[] =  new error('No work request number (wr) provided.',403); # EKM TODO add id not allowed option
+        } else {
+          $response->data[] =  new error('No work request number (wr) provided.',403); # EKM TODO add id not allowed option
         }
       }
       return $response;
+    }
 }
