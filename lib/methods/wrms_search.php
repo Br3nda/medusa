@@ -8,7 +8,7 @@
 
  /**
   * @ingroup Methods
-  * Work Requests
+  * Search objects
   */
 class wrms_search extends wrms_base_method {
   private $parameters;

@@ -20,6 +20,12 @@ class wrms_search_sql_feed extends wrms_base_method {
             case 'roles':
                 return $this->fillRoles();
                 break;
+            case 'user':
+                return $this->fillUser();
+                break;
+            case 'users':
+                return $this->fillUser();
+                break;
             default:
                 error_logging('WARNING', "Search type $search doesn't exist.");
                 break;
@@ -74,6 +80,18 @@ class wrms_search_sql_feed extends wrms_base_method {
         $this->gettodbjoins ['member'] = 'INNER JOIN role_member AS rlrm ON roles.role_no=rlrm.role_no INNER JOIN usr AS rlusr ON rlrm.user_no=rlusr.user_no';
 
     }
+
+    private function fillUser() {
+        $this->searchtable = 'user';
+
+        $this->gettodbfields['name'] = 'rmroles.role_name';
+        $this->gettodbjoins ['name'] = ''; # EKM, owtf, start again here on Tuesday
+
+        $this->gettodbfields['member'] = 'rlusr.username';
+        $this->gettodbjoins ['member'] = 'INNER JOIN role_member AS rlrm ON roles.role_no=rlrm.role_no INNER JOIN usr AS rlusr ON rlrm.user_no=rlusr.user_no';
+
+    }
+
 
     function __destruct() {
     }
