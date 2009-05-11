@@ -36,7 +36,7 @@ class wrms_request_getRequests extends wrms_base_method {
 
       $response = new response('Success');
       $sql = 'SELECT * FROM request WHERE request_id IN (' . $params['GET']['wr']  . ')';
-      $result = call_user_func_array('db_query', $sql);
+      $result = db_query($sql);
       while ($row = db_fetch_object($result)) {
         if ($access->permitted('wr/view', $row->request_id)) {
           $object = new WrmsWorkRequest();
