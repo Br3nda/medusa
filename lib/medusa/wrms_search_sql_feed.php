@@ -9,6 +9,7 @@ class wrms_search_sql_feed extends wrms_base_method {
         $this->searchtable = null;
         $this->gettodbfields = array();
         $this->gettodbjoins = array();
+        $this->newobject = null;
 
         switch ($search) {
             case 'request':
@@ -46,6 +47,10 @@ class wrms_search_sql_feed extends wrms_base_method {
         return $this->gettodbfields;
     }
 
+    public function getNewObject() {
+      return new $this->newobject;
+    }
+
     public function run($input = null) {
         // TODO return fail here.
     }
@@ -55,6 +60,7 @@ class wrms_search_sql_feed extends wrms_base_method {
     * based on the records found.
     */
     private function fillWorkRequest() {
+        $this->newobject = 'WrmsWorkRequest';
         $this->searchtable = 'request';
 
         $this->gettodbfields['requesterusername'] = 'requsrname.username';
@@ -71,6 +77,7 @@ class wrms_search_sql_feed extends wrms_base_method {
     }
 
     private function fillRoles() {
+        $this->newobject = 'WrmsWorkRoles';
         $this->searchtable = 'roles';
 
         $this->gettodbfields['name'] = 'rmroles.role_name';
@@ -82,16 +89,19 @@ class wrms_search_sql_feed extends wrms_base_method {
     }
 
     private function fillUser() {
-        $this->searchtable = 'user';
+        $this->newobject = 'user'; # TODO, this doesn't work
+        $this->searchtable = 'usr';
 
-        $this->gettodbfields['name'] = 'rmroles.role_name';
-        $this->gettodbjoins ['name'] = ''; # EKM, owtf, start again here on Tuesday
+        $this->gettodbfields['name'] = 'usr.fullname';
+        $this->gettodbjoins ['name'] = '';
 
-        $this->gettodbfields['member'] = 'rlusr.username';
-        $this->gettodbjoins ['member'] = 'INNER JOIN role_member AS rlrm ON roles.role_no=rlrm.role_no INNER JOIN usr AS rlusr ON rlrm.user_no=rlusr.user_no';
+        $this->gettodbfields['username'] = 'usr.username';
+        $this->gettodbjoins ['username'] = '';
+
+        $this->gettodbfields['email'] = 'usr.email';
+        $this->gettodbjoins ['email'] = '';
 
     }
-
 
     function __destruct() {
     }
