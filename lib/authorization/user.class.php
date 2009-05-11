@@ -3,29 +3,26 @@
  *
  * @ingroup User
  */
-class user {
+class user extends WrmsBase {
     private $userid;
     private $username;
     private $data = array();
     private $roles = array();
     private $systems = array();
 
-    public function __construct($user) {
+    public function __construct($user = null) {
         //$user can be either an ID value or a username
+        if (is_null($user)) {
+            $this->populated = false;
+            return false; 
+        }
         if (intval($user) || is_int($user) && ($user > 0)) {
             $result = db_query("SELECT * FROM usr WHERE usr.user_no=%d", $user);
         }   
         elseif (is_string($user) && (preg_match('!^[a-zA-Z0-9]+$!', $user))) {
             $result = db_query("SELECT * FROM usr WHERE usr.username='%s'", $user);
         }
-        else {
-            //Provided information isn't whats expected, explode
-            return false; 
-        }
-
-        //Is there a result
         if (!$result) {
-            //No result, explode
             return false;
         }
 
@@ -37,7 +34,37 @@ class user {
         foreach ($object as $key=>$val) {
             $this->$key = $val; //Will call the private magic __set function
         }
+        $this->loadRoles();
+        $this->loadSystemRoles();
+    }
 
+
+    public function populateNow($row = null) {
+        error_logging('DEBUG', "usr::populateNow() - begins");
+        if (is_null($row)) {
+            return false;
+        }
+        // Convert an object we got with db_fetch_object to an array
+        else if (is_object($row)) {
+            $row = get_object_vars($row);
+        }
+        if (is_array($row)) {
+            error_logging('DEBUG', "usr::populateNow() - Adding $k -> $v");
+            foreach ($row as $k => $v) {
+                $this->$k = $v;
+            }
+        }
+        else {
+            return false;
+        }
+    }
+
+    public function populateChildren() {
+      $this->loadRoles();
+      $this->loadSystemRoles();
+    }
+
+    private function loadRoles() {
         //Load roles
         $result = db_query("SELECT m.role_no,r.role_name FROM role_member m INNER JOIN roles r ON m.role_no=r.role_no WHERE m.user_no = %d", $this->userid);
         if ($result) {
@@ -50,6 +77,9 @@ class user {
                 );
             }
         }
+    }
+
+    private function loadSystemRoles() {
         //Load system roles
         $result = db_query("SELECT s.role,s.system_id,l.lookup_desc FROM system_usr s INNER JOIN lookup_code l ON s.role=l.lookup_code WHERE l.source_table = 'system_usr' AND s.user_no = %d", $this->userid);
         if ($result) {
@@ -63,6 +93,7 @@ class user {
             }
         }
     }
+
 
     public function getRoles() {
         return $this->roles;
@@ -96,7 +127,9 @@ class user {
         unset($this->data[$name]);
     }
 
-    private function __set($name, $value) {
+    protected function __set($name, $value) {
+        if ($name == 'password') # Let's not show this!
+          return;
         $this->data[$name] = $value;
     }
 }

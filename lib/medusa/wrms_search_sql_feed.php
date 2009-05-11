@@ -77,7 +77,7 @@ class wrms_search_sql_feed extends wrms_base_method {
     }
 
     private function fillRoles() {
-        $this->newobject = 'WrmsWorkRoles';
+        $this->newobject = 'WrmsRoles';
         $this->searchtable = 'roles';
 
         $this->gettodbfields['name'] = 'rmroles.role_name';
