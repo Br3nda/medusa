@@ -29,8 +29,6 @@ class user extends WrmsBase {
         //Loading information into objects
         error_logging('DEBUG', 'Adding in user details');
         $object = db_fetch_object($result);
-        $this->userid = $object->user_no;
-        $this->username = $object->username;
         foreach ($object as $key=>$val) {
             $this->$key = $val; //Will call the private magic __set function
         }
@@ -130,6 +128,11 @@ class user extends WrmsBase {
     protected function __set($name, $value) {
         if ($name == 'password') # Let's not show this!
           return;
-        $this->data[$name] = $value;
+        else if ($name == 'user_no') # Let's not show this!
+          $this->userid = $value;
+        else if ($name == 'username') # Let's not show this!
+          $this->username = $value;
+        else
+          $this->data[$name] = $value;
     }
 }
