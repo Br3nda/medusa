@@ -72,7 +72,7 @@ class wrms_search extends wrms_base_method {
     }
     if ($found == false)
       return new error("No usable search terms found.");
-    $sql = "SELECT ". $this->gettable .".* FROM ". $this->gettable ." ". implode(' ', $joinsql) ." WHERE ". implode(' AND ', $wheresql);
+    $sql = "SELECT DISTINCT ". $this->gettable .".* FROM ". $this->gettable ." ". implode(' ', $joinsql) ." WHERE ". implode(' AND ', $wheresql);
     error_logging('DEBUG', "wrms_search auto generated $sql");
     $result = db_query($sql);
 
