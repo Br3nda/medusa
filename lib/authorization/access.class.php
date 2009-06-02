@@ -53,8 +53,32 @@ class access {
         }
     }
 
+    private function getQueue($action) {
+        //Get all permissions associated with this access
+        //Also looks for parents to the action and merges all into a single queue
+        /*
+         * Example: wr/timesheet/add
+         *
+         * Checks for permissions on:
+         * wr
+         * wr/timesheet
+         * wr/timesheet/add
+         */
+        $parts = explode('/', $action);
+        $search = array();
+        $return = array();
+        foreach ($parts as $part) {
+            $search[] = $part;
+            $perm = implode('_', $search);
+            $items = $this->permissions_map[$perm];
+            if (!empty($items) && is_array($items)) {
+                $return = array_merge($return, $items);
+            }
+        }
+        return $return;
+    }
+
     public function permitted ($action, $object) {
-        $action = str_replace('/', '_', $action);
         error_logging('DEBUG', "Executing permissions check for $action");
         if (defined('AUTHORIZE_FREE_ACCESS') && constant('AUTHORIZE_FREE_ACCESS')) {
             //Free access to all requests including anonymous
@@ -74,7 +98,7 @@ class access {
                 return false;
             }
         }
-        $queue = $this->permissions_map[$action];
+        $queue = $this->getQueue($action);
         if (!empty($queue)) {
             if (isset($this->chains[$action])) {
                 //This permission chain was already created
