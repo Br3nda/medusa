@@ -27,7 +27,7 @@ class access {
                         $this->permissions_map[$parts[0]][] = array(
                             'file' => $file,
                             'weight' => $parts[1],
-                            'class' => 'permissions_'.$parts[2],
+                            'class' => 'permissions_'.$parts[0].'_'.$parts[2],
                         );
                     }
                 }
@@ -41,7 +41,7 @@ class access {
         if (!isset($this->loaded_files[$permission])) {
             $filename = $dir.$permission;
             error_logging('DEBUG', "Including permission $permission");
-            include($filename);
+            include_once($filename);
         }
     }
 

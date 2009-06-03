@@ -1,9 +1,9 @@
 <?php
-//File: wr_view.10.system_role_check.php
-//Permission: wr/view
+//File: wr_timesheet_add.10.user_systems_role.php
+//Permission: wr/timesheet/add
 //Weight: 10
 
-class permissions_system_role_check extends permissions {
+class permissions_wr_timesheet_add_user_systems_role extends permissions {
     public function performCheck(&$obj, &$user) {
         //Check if user has been assigned to the system
         $return = false;
@@ -18,7 +18,13 @@ class permissions_system_role_check extends permissions {
         } 
         if (isset($systems[$system_id])) {
             //If the system info exists user must have access to view it
-            $return = true;
+            switch ($systems[$system_id]['role']) {
+                case 'S':
+                case 'A':
+                    //Only support and allocatable roles get the ability to assign time
+                    $return = true;
+                    break;
+            }
         }
         return $return;
     }

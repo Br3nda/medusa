@@ -26,11 +26,14 @@ class WrmsWorkRequest extends WrmsBase {
   }
 
   public function populateChildren() {
-      $result = db_query("SELECT * FROM request_timesheet WHERE request_id='%d'", $this->id);
-      while ($row = db_fetch_assoc($result)) {
-        $newsheet = new WrmsTimeSheet();
-        $newsheet->populate($row);
-        $this->timesheets[] = $newsheet;
+      $access = access::getInstance();
+      if ($access->permitted('wr/timesheet/view', $this->id)) {
+        $result = db_query("SELECT * FROM request_timesheet WHERE request_id='%d'", $this->id);
+        while ($row = db_fetch_assoc($result)) {
+          $newsheet = new WrmsTimeSheet();
+          $newsheet->populate($row);
+          $this->timesheets[] = $newsheet;
+        }
       }
 
       # This possibly isn't the smallest implementation, but it will do for the moment.

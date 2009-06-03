@@ -1,9 +1,9 @@
 <?php
-//File: wr.-100.admin_check.php
+//File: wr.-100.admin_role.php
 //Permission: wr
 //Weight: -100
 
-class permissions_admin_check extends permissions {
+class permissions_wr_admin_role extends permissions {
     public function performCheck(&$obj, &$user) {
         //Check if user is an admin
         //If an admin give all rights

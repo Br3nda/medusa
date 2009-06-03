@@ -1,9 +1,9 @@
 <?php
-//File: wr_timesheet_add.-50.support_global_role_check.php
-//Permission: wr/timesheet/add
-//Weight: -50
+//File: wr_quote_add.-10.support_global_role.php
+//Permission: wr/quote
+//Weight: -10
 
-class permissions_support_global_role_check extends permissions {
+class permissions_wr_quote_add_support_global_role extends permissions {
     public function performCheck(&$obj, &$user) {
         //Check if user has the global support role
         $return = false;
