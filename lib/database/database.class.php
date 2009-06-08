@@ -130,7 +130,7 @@ class db {
   
   /**
     * query database
-    * @param query string
+    * @param $query string - string of SQL
     * @return recordset object on success or false on failure
     */
     public static function query($query) {
@@ -139,7 +139,7 @@ class db {
   
   /**
     * returns number of rows in given dataset
-    * @param recordset
+    * @param $rs Recordset to get count of
     */
     public static function num_rows($rs) {
       if (get_resource_type($rs) == 'pgsql result') {
@@ -254,6 +254,7 @@ function db_query($query) {
  * makes db querys safe
  * @param $matches - if $reset is true, $matches should be an array of arguments else $matches is populated
  *                                from preg_replace_callback in db_query()
+ * @param $reset - Defaults to false
  * @return db query safe string
  * @ingroup Database
  */
@@ -289,8 +290,8 @@ function _sort_db_query($matches, $reset = false) {
 
 /**
  * Fetch associative array from row of recordset
- * @param recordset
- * @param offset of row
+ * @param $result recordset to get associative array from
+ * @param $int offset of row
  * @return array
  * @ingroup Database
  */
@@ -306,7 +307,7 @@ function db_fetch_assoc($result, $int = false) {
 
 /**
  * @return number of rows
- * @param recordset
+ * @param $rs recordset
  * @ingroup Database
  */
 function db_num_rows($rs) {
@@ -315,8 +316,8 @@ function db_num_rows($rs) {
 
 /**
  * @return object as recordset rows
- * @param recordset
- * @param offset of row
+ * @param $result recordset
+ * @param $int offset of row
  * @ingroup Database
  */
 function db_fetch_object($result, $int = false) {

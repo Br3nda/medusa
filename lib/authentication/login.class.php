@@ -11,7 +11,7 @@ class login {
     /**
      * Calls all the methods necessary to do a login
      *
-     * @params $params
+     * @param $params
      *      Array of parameters
      *      - $params['POST']['username']: The username of the user POSTed to the page 
      *      - $params['POST']['password']: The password of the user POSTed to the page 
@@ -59,13 +59,11 @@ class login {
 
    /**
     * Checks the username and password of a user and returns their ID if they are valid
-     * @params
-     *      $username: The username of the person logging in - unclean data
-     *      $password: The password of the person logging in - unclean data
-     *      $user_id: The ID of the user, which we will set if their details are correct (passed by reference)
-     *      $response: A string of text explaining the true/false result
-     * @return
-     *      TRUE if credentials are valid, FALSE if they are not
+     * @param $username The username of the person logging in - unclean data
+     * @param $password The password of the person logging in - unclean data
+     * @param $user_id The ID of the user, which we will set if their details are correct (passed by reference)
+     * @param $response A string of text explaining the true/false result
+     * @return TRUE if credentials are valid, FALSE if they are not
      */
     private function valid_credentials($username, $password, &$user_id, &$response) {        
         assert(!is_null($username));
@@ -148,11 +146,9 @@ class login {
      * Creates a session for this user - the user can have multiple sessions
      * Allows multiple scripts to run at the same time and not cause each other to fail
      *
-     * @params
-     *      $user_id: the ID of the current user
-     *      $response: passed by reference, either the reason for the failure or the session ID
-     * @return
-     *      TRUE if the session is created, FALSE if it is not
+     * @param $user_id: the ID of the current user
+     * @param $response: passed by reference, either the reason for the failure or the session ID
+     * @return TRUE if the session is created, FALSE if it is not
      */
     private function create_session($user_id, $response) {
 
@@ -181,7 +177,7 @@ class login {
 
     /**
      * Checks to see if their session is still valid in memcache
-     * @params
+     * @param
      *      $session_id: The ID of the session we want to check
      * @return
      *      An error string if memcache fails

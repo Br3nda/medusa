@@ -7,7 +7,7 @@ class wrms_request_timesheet_getTimesheets extends wrms_base_method {
     /**
      * Performs the fetch of the timesheets by work request
      *
-     * @params $params
+     * @param $params
      *   Associative array of parameters
      *   - $params->wr: Work Request ID
      *   - $params->user: User ID making the request

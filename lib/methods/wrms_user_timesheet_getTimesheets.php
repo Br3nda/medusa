@@ -7,7 +7,7 @@ class wrms_user_timesheet_getTimesheets extends wrms_base_method {
     /**
      * Performs the fetch of the timesheets by user
      * 
-     * @params $params
+     * @param $params
      *   Associative array of parameters
      *   - $params->person: User ID to get timesheets from
      *   - $params->user: User ID making the request

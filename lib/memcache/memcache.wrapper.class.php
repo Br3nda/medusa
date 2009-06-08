@@ -16,11 +16,11 @@ class memcached {
 
     /**
      * Sets a key/value pair in memcache
-     * @params
-     *      $key: The value to set
-     *      $data: The value set
-     *      $exptime: Expiration time
-     *      $forcehost: Not sure, was part of the Memcache Client class
+     *
+     * @param     $key: The value to set
+     * @param     $data: The value set
+     * @param     $exptime: Expiration time
+     * @param     $forcehost: Not sure, was part of the Memcache Client class
      * @return
      *      Whatever the Memcache Client cache returns
      */
@@ -31,9 +31,8 @@ class memcached {
 
     /**
      * Gets a value from memcache
-     * @params
-     *      $keys: A key or keys (in an array?)
-     *      $forcehost:  Not sure, was part of the Memcache Client class
+     * @param $keys: A key or keys (in an array?)
+     * @param $forcehost:  Not sure, was part of the Memcache Client class
      * @return
      *       Whatever the Memcache Client cache returns
      */

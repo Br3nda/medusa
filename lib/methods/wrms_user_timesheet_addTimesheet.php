@@ -7,7 +7,7 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
     /**
      * Performs the insert of the timesheet
      *
-     * @params $params
+     * @param $params
      *   Associative array of parameters
      *   - $params->wr: Work Request ID
      *   - $params->datetime: The date and time to record the timesheet for in ISO format

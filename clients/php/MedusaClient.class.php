@@ -1,7 +1,7 @@
 <?php                                                                                                                                                                           
                                                                                                                                                                                 
 /**                                                                                                                                                                             
- * @Class handles interaction with the medusa API                                                                                                                               
+ * @class handles interaction with the medusa API                                                                                                                               
  *                                                                                                                                                                              
  * Usage:                                                                                                                                                                       
  *  $wrms = new MedusaRequest($username, $password);                                                                                                                                     
@@ -54,8 +54,8 @@ class MedusaRequest {
    * Constructs a new WRMS request, authenticating along the way
    * if a session key isn't passed in                           
    *                                                            
-   * @param string $username the username to auth with, or a session key
-   * @param string $password the password to auth with, or null if a session key was provided
+   * @param $username string - the username to auth with, or a session key
+   * @param $password string - the password to auth with, or null if a session key was provided
    * @throws WRMSException on auth (or other) failure                                        
    * @see WRMS::set_url()                                                                    
    */                                                                                        
@@ -86,7 +86,7 @@ class MedusaRequest {
    * Sets the URL of the Medusa API server in use. Persists between requests
    * so you only need to set this once                                      
    *                                                                        
-   * @param string $url the URL base of the server, eg. http://api.wrms.catalyst.net.nz/
+   * @param $url string - the URL base of the server, eg. http://api.wrms.catalyst.net.nz/
    */                                                                                   
   public static function set_url($url) {                                                
     if (!preg_match('|/$|', $url)) {                                                    
@@ -116,7 +116,7 @@ class MedusaRequest {
   /**
    * Set method parameters
    *                      
-   * @param Array Key/value pairs of parameters
+   * @param $parameters - Array Key/value pairs of parameters
    */                                          
   public function parameters(array $parameters) {
     $this->parameters = array_merge($this->parameters, $parameters);

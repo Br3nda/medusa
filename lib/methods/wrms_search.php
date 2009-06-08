@@ -23,7 +23,7 @@ class wrms_search extends wrms_base_method {
   /**
    * Search on the requested options
    *
-   * @param $params
+   * @param $parameters
    *   Associative array of parameters
    *   - $params->type: Type of object to search for. See wrms_search_sql_feed for more details.
    *   - $params->xxx: Attributes to search against. See wrms_search_sql_feed and wrms_search::formatBoolValues for formatting for more details.
