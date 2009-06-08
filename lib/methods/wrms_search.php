@@ -97,6 +97,7 @@ class wrms_search extends wrms_base_method {
   */
   private function formatBoolValues($key, $string) {
     // TODO add some function checking here
+    // TODO Add wildcard functionality?
     return preg_replace(array('/([a-zA-Z0-9]+)/', '/\+/', '/\|/'), array($key .'=\'${1}\'', ' AND ', ' OR '), $string);
   }
 

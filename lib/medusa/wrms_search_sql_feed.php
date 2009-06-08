@@ -27,6 +27,9 @@ class wrms_search_sql_feed extends wrms_base_method {
             case 'users':
                 return $this->fillUser();
                 break;
+            case 'organisation':
+                return $this->fillOrganisation();
+                break;
             default:
                 error_logging('WARNING', "Search type $search doesn't exist.");
                 break;
@@ -89,7 +92,7 @@ class wrms_search_sql_feed extends wrms_base_method {
     }
 
     private function fillUser() {
-        $this->newobject = 'user'; # TODO, this doesn't work
+        $this->newobject = 'user';
         $this->searchtable = 'usr';
 
         $this->gettodbfields['name'] = 'usr.fullname';
@@ -99,6 +102,21 @@ class wrms_search_sql_feed extends wrms_base_method {
         $this->gettodbjoins ['username'] = '';
 
         $this->gettodbfields['email'] = 'usr.email';
+        $this->gettodbjoins ['email'] = '';
+
+    }
+
+    private function fillOrganisation() {
+        $this->newobject = 'WrmsOrganisation'; # TODO, this doesn't work
+        $this->searchtable = 'organisation';
+
+        $this->gettodbfields['name'] = 'organisation.org_name';
+        $this->gettodbjoins ['name'] = '';
+
+        $this->gettodbfields['abbreviation'] = 'organisation.abbreviation';
+        $this->gettodbjoins ['abbreviation'] = '';
+
+        $this->gettodbfields['email'] = 'organisation.email';
         $this->gettodbjoins ['email'] = '';
 
     }
