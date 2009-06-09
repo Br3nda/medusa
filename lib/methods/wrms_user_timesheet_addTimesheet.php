@@ -35,7 +35,7 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
         if ($access->permitted('wr/timesheet/add', $wr)) {
 
             // Get the ID of the user
-            $id = $user->getUserID();
+            $id = $user->getID();
             if ($id == null) {
                 return new error('You must be logged in to add a timesheet', '403');
             }
