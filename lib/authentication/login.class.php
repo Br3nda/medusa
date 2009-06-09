@@ -81,12 +81,38 @@ class login {
         $hash = $row->password;
 
         /*
+         * This is a cheap and easy way to check mulitple passwords, should eventually refactor into something better
+         * 
+         * Alternate password format: *salt*SHA1hash
+         */
+        if (preg_match('/^\*(.+)\*{[A-Z]+}.+$/', $hash, $matches)) {
+            //Get the salf and the hash of the password received
+            $salt = $matches[1];
+            $hash_of_received = sprintf("*%s*{SSHA}%s", $salt, base64_encode(sha1($password.$salt, true) . $salt));
+
+            //Compare our hashes
+            if ($hash_of_received == $hash) {
+                //Check to see if they are still active
+                if ($row->active == 't') {
+                    $user_id = $row->user_no;
+                    return true;
+                }
+                else {
+                    $response = "Your account has been disabled.";
+                    return false;
+                }
+            }
+            else {
+                $response = "Invalid username or password";
+                return false;
+            }
+        }
+        /*
          * WRMS has passwords in the format: *salt*md5hash
          * We need to get the salt and then salt the password the user provided to us
          */
         // If the password is in the format we expect
-        if (preg_match('/^\*(.+)\*.+$/', $hash, $matches)) { 
-            
+        elseif (preg_match('/^\*(.+)\*.+$/', $hash, $matches)) { 
             // Get the salt and has the password we received
             $salt = $matches[1];
             $hash_of_received = sprintf("*%s*%s", $salt, md5($salt . $password)); // Handles the unclean password
@@ -109,33 +135,7 @@ class login {
                 return false;
             }
         }
-        /*
-         * This is a cheap and easy way to check mulitple passwords, should eventually refactor into something better
-         * 
-         * Alternate password format: *salt*SHA1hash
-         */
-        elseif (preg_match('/^\*(.+)\*{[A-Z]+}.+$/', $hash, $matches)) {
-            //Get the salf and the hash of the password received
-            $salt = $matches[1];
-            $hash_of_received = sprintf("*%s*{SSHA}%s", $salt, base64_encode(sha1($password.$salt, true) . $salt));
 
-            //Compare our hashes
-            if ($hash_of_received == $hash) {
-                //Check to see if they are still active
-                if ($row->active == 't') {
-                    $user_id = $row->user_no;
-                    return true;
-                }
-                else {
-                    $response = "Your account has been disabled.";
-                    return false;
-                }
-            }
-            else {
-                $response = "Invalid username or password";
-                return false;
-            }
-        }
         else {
             $response = "Invalid password format";
             return false;

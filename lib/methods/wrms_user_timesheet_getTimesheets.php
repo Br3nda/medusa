@@ -52,7 +52,7 @@ class wrms_user_timesheet_getTimesheets extends wrms_base_method {
 
             $sql .= 'ORDER BY work_on ASC';
 			
-            $result = db_query($sql, $user->getUserID());
+            $result = db_query($sql, $user->getID());
                 $timesheets = array();
                 while ($row = db_fetch_object($result)) {
                     $timesheet = new WrmsTimeSheet();
