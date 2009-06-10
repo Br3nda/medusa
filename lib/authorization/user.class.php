@@ -34,6 +34,7 @@ class user extends WrmsBase {
         }
         $this->loadRoles();
         $this->loadSystemRoles();
+        $this->populated = true;
     }
 
 

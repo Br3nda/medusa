@@ -39,12 +39,15 @@ error_logging('DEBUG', "method=$method params=".print_r($params, true)." format=
 /*
  * POST variables are not cleaned here
  */
-foreach ($_POST as $k => $v) {
+#foreach ($_POST as $k => $v) {
         $params['POST'] = $_POST;
-}
+#}
 
 if (!is_null($params['POST']['session_id'])) {
     currentuser::set(new user(login::check_session($params['POST']['session_id'])));
+} else {
+    # Problem, complain not logged in and boot out, unless doing a login
+    error_logging('WARNING', 'session_id not set');
 }
 
 $access = access::getInstance();
