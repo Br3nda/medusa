@@ -35,7 +35,7 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
         if ($access->permitted('wr/timesheet/add', $wr)) {
 
             // Get the ID of the user
-            $id = $user->getID();
+            $id = currentuser::getID();
             if ($id == null) {
                 return new error('You must be logged in to add a timesheet', '403');
             }
@@ -49,7 +49,7 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
             // Make sure the date and time are valid - convert to wrms-happy timestamp
             $timestamp = date('Y-m-d H:i:s', strtotime($datetime));
 
-            if ($timestamp == '1970-01-01 12:00:00') {
+            if ($timestamp == 0 || $timestamp == 43200) { # Change to proper UTC time at some point
                 return new error('Unable to add timesheet: Invalid date', 400);
             }
             
