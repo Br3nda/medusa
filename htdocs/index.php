@@ -33,6 +33,7 @@ $Uri_Parser = new Uri_Parser($uri);
 $method = $Uri_Parser->get_method();
 $params['GET'] = $Uri_Parser->get_params();
 $format = $Uri_Parser->get_format();
+$response_renderer = response_renderer::getInstance();
 
 error_logging('DEBUG', "method=$method params=".print_r($params, true)." format=$format");
 
@@ -43,36 +44,51 @@ error_logging('DEBUG', "method=$method params=".print_r($params, true)." format=
         $params['POST'] = $_POST;
 #}
 
-if (!is_null($params['POST']['session_id'])) {
-    currentuser::set(new user(login::check_session($params['POST']['session_id'])));
-} else {
-    # Problem, complain not logged in and boot out, unless doing a login
-    error_logging('WARNING', 'session_id not set');
-}
-
-$access = access::getInstance();
-$access->setUser(currentuser::getInstance());
-$response_renderer = response_renderer::getInstance();
-$response_renderer->set_format($format);
-
 if (!$method) {
-	error_logging('WARNING', "No method");
-	$result = new error("Method required");
+	error_logging('ERROR', "No method");
+  echo $response_renderer->render(new error("Method required"));
+  exit(0);
 }
 elseif (!$format) {
-	$result = new error("Format required");
-}
-// Make sure they are calling a wrms_ class method
-elseif (substr($method, 0, 5) == 'wrms_' && class_exists($method)) {
-	error_logging('DEBUG', "method $method exists");
-	$class = new $method();
-	error_logging('DEBUG', "about to run $method");
-	$result = $class->run($params);
+	error_logging('ERROR', "No format");
+  echo $response_renderer->render(new error("Format required"));
+  exit(0);
 }
 else {
-	error_logging('WARNING', "Method $method does not exist");
-	$result = new error("$method does not exist");	
+  $response_renderer->set_format($format);
 }
 
-error_logging('DEBUG', "Sending response");
+if (is_null($params['POST']['session_id'])) {
+    # Problem, complain not logged in and boot out, unless doing a login
+    if ($method == 'wrms_login' && class_exists($method)) {
+    	error_logging('DEBUG', "Creating class login::");
+    	$class = new wrms_login;
+    	$result = $class->run($params);
+    } else {
+      $result = new error("Session not set.");
+      error_logging('WARNING', 'session_id not set');
+    }
+}
+else {
+    $user = currentuser::set(new user(login::check_session($params['POST']['session_id'])));
+    if ($user != null) {
+      if (substr($method, 0, 5) == 'wrms_' && class_exists($method)) {
+        $access = access::getInstance();
+        $access->setUser(currentuser::getInstance());
+      	  error_logging('DEBUG', "method $method exists");
+      	$class = new $method();
+      	  error_logging('DEBUG', "about to run $method");
+    	  $result = $class->run($params);
+      }
+      else {
+      	error_logging('WARNING', "Method $method does not exist");
+      	$result = new error("$method does not exist");
+      }
+    }
+    else {
+    	error_logging('DEBUG', "Session timed out, or no longer exists.");
+  	  $result = new error("Session timed out, or no longer exists.");
+    }
+}
+
 echo $response_renderer->render($result);
