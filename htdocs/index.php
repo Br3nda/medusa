@@ -70,8 +70,8 @@ if (is_null($params['POST']['session_id'])) {
     }
 }
 else {
-    $user = currentuser::set(new user(login::check_session($params['POST']['session_id'])));
-    if ($user != null) {
+    currentuser::set(new user(login::check_session($params['POST']['session_id'])));
+    if (currentuser::getInstance() != null) {
       if (substr($method, 0, 5) == 'wrms_' && class_exists($method)) {
         $access = access::getInstance();
         $access->setUser(currentuser::getInstance());
@@ -86,8 +86,8 @@ else {
       }
     }
     else {
-    	error_logging('DEBUG', "Session timed out, or no longer exists.");
-  	  $result = new error("Session timed out, or no longer exists.");
+    	error_logging('DEBUG', "Session is invalid, timed out, or no longer exists.");
+  	  $result = new error("Session is invalid, timed out, or no longer exists.");
     }
 }
 
