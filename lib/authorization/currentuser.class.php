@@ -41,6 +41,7 @@ class currentuser extends user {
           error_logging('DEBUG', 'currentuser setting new user id; ' . $usr->getID());
           self::$user = $usr;
         }
+      return self::$user;
     }
 }
 ?>
