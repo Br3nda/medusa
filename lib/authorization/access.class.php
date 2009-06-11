@@ -15,6 +15,7 @@ class access {
      * Reads the directory permissions/ relative to this file
      */
     private function build_map() {
+        error_logging('DEBUG', "Building permissions map");
         //Assuming location of files is one directory off
         //Read through the directory and place files into the permissions map
         //Assumes files are of the format [permission].[weight].[class name].php
@@ -29,7 +30,9 @@ class access {
                             'weight' => $parts[1],
                             'class' => 'permissions_'.$parts[0].'_'.$parts[2],
                         );
+                        $index = $parts[0];
                     }
+                    
                 }
                 closedir($dh);
             }
@@ -70,8 +73,10 @@ class access {
         foreach ($parts as $part) {
             $search[] = $part;
             $perm = implode('_', $search);
+            error_logging('DEBUG', "Searching for $perm");
             $items = $this->permissions_map[$perm];
             if (!empty($items) && is_array($items)) {
+                error_logging('DEBUG', 'Returning item of class/file '. $items[0]['class'].'/'. $items[0]['file']);
                 $return = array_merge($return, $items);
             }
         }
