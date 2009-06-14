@@ -160,13 +160,13 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
             
             // I know "$quantity $units" looks bad, postgres puts this into an 'interval' database field, so _it_ figures out how to make it nice, not us
             if ($units != 'amount') {
-                $duration = "'$quantity $units'";
+                $duration = "$quantity $units";
             }
             else {
                 $duration = "null";
             }
             $result = db_query("INSERT INTO request_timesheet (request_id, work_on, work_quantity, work_duration, work_by_id, work_description, work_rate, work_units) 
-                                VALUES (%d, '%s', %d, %s, %d, '%s', %d, '%s')", $wr, $timestamp, $quantity, $duration, $id, $description, $rate, $units);
+                                VALUES (%d, '%s', %d, '%s', %d, '%s', %d, '%s')", $wr, $timestamp, $quantity, $duration, $id, $description, $rate, $units);
 
             if ($result == false) {
                 return new error('Database query failed', '500');
