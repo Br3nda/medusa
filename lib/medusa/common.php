@@ -14,7 +14,12 @@ require('response/error.class.php');
 require('response/response_renderer.class.php');
 require('authentication/login.class.php');
 require_once('database/database.class.php');
-require_once('config/config.php');
+if (file_exists('/etc/medusa/config.php')) {
+    require_once('/etc/medusa/config.php');
+}
+else {
+    require_once('../config/config.php');
+}
 require_once('authentication/session.class.php');
 require_once('authorization/user.class.php');
 require_once('authorization/currentuser.class.php');
