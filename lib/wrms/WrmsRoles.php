@@ -1,10 +1,10 @@
 <?php
 
 /**
- * WrmsQuote Object to attach to Work requests
+ * WrmsRoles Object to attach to Work requests
  * 
  */
-class WrmsQuote extends WrmsBase {
+class WrmsRoles extends WrmsBase {
 
   public function populateNow($row = null) {
 
@@ -28,7 +28,7 @@ class WrmsQuote extends WrmsBase {
     
   protected function __set($name, $value) {
     switch ($name) {
-      case 'note_by_id':
+      case 'role_no':
         $this->id = $value;
         break;
       default:

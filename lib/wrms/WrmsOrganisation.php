@@ -1,10 +1,10 @@
 <?php
 
 /**
- * WrmsQuote Object to attach to Work requests
+ * WrmsOrganisation object
  * 
  */
-class WrmsQuote extends WrmsBase {
+class WrmsOrganisation extends WrmsBase {
 
   public function populateNow($row = null) {
 
@@ -28,8 +28,11 @@ class WrmsQuote extends WrmsBase {
     
   protected function __set($name, $value) {
     switch ($name) {
-      case 'note_by_id':
+      case 'org_code':
         $this->id = $value;
+        break;
+      case 'org_name':
+        $this->name = $value;
         break;
       default:
         parent::__set($name, $value);

@@ -18,7 +18,7 @@ class wrms_request_subscriber_getSubscribers extends wrms_base_method {
     function run($params) {
         $request_id = $params['GET']['wr'];
         $access = access::getInstance();
-        if ($access->canUserSeeRequest($request_id)) {
+        if ($access->permitted('wr/view', $request_id)) {
 
           $result = db_query('SELECT user_no FROM request_interested WHERE request_id = %d', $request_id);
             if (db_num_rows($result) >= 1) {

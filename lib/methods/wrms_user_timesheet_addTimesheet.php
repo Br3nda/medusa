@@ -7,7 +7,7 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
     /**
      * Performs the insert of the timesheet
      *
-     * @params $params
+     * @param $params
      *   Associative array of parameters
      *   - $params->wr: Work Request ID
      *   - $params->datetime: The date and time to record the timesheet for in ISO format
@@ -20,7 +20,7 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
      */
     function run($params) {
 
-        // All the things we might need to enter a WR
+        // All the things we might need to enter a timesheet
         $wr = $params['GET']['wr']; 
         $datetime = $params['GET']['datetime'];
         $quantity = $params['GET']['quantity']; 
@@ -32,10 +32,10 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
         $user = currentuser::getInstance();
         $access = access::getInstance();
 
-        if ($access->canUserAddTimesheets()) {
+        if ($access->permitted('wr/timesheet/add', $wr)) {
 
             // Get the ID of the user
-            $id = $user->getUserID();
+            $id = $user->getID();
             if ($id == null) {
                 return new error('You must be logged in to add a timesheet', '403');
             }
@@ -49,7 +49,7 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
             // Make sure the date and time are valid - convert to wrms-happy timestamp
             $timestamp = date('Y-m-d H:i:s', strtotime($datetime));
 
-            if ($timestamp == '1970-01-01 12:00:00') {
+            if ($timestamp == 0 || $timestamp == 43200) { # Change to proper UTC time at some point
                 return new error('Unable to add timesheet: Invalid date', 400);
             }
             

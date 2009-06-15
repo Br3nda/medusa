@@ -1,5 +1,6 @@
 <?php
 /**
+ * @ingroup Methods
  * wrms.request.status.getCurrentStatus
  * Returns the current status of the WR
  */
@@ -19,7 +20,7 @@ class wrms_request_status_getCurrentStatus extends wrms_base_method {
     function run($params) {
         $request_id = $params['GET']['wr'];
         $access = access::getInstance();
-        if ($access->canUserSeeStatus($request_id)) {
+        if ($access->permitted('wr/view', $request_id)) {
             $result = db_query('SELECT * FROM request_status WHERE request_id = %d ORDER BY status_on DESC LIMIT 1', $request_id);
              if (db_num_rows($result) > 0) {
                 $response = new response('Success');

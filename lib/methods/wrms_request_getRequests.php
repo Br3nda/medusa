@@ -19,33 +19,33 @@ class wrms_request_getRequests extends wrms_base_method {
      *   - $params->wr: Work Request ID or array of
      *   - $params->user: User ID making the request
      *   @return
-     *     The request object on success
-     *     FALSE if permission is denied
-     *     NULL if no work request
+     *    - The request object on success
+     *    - Error message if access is denied, or wr was not filled.
      */
     function run($params) {
-      $requests = explode(',', $params['GET']['wr']);
       $access = access::getInstance();
-      $wr = array();
-      foreach ($requests as $request_id) {
-        if ($access->canUserSeeRequest($request_id)) {
-          $wr[$request_id] = null;
-        }
+
+      if ($params['GET']['wr'] == null) {
+        error_logging('WARNING', "No work request number (wr) provided.");
+        return new error('No work request number (wr) provided.');
       }
-      $placeholders = array();
-      $placeholders = array_pad($placeholders, count($wr), '%d');
-      $sql = 'SELECT * FROM request WHERE request_id IN (' . implode(', ', $placeholders)  . ')';
-	  $params = array_keys($wr);
-      array_unshift($params,$sql);
-      $result = call_user_func_array('db_query', $params);
-      if (!db_num_rows($result)) {
-        return new Error('Request does not exist or you do not have permission to view it');
+      if (!preg_match('/^(\d+)(,\d+)*$/',$params['GET']['wr'])) {
+        error_logging('WARNING', 'Provided work request (wr) of; "'. $params['GET']['wr'] .'" argument does not match required format.');
+        return new error('Bad work request (wr) argument. Argument must be in the format of one or more integers seperated by commas.');
       }
+
       $response = new response('Success');
+      $sql = 'SELECT * FROM request WHERE request_id IN (' . $params['GET']['wr']  . ')';
+      $result = db_query($sql);
       while ($row = db_fetch_object($result)) {
-        $object = new WrmsWorkRequest();
-        $object->populate($row);
-		$response->data[] = $object;
+        if ($access->permitted('wr/view', $row->request_id)) {
+          $object = new WrmsWorkRequest();
+          $object->populate($row);
+          $object->populateChildren();
+          $response->data[] = $object;
+        } else {
+          $response->data[] =  new error('You cannot access this work request.',403); # EKM TODO add id not allowed option
+        }
       }
       return $response;
     }

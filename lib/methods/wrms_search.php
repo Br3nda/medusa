@@ -1,5 +1,15 @@
 <?php
+/**
+ * @file 
+ * @ingroup Methods
+ * wrms.request.search
+ * Returns a list specified objects based on a dynamic list of arguments
+ */
 
+ /**
+  * @ingroup Methods
+  * Search objects
+  */
 class wrms_search extends wrms_base_method {
   private $parameters;
   private $sqldata;
@@ -10,62 +20,71 @@ class wrms_search extends wrms_base_method {
   function __construct() {
   }
 
-
+  /**
+   * Search on the requested options
+   *
+   * @param $parameters
+   *   Associative array of parameters
+   *   - $params->type: Type of object to search for. See wrms_search_sql_feed for more details.
+   *   - $params->xxx: Attributes to search against. See wrms_search_sql_feed and wrms_search::formatBoolValues for formatting for more details.
+   * @return
+   *   - An array of object on success
+   *   - An empty array if the request was valid, but no matches were found
+   *   - An error on failure
+   */
   public function run($parameters) {
     if ($parameters['GET']['type'] == null) {
       error_logging('WARNING', "No type provided.");
-      return null;
+      return new error('"No type provided.');
     }
-
-    $this->sqldata       = new wrms_search_sql_feed($parameters['GET']['type']);
-    $this->gettable      = $this->sqldata->getSearchTable();
-    $this->gettodbjoins  = $this->sqldata->getJoinSQL(); # Array of joins
-    $this->gettodbfields = $this->sqldata->getWhereFields(); # List of fields
-
-    // TODO - run our access magic here.
-    if ($this->sqldata == null) {
-      error_logging('WARNING', "No type provided.");
-      return null;
+    else {
+      $this->parameters = $parameters['GET'];
+      $this->sqldata       = new wrms_search_sql_feed($parameters['GET']['type']);
+      $this->gettable      = $this->sqldata->getSearchTable();
+      $this->gettodbjoins  = $this->sqldata->getJoinSQL(); # Array of joins
+      $this->gettodbfields = $this->sqldata->getWhereFields(); # List of fields
+      // TODO - run our access magic here.
+      if ($this->sqldata == null) {
+        error_logging('WARNING', "Invalid search type provided.");
+        return new error('Invalid search type  provided.');
+      } else {
+        $this->parameters = $parameters['GET'];
+        return $this->search();
+      }
     }
-
-    $this->parameters = $parameters['GET'];
-	$resp = new response('Success');
-	$resp->set('responses', $this->search());
-    return $resp;
   }
 
-    /**
-  * If a search request is found for workrequests, search for and builds workrequest objects
-  * based on the records found.
-    */
+  /**
+  * Performs a search using dynamically generated SQL from the input parameters.
+  */
   private function search() {
-    $matches = array();
-
   /**
     * Acceptable paramters are;
-    * requester
-    * status history
-    * watchers (users)
-    * todo (users)
-  */
-    foreach ($this->parameters as $parameterkey => $parameterstring) {
+    *
+    */
+    $found = false;
+    foreach ($this->parameters as $parameterkey => $parameterstring) { 
       if (array_key_exists($parameterkey, $this->gettodbfields) && array_key_exists($parameterkey, $this->gettodbjoins)) {
+        $found = true;
         $joinsql[] = $this->gettodbjoins[$parameterkey];
         $wheresql[] = $this->formatBoolValues($this->gettodbfields[$parameterkey], $parameterstring);
       }
     }
-    $sql = "SELECT ". $this->gettable .".* FROM ". $this->gettable ." ". implode(' ', $joinsql) ." WHERE ". implode(' AND ', $wheresql);
+    if ($found == false)
+      return new error("No usable search terms found.");
+    $sql = "SELECT DISTINCT ". $this->gettable .".* FROM ". $this->gettable ." ". implode(' ', $joinsql) ." WHERE ". implode(' AND ', $wheresql);
     error_logging('DEBUG', "wrms_search auto generated $sql");
     $result = db_query($sql);
 
+	  $resp = new response('Success');
     while ($row = db_fetch_assoc($result)) {
-      error_logging('DEBUG', "Creating WrmsWorkRequest in wrms_search");
-      $workreq = new WrmsWorkRequest();
-      $workreq->populate($row);
-      $workreq->populateChildren();
-      $matches[] = $workreq;
+      $object = $this->sqldata->getNewObject();
+      error_logging('DEBUG', "Creating new ". get_class ($object) . " in wrms_search");
+      $object->populate($row);
+      $object->populateChildren();
+      $resp->data[] = $object;
     }
-    return $matches;
+    return $resp;
   }
 
   /**
@@ -78,10 +97,13 @@ class wrms_search extends wrms_base_method {
   */
   private function formatBoolValues($key, $string) {
     // TODO add some function checking here
+    // TODO Add wildcard functionality?
     return preg_replace(array('/([a-zA-Z0-9]+)/', '/\+/', '/\|/'), array($key .'=\'${1}\'', ' AND ', ' OR '), $string);
   }
 
   function __destruct() {
   }
 }
+
+
 

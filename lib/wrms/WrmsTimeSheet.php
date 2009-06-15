@@ -27,4 +27,9 @@ class WrmsTimeSheet extends WrmsBase {
   }
 
   public function populateChildren() {}
+
+  public function writeToDatabase() {
+    return false;
+  }
+
 }

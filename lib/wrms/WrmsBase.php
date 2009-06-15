@@ -50,6 +50,10 @@ abstract class WrmsBase {
     $this->populated = true;
   }
 
+  public function writeToDatabase() {
+    return false;
+  }
+
   private function __isset($name) {
     return isset($this->$name);
   }

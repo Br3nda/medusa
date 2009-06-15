@@ -7,7 +7,7 @@ class wrms_user_timesheet_getTimesheets extends wrms_base_method {
     /**
      * Performs the fetch of the timesheets by user
      * 
-     * @params $params
+     * @param $params
      *   Associative array of parameters
      *   - $params->person: User ID to get timesheets from
      *   - $params->user: User ID making the request
@@ -19,12 +19,12 @@ class wrms_user_timesheet_getTimesheets extends wrms_base_method {
      *     An array of timesheets or an empty array if no results
      */
     function run($params) {
-        $user_id = $params['GET']['person'];
+        $user = new user($params['GET']['person']);
         $from = $params['GET']['start_date'];
         $to = $params['GET']['end_date'];
         $request_id = $params['GET']['wr'];
         $access = access::getInstance();
-        if ($access->canUserSeeRequest($request_id)) {
+        if ($access->permitted('user/timesheet/view', $user)) {
 
             $sql = 'SELECT * FROM request_timesheet WHERE work_by_id = %d ';
             
@@ -45,14 +45,14 @@ class wrms_user_timesheet_getTimesheets extends wrms_base_method {
                 if ($to == "1970-01-01") {
                     return new error('Invalid date format in end date. Required format: yyyy-mm-dd');
                 }
-                else {
+                else { 
                     $sql .= "AND work_on <= '$to' ";
                 }
             }
 
             $sql .= 'ORDER BY work_on ASC';
-
-            $result = db_query($sql, $user_id);
+			
+            $result = db_query($sql, $user->getID());
                 $timesheets = array();
                 while ($row = db_fetch_object($result)) {
                     $timesheet = new WrmsTimeSheet();

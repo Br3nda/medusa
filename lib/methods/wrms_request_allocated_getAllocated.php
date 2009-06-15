@@ -2,7 +2,6 @@
 /**
  * wrms.request.allocated.getAllocated
  * Returns the current allocated users
- * wrms.request.allocated.getAllocated 
  * @ingroup Methods
  */
 class wrms_request_allocated_getAllocated extends wrms_base_method {
@@ -12,16 +11,18 @@ class wrms_request_allocated_getAllocated extends wrms_base_method {
      * @param $params
      *   Associative array of parameters
      *   - $params->wr: Work Request ID
-     *   - $params->user: User ID making the request
      *   @return
      *     An array of users on success
-     *     An empty array on failure
+     *     An error reponses
      */
     function run($params) {
-
+        if ($params['GET']['wr'] == null) {
+          error_logging('WARNING', "No work request number (wr) provided.");
+          return new error('No work request number (wr) provided.');
+        }
         $request_id = $params['GET']['wr'];
         $access = access::getInstance();
-        if ($access->canUserSeeRequest($request_id)) {
+        if ($access->permitted('wr/view', $request_id)) {
             $result = db_query('SELECT allocated_to_id FROM request_allocated WHERE request_id = %d', $request_id);
             $users = array();
             $response = new response('Success');

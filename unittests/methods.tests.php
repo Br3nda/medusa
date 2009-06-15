@@ -55,7 +55,7 @@ class test_wrms_request_getRequest extends wrms_restful_method_testcase {
     
     while ($row = db_fetch_object($pg_result)) {
       
-      $method = new wrms_request_getRequest();
+      $method = new wrms_request_getRequests();
       
       $params = array('GET' => array('wr' => $row->request_id));
       $request = $method->run($params);
