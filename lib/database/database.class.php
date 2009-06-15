@@ -105,7 +105,7 @@ class db {
       }
       return true;
     }
-  
+
   /**
     * Connection function
     * @return PDO connection object or exit on failure
@@ -128,14 +128,14 @@ class db {
         return self::$con;
       }
     }
-  
+
   /**
     * escapes str for query
     */
     public static function escape_string($str) {
       return pg_escape_string($str);
     }
-  
+
   /**
     * query database
     * @param array two-element array with SQL query in 0 and binds array in 1
@@ -278,7 +278,7 @@ function db_query($query) {
     error_logging("ERROR", "SQL query failed: $query");
   }
 
-  return $rs;
+  return $stmt;
 }
 
 
