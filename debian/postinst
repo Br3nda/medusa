@@ -24,7 +24,7 @@ set -e
 
 TMP_M4_FILE=/etc/medusa/postinst.m4.tmp
 APACHE_CONF_FILE=/etc/apache2/sites-available/medusa.conf
-SETTINGS_PHP=/etc/medusa/config/config.php
+SETTINGS_PHP=/etc/medusa/config.php
 
 case "$1" in
     configure)
@@ -72,9 +72,8 @@ case "$1" in
         ln -f -s $APACHE_CONF_FILE /etc/apache2/sites-enabled/100-medusa.conf
        
         if [ -d /var/lib/medusa/config ]; then
-          rm /var/lib/medusa/config
+          rm /var/lib/medusa/config/*
         fi
-        ln -s /etc/medusa/config /var/lib/medusa/
 
         a2enmod rewrite
         restart_apache2;
