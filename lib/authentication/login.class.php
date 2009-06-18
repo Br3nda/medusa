@@ -201,12 +201,12 @@ class login {
         }
     }
 /**
- * Generates a random ID based on the current timestamp and a random integer
+ * Generates a session ID
  * @return
- *      A session ID in the format timestamp:randomint
+ *      A session ID
  */
     private function __generate_session_id() {
-        return time().':'.rand(0000000000000, 9999999999999);
+        return uniqid(mt_rand(), true);
     }
 
 }
