@@ -72,6 +72,9 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
                 case 'days':
                     // If we are in days, then our job is very simple - we do nothing and the SQL figures itself out        
                 break;
+                case 'minutes':
+                    // If we don't handle minutes, we'll pass it in as hours, and that'll be bad.            
+                break;
                 case 'amount':
                     if (empty($rate)) {
                         return new error('Unable to add timesheet: you must specify a rate when adding an amount to a WR', '400');
