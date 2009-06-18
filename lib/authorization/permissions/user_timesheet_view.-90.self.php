@@ -5,8 +5,7 @@
 
 class permissions_user_timesheet_view_self extends permissions {
     public function performCheck(&$obj, &$user) {
-        $currentuser = currentuser::getInstance();
-        if ($currentuser->getID() == $user->getID())
+        if ($obj->getID() == $user->getID())
           return true;
         else
           return false;

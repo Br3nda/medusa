@@ -95,7 +95,6 @@ class test_wrms_request_allocated_getAllocated extends wrms_restful_method_testc
     $class = new wrms_request_allocated_getAllocated();
     $params = array('GET'=> array('wr' => '58286'));
     $result = $class->run($params);
-    
     $this->assertTrue(is_object($result));
     $this->result_okay($result);
     
