@@ -82,7 +82,7 @@ else {
       }
       else {
       	error_logging('WARNING', "Method $method does not exist");
-      	$result = new error("$method does not exist");
+      	$result = new error("The method you are trying to call does not exist");
       }
     }
     else {
