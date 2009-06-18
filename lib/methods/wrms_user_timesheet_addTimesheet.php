@@ -27,6 +27,7 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
         $units = $params['GET']['units']; 
         $rate = $params['GET']['rate']; 
         $description = $params['GET']['description']; 
+        $needsreview = (int)(bool)$params['GET']['needs_review'];
 
         // Who are we logged in as, and can we actually add timesheets?
         $user = currentuser::getInstance();
@@ -165,8 +166,8 @@ class wrms_user_timesheet_addTimesheet extends wrms_base_method {
             else {
                 $duration = "null";
             }
-            $result = db_query("INSERT INTO request_timesheet (request_id, work_on, work_quantity, work_duration, work_by_id, work_description, work_rate, work_units) 
-                                VALUES (%d, '%s', %d, %s, %d, '%s', %d, '%s')", $wr, $timestamp, $quantity, $duration, $id, $description, $rate, $units);
+            $result = db_query("INSERT INTO request_timesheet (request_id, work_on, work_quantity, work_duration, work_by_id, work_description, work_rate, work_units, review_needed)
+                                VALUES (%d, '%s', %d, %s, %d, '%s', %d, '%s', %b)", $wr, $timestamp, $quantity, $duration, $id, $description, $rate, $units, $needsreview);
 
             if ($result == false) {
                 return new error('Database query failed', '500');
