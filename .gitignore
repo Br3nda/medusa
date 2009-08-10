@@ -2,4 +2,5 @@
 config/config.php
 unittests/simpletest
 unittests/simpletest*
+html/
 
