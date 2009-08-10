@@ -71,10 +71,11 @@ class login {
 
         error_logging('DEBUG', "checking credentials of $username, $password");
         // See if they even exist
-        $result = db_query("SELECT user_no, password, active from usr where username = '%s'", $username); // Handles the unclean username - <3 Database Abstraction
+        $result = db_query("SELECT user_no, password, active from usr where username=%s", $username); // Handles the unclean username - <3 Database Abstraction
         
         if (!$row = db_fetch_object($result)) {
           // Invalid username, but lets not give any clues.
+          error_logging('DEBUG', "$username was not found in the usr table");
           $response = "Invalid username or password";
           return false;
         }
